@@ -52,10 +52,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-@Mod(modid="MoreInventoryMod", name = "MoreInventoryMod", version="2.1.1",dependencies = "after:InvTweaks; after:IronChest")
+@Mod(modid=MoreInventoryMod.MODID, name = "MoreInventoryMod", version= MoreInventoryMod.VERSION,dependencies = "after:InvTweaks; after:IronChest")
 public class MoreInventoryMod {
 
 public static final String MODID = "MoreInventoryMod";
+public static final String VERSION = "2.1.1";
 
 @Instance("MoreInventoryMod")
 public static MoreInventoryMod instance;
