@@ -379,21 +379,23 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 						maxCount = itemstack.getMaxStackSize();
 					}
 				}
-				
-				int l = maxCount - retItemStack.stackSize;
-				
-				if(itemstack.stackSize < l)
-				{
-					l = itemstack.stackSize;
-				}
-				decrStackSize(i, l);
-				retItemStack.stackSize += l;
-				
-				if(retItemStack.stackSize == maxCount)
-				{
-					break;
-				}
 
+                if(ItemStack.areItemStackTagsEqual(retItemStack, itemstack))
+                {
+                    int l = maxCount - retItemStack.stackSize;
+
+                    if(itemstack.stackSize < l)
+                    {
+                        l = itemstack.stackSize;
+                    }
+                    decrStackSize(i, l);
+                    retItemStack.stackSize += l;
+
+                    if(retItemStack.stackSize == maxCount)
+                    {
+                        break;
+                    }
+                }
 			}
 		}
 		return retItemStack;
