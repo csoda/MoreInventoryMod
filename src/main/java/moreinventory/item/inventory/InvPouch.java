@@ -122,16 +122,10 @@ public class InvPouch implements IInventory{
     		int m = this.invlength + 18;
     		for(int i=18;i<m;i++)
     		{
-    			ItemStack itemstack = this.getStackInSlot(i);
+                ItemStack itemstack = this.getStackInSlot(i);
     			if(itemstack!=null)
     			{
-    				for(int j=0;j<k;j++){
-    					if(tile.getStackInSlot(j)==null&&tile.isItemValidForSlot(j, itemstack)){
-    						tile.setInventorySlotContents(j, itemstack);
-    						this.setInventorySlotContents(i, (ItemStack)null);
-    						break;
-    					}
-    				}
+                    CSutil.mergeItemStack(itemstack, tile);
     			}
     		}
     	}
