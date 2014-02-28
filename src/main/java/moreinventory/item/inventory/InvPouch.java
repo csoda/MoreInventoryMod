@@ -116,8 +116,7 @@ public class InvPouch implements IInventory{
 	}
     
     public void transferToChest(IInventory tile){
-    	int k =tile.getSizeInventory();
-    	if(k>=27)
+    	if(tile.getSizeInventory()>=27)
     	{
     		int m = this.invlength + 18;
     		for(int i=18;i<m;i++)
