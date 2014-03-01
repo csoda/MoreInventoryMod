@@ -474,7 +474,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 	public static int getPowerOutput(TileEntityStorageBox tile)
 	{
 		int ret = 0;
-		if(tile.type != StorageBoxType.Ender&&tile.getContents() != null){
+		if(tile.type != StorageBoxType.Glass && tile.type != StorageBoxType.Ender && tile.getContents() != null){
 			ret = 15 * tile.ContentsItemCount / tile.type.invSize /  tile.getContents().getMaxStackSize();
 		}
 		return ret;
