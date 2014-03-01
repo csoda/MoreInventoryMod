@@ -174,12 +174,13 @@ public class StorageBoxNetworkManager
 				if(StorageBoxList.getItem(i) == null)
 				{
 					TileEntityStorageBox tile = (TileEntityStorageBox)StorageBoxList.getTileBeyondDim(i);
-					tile.registerItems(itemstack);
-					tile.tryPutIn(itemstack);
-					if(itemstack == null)
-					{
-						return true;
-					}
+                    if(tile.getStorageBoxType() != StorageBoxType.Glass && tile.getStorageBoxType()  != StorageBoxType.Ender && tile.getContents() == null){
+                        tile.tryPutIn(itemstack);
+                        if(itemstack == null)
+                        {
+                            return true;
+                        }
+                    }
 				}
 			}
 		}

@@ -56,7 +56,7 @@ import java.util.Map;
 public class MoreInventoryMod {
 
 public static final String MODID = "MoreInventoryMod";
-public static final String VERSION = "2.1.1";
+public static final String VERSION = "2.1.2";
 
 @Instance("MoreInventoryMod")
 public static MoreInventoryMod instance;

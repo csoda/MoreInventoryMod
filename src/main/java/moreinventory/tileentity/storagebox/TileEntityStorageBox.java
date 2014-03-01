@@ -277,7 +277,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 
 	public boolean isSameAsContents(ItemStack itemstack)
 	{
-		boolean flg = itemstack != null&& itemstack.getItem() ==  this.getContents().getItem() && (itemstack.getItemDamage()==getContentsDamage()||(itemstack.isItemDamaged()&&getContentsDamage()!=0));
+		boolean flg = itemstack != null && (this.getContents() == null || CSutil.compareStacksWithDamage(itemstack, this.getContents()));
 		if(flg&&itemstack.hasTagCompound()&&checkNBT)
 		{
 			for(int i = 0; i < this.getSizeInventory(); i++)
