@@ -125,7 +125,8 @@ public class InvPouch implements IInventory{
     			if(itemstack!=null)
     			{
                     CSutil.mergeItemStack(itemstack, tile);
-    			}
+                    CSutil.checkNullStack(this,i);
+                }
     		}
     	}
     }
