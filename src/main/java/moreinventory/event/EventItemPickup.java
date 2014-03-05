@@ -28,14 +28,15 @@ public class EventItemPickup {
 				if(itemstack.getItem() == MoreInventoryMod.Pouch)
 				{
 					InvPouch pouch = new InvPouch(itemstack);
-					if(pouch.isAutoCollect(enItem))
+					if(pouch.canAutoCollect(enItem))
 					{
-						CSutil.mergeItemStack(enItem,(IInventory)pouch);
+						CSutil.mergeItemStack(enItem,pouch);
 					}
 					if(MoreInventoryMod.isFullAutoCollectPouch){
 						pouch.collectAllItemStack(invp, false);
 					}
 				}
+
 				if(enItem.isItemEqual(new ItemStack(Blocks.torch))&&MoreInventoryMod.isCollectTorch){
 					for(int t = 0; t<3; t++){
 						if(itemstack.getItem() == MoreInventoryMod.Torchholder[t]){

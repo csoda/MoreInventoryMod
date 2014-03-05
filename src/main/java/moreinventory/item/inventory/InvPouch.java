@@ -52,18 +52,22 @@ public class InvPouch implements IInventory{
     	}
     }
 
-    public boolean isAutoCollect(ItemStack itemstack){
-		for(int i=0;i<18;i++)
-		{
-			if(inv[i]!=null)
-			{
-				if(CSutil.compareStacksWithDamage(inv[i], itemstack))
-				{
-					return true;
-				}
-			}
-		}
-    	return false;
+    public boolean canAutoCollect(ItemStack itemstack){
+    	return this.isAutoCollect && this.isCollectableItem(itemstack);
+    }
+
+    public boolean isCollectableItem(ItemStack itemstack){
+        for(int i=0;i<18;i++)
+        {
+            if(inv[i]!=null)
+            {
+                if(CSutil.compareStacksWithDamage(inv[i], itemstack))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public void collectedByBox(TileEntityStorageBox tile){
@@ -105,7 +109,7 @@ public class InvPouch implements IInventory{
 				}
 				else
 				{
-					if(this.isAutoCollect(itemstack))
+					if(this.isCollectableItem(itemstack))
 					{
 						CSutil.mergeItemStack(itemstack,this);
 					}
