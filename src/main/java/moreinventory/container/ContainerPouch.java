@@ -1,6 +1,9 @@
 package moreinventory.container;
 
 
+import invtweaks.api.container.ChestContainer;
+import invtweaks.api.container.ContainerSection;
+import invtweaks.api.container.ContainerSectionCallback;
 import moreinventory.MoreInventoryMod;
 import moreinventory.gui.slot.SlotPouch;
 import moreinventory.gui.slot.SlotPouch2;
@@ -12,7 +15,13 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-//@ChestContainer
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+@ChestContainer
 public class ContainerPouch extends Container{
 	protected InvPouch tileEntity;
 
@@ -135,9 +144,9 @@ public class ContainerPouch extends Container{
     	tileEntity.closeInventory();
     }
     
-    /*
-    @RowSizeCallback
-    public int getRowSize(){
+
+    @ChestContainer.RowSizeCallback
+    private int getRowSize(){
 		return 54;
     	
     }
@@ -155,6 +164,6 @@ public class ContainerPouch extends Container{
     	
     	return retMap;
     }
-    */
+
 
 }
