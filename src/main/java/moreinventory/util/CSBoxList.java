@@ -139,7 +139,7 @@ public class CSBoxList implements IWorldDataSave{
 	}
 	
 	public void readFromNBT(NBTTagCompound nbt){
-		NBTTagList nbttaglist = nbt.getTagList(tagName, 8);
+		NBTTagList nbttaglist = nbt.getTagList(tagName, 10);
         for (int i = 0; i < nbttaglist.tagCount(); i++)
         {
             NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);

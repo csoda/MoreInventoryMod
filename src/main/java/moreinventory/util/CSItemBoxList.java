@@ -119,7 +119,7 @@ public class CSItemBoxList extends CSBoxList{
 	@Override
 	public void readFromNBT(NBTTagCompound nbt){
 		super.readFromNBT(nbt);
-		NBTTagList nbttaglist = nbt.getTagList(tagName + "Item" , 8);
+		NBTTagList nbttaglist = nbt.getTagList(tagName + "Item" , 10);
             itemList = new ArrayList<ItemStack>(this.getListSize());
             for (int i = 0; i < nbttaglist.tagCount(); i++)
             {

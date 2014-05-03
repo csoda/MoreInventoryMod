@@ -1,6 +1,7 @@
 package moreinventory;
 
 
+import com.google.common.collect.Lists;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -16,7 +17,7 @@ import moreinventory.block.BlockStorageBox;
 import moreinventory.block.BlockStorageBoxAddon;
 import moreinventory.block.BlockTransportManager;
 import moreinventory.crafting.RecipePouch;
-import moreinventory.crafting.RecipeTorchHolder;
+import moreinventory.crafting.RecipeTorchHolder2;
 import moreinventory.event.EventChestTPDrop;
 import moreinventory.event.EventItemPickup;
 import moreinventory.event.EventWorldSave;
@@ -56,7 +57,7 @@ import java.util.Map;
 public class MoreInventoryMod {
 
 public static final String MODID = "MoreInventoryMod";
-public static final String VERSION = "2.1.5";
+public static final String VERSION = "2.1.6";
 
 @Instance("MoreInventoryMod")
 public static MoreInventoryMod instance;
@@ -208,14 +209,18 @@ public void load(FMLInitializationEvent event) {
     GameRegistry.addRecipe(new ItemStack(Torchholder[0],1,ItemTorchholder.maxDamage[0]-2),"I L","I I","III",
     'I',new ItemStack(Items.iron_ingot),
     'L',new ItemStack(Items.leather));
-    GameRegistry.addRecipe(new RecipeTorchHolder(3,3,
-    new ItemStack[]{ingotGold,null,ingotGold,
-                    ingotGold,new ItemStack(this.Torchholder[0],1,32767),ingotGold,
-                    ingotGold,new ItemStack(Items.blaze_rod),ingotGold},new ItemStack(Torchholder[1],1,ItemTorchholder.maxDamage[1]-2)));
-    GameRegistry.addRecipe(new RecipeTorchHolder(3,3,
-    new ItemStack[]{diamond,null,diamond,
-                    diamond,new ItemStack(this.Torchholder[1],1,32767),diamond,
-                    diamond,new ItemStack(Items.nether_star),diamond},new ItemStack(Torchholder[2],1,ItemTorchholder.maxDamage[1]-2)));
+    GameRegistry.addRecipe(new ItemStack(Torchholder[1],1,ItemTorchholder.maxDamage[1]-2),"I L","I I","ISI",
+            'I',new ItemStack(Items.gold_ingot),
+            'L',new ItemStack(Items.leather),
+            'S',new ItemStack(Items.blaze_rod));
+    GameRegistry.addRecipe(new ItemStack(Torchholder[2],1,ItemTorchholder.maxDamage[2]-2),"I L","I I","ISI",
+            'I',new ItemStack(Items.diamond),
+            'L',new ItemStack(Items.leather),
+            'S',new ItemStack(Items.nether_star));
+    for(int i = 0 ; i < 2; i++){
+        GameRegistry.addRecipe(new RecipeTorchHolder2(new ItemStack(Blocks.torch),
+               Lists.newArrayList(new ItemStack(Torchholder[i],1,32767))));
+    }
     GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Catchall),
             new Object[]{"P P","PCP","HHH",
                 'P', "plankWood",

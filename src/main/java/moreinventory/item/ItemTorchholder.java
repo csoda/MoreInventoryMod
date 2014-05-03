@@ -27,6 +27,7 @@ public class ItemTorchholder extends Item
 		grade = arggrade;
 		setMaxDamage(maxDamage[grade]);
 		this.canRepair = false;
+        setContainerItem(this);
 		setCreativeTab(MoreInventoryMod.customTab);
 	}
 
@@ -95,6 +96,21 @@ public class ItemTorchholder extends Item
 	    }
 	 }
 
+    @Override
+    public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack)
+    {
+        return false;
+    }
+
+    public ItemStack getContainerItem(ItemStack itemStack)
+    {
+        if (!hasContainerItem(itemStack))
+        {
+            return null;
+        }
+        itemStack.setItemDamage(itemStack.getItemDamage() + 1);
+        return itemStack;
+    }
 
 	 @SideOnly(Side.CLIENT)
      @Override

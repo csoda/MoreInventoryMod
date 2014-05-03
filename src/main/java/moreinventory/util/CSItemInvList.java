@@ -105,11 +105,11 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave{
                         NBTTagCompound itemNBT = new NBTTagCompound();
                         ItemStack contents = list.get(i);
                         if(contents != null){
-                              contents.writeToNBT(nbt);
+                              contents.writeToNBT(itemNBT);
                         }
                         ItemStack itemstack = inv.get(i)[1];
                         int t = itemstack != null ? itemstack.stackSize : 0;
-                          nbttagcompound1.setTag("Item", itemNBT);
+                        nbttagcompound1.setTag("Item", itemNBT);
                         nbttagcompound1.setInteger("Count", count.get(i)+t);
                         nbttaglist.appendTag(nbttagcompound1);
                   }
@@ -118,7 +118,7 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave{
 	}
 	
 	public void readFromNBT(NBTTagCompound nbt){
-		NBTTagList nbttaglist = nbt.getTagList(tagName,8);
+        NBTTagList nbttaglist = nbt.getTagList(tagName,10);
         for (int i = 0; i < nbttaglist.tagCount(); i++)
         {
             NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);
