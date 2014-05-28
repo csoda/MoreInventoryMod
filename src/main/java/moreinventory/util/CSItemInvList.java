@@ -48,7 +48,7 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave{
 	
 	public void registerItem(ItemStack itemstack){
 		if(itemstack != null &&getItemIndex(itemstack)==-1){
-                  list.add(itemstack);
+            list.add(itemstack);
 			count.add(0);
 			inv.add(new ItemStack[2]);
 		}

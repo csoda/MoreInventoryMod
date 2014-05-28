@@ -6,6 +6,7 @@ import moreinventory.util.CSutil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
 public class TileEntityEnderStorageBox extends TileEntityStorageBox{
@@ -16,11 +17,17 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox{
 	public TileEntityEnderStorageBox(){
 		super(StorageBoxType.Ender);
 	}
-	
+	public ItemStack[] getInv(){
+        if(this.itemList != null){
+           return this.itemList.getInv(getContents());
+        }
+        return new ItemStack[2];
+    }
+
 	@Override
 	public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack){
     	if(par1 == 0){
-    		return par2ItemStack != null && par2ItemStack.getItem() == getContents().getItem() && par2ItemStack.getItemDamage()==this.getContentsDamage()&&!par2ItemStack.hasTagCompound();
+    		return par2ItemStack != null && par2ItemStack.getItem() == this.getContentsItem() && par2ItemStack.getItemDamage()==this.getContentsDamage()&&!par2ItemStack.hasTagCompound();
     	}
     	else
     	{
@@ -55,15 +62,18 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox{
 		for(int i = 0; i < k; i++){
 			if(CSutil.compareStacksWithDamage(enderboxList.getItem(i) , getContents())){
 				int[] pos = enderboxList.getBoxPos(i);
-				TileEntity tile = DimensionManager.getWorld(enderboxList.getDimensionID(i)).getTileEntity(pos[0], pos[1], pos[2]);
-				if(tile != null&&tile instanceof TileEntityEnderStorageBox){
-					((TileEntityStorageBox)tile).getContentItemCount();
-					((TileEntityStorageBox)tile).sendPacket();
-				}
-				else
-				{
-					this.enderboxList.removeBox(i);
-				}
+                World world = DimensionManager.getWorld(enderboxList.getDimensionID(i));
+                if(world != null){
+                    TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+                    if(tile != null&&tile instanceof TileEntityEnderStorageBox){
+                        ((TileEntityStorageBox)tile).getContentItemCount();
+                        ((TileEntityStorageBox)tile).sendPacket();
+                    }
+                    else
+                    {
+                        this.enderboxList.removeBox(i);
+                    }
+                }
 			}
 		}
 	}
@@ -82,7 +92,7 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox{
     public void readFromNBT(NBTTagCompound par1NBTTagCompound)
     {
         super.readFromNBT(par1NBTTagCompound);
-        this.inv = this.itemList.getInv(getContents());
+        this.inv = getInv();
     }
 
 }

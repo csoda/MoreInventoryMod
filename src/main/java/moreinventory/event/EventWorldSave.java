@@ -30,7 +30,8 @@ public class EventWorldSave {
 				SaveList.add((IWorldDataSave) TileEntityEnderStorageBox.enderboxList);
 				SaveList.add((IWorldDataSave) TileEntityTeleporter.teleporterList);
 				MoreInventoryMod.saveHelper = new CSWorldSaveHelper(event.world, "MoreInvData" ,SaveList);
-			}
+                System.out.println(event.world.getWorldInfo().getWorldTotalTime());
+            }
 		}
 	}
 

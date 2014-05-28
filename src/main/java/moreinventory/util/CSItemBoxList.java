@@ -47,13 +47,13 @@ public class CSItemBoxList extends CSBoxList{
 	
 	public boolean insBox(int index, int x, int y, int z , int d, ItemStack item){
 		super.insBox(index, x, y, z, d);
-            itemList.add(index,item);
+        itemList.add(index,item);
 		return true;
 	}
 	
 	public void removeBox(int i){
 		super.removeBox(i);
-            itemList.remove(i);
+        itemList.remove(i);
 	}
 	
 	@Override
@@ -61,7 +61,7 @@ public class CSItemBoxList extends CSBoxList{
 	
 	public void addAllBoxList(CSItemBoxList csList){
 		super.addAllBox(csList);
-            itemList.addAll(csList.itemList);
+        itemList.addAll(csList.itemList);
 	}
 	
 	public ItemStack getItem(int i){
@@ -120,12 +120,12 @@ public class CSItemBoxList extends CSBoxList{
 	public void readFromNBT(NBTTagCompound nbt){
 		super.readFromNBT(nbt);
 		NBTTagList nbttaglist = nbt.getTagList(tagName + "Item" , 10);
-            itemList = new ArrayList<ItemStack>(this.getListSize());
-            for (int i = 0; i < nbttaglist.tagCount(); i++)
-            {
-                  NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);
-                  int k = nbttagcompound1.getInteger("Index");
-                  itemList.add(k,ItemStack.loadItemStackFromNBT(nbttagcompound1));
-            }
+        itemList = new ArrayList<ItemStack>(nbttaglist.tagCount());
+        for (int i = 0; i < nbttaglist.tagCount(); i++)
+        {
+              NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);
+              int k = nbttagcompound1.getInteger("Index");
+              itemList.add(k,ItemStack.loadItemStackFromNBT(nbttagcompound1));
+        }
 	}
 }

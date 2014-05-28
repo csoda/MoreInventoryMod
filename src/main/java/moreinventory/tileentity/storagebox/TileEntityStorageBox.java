@@ -9,6 +9,7 @@ import moreinventory.util.CSutil;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -118,6 +119,16 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 
             return this.contents;
 	}
+
+    public Item getContentsItem(){
+        Item item = null;
+        ItemStack stack = this.getContents();
+        if(stack != null)
+        {
+            item = stack.getItem();
+        }
+        return item;
+    }
 	
 	public void setContents(ItemStack item)
 	{
