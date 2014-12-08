@@ -1,6 +1,5 @@
 package moreinventory.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,26 +7,21 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.DimensionManager;
 
+import com.google.common.collect.Lists;
+
 public class CSBoxList implements IWorldDataSave
 {
-	protected List<Integer> listX;
-	protected List<Integer> listY;
-	protected List<Integer> listZ;
-	protected List<Integer> dimension;
+	private final List<Integer> listX = Lists.newArrayList();
+	private final List<Integer> listY = Lists.newArrayList();
+	private final List<Integer> listZ = Lists.newArrayList();
+	private final List<Integer> dimension = Lists.newArrayList();
 	protected String tagName;
 
-	public CSBoxList()
-	{
-		listX = new ArrayList();
-		listY = new ArrayList();
-		listZ = new ArrayList();
-		dimension = new ArrayList();
-	}
+	public CSBoxList() {}
 
 	public CSBoxList(String tag)
 	{
-		this();
-		tagName = tag;
+		this.tagName = tag;
 	}
 
 	public int getListSize()
@@ -37,7 +31,7 @@ public class CSBoxList implements IWorldDataSave
 
 	public int[] getBoxPos(int i)
 	{
-		return new int[] { listX.get(i), listY.get(i), listZ.get(i) };
+		return new int[] {listX.get(i), listY.get(i), listZ.get(i)};
 	}
 
 	public int getDimensionID(int i)
@@ -48,7 +42,8 @@ public class CSBoxList implements IWorldDataSave
 	public TileEntity getTileBeyondDim(int i)
 	{
 		int[] pos = getBoxPos(i);
-		return DimensionManager.getWorld(this.getDimensionID(i)).getTileEntity(pos[0], pos[1], pos[2]);
+
+		return DimensionManager.getWorld(getDimensionID(i)).getTileEntity(pos[0], pos[1], pos[2]);
 	}
 
 	public boolean addBox(int x, int y, int z, int d)
@@ -59,8 +54,10 @@ public class CSBoxList implements IWorldDataSave
 			listY.add(y);
 			listZ.add(z);
 			dimension.add(d);
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -72,8 +69,10 @@ public class CSBoxList implements IWorldDataSave
 			listY.add(index, y);
 			listZ.add(index, z);
 			dimension.add(index, d);
+
 			return true;
 		}
+
 		return false;
 	}
 
@@ -95,42 +94,47 @@ public class CSBoxList implements IWorldDataSave
 
 	public boolean isOnBoxList(int x, int y, int z, int d)
 	{
-		int[] pos = new int[3];
-		int k = getListSize();
-		for (int i = 0; i < k; i++)
+		for (int i = 0; i < getListSize(); i++)
 		{
-			pos = getBoxPos(i);
+			int[] pos = getBoxPos(i);
+
 			if (x == pos[0] && y == pos[1] && z == pos[2] && dimension.get(i) == d)
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	public CSBoxList getDifference(CSBoxList list)
 	{
 		CSBoxList newList = new CSBoxList();
-		for (int i = 0; i < this.getListSize(); i++)
+
+		for (int i = 0; i < getListSize(); i++)
 		{
-			boolean flg = true;
-			int[] pos1 = this.getBoxPos(i);
-			int dimID1 = this.getDimensionID(i);
-			for (int t = 0; t < list.getListSize(); t++)
+			boolean flag = true;
+			int[] pos1 = getBoxPos(i);
+			int dim1 = getDimensionID(i);
+
+			for (int j = 0; j < list.getListSize(); j++)
 			{
-				int[] pos2 = list.getBoxPos(t);
-				int dimID2 = list.getDimensionID(t);
-				if (pos1[0] == pos2[0] && pos1[1] == pos2[1] && pos1[2] == pos2[2] && dimID1 == dimID2)
+				int[] pos2 = list.getBoxPos(j);
+				int dim2 = list.getDimensionID(j);
+
+				if (pos1[0] == pos2[0] && pos1[1] == pos2[1] && pos1[2] == pos2[2] && dim1 == dim2)
 				{
-					flg = false;
+					flag = false;
 					break;
 				}
 			}
-			if (flg)
+
+			if (flag)
 			{
-				newList.addBox(pos1[0], pos1[1], pos1[2], dimID1);
+				newList.addBox(pos1[0], pos1[1], pos1[2], dim1);
 			}
 		}
+
 		return newList;
 	}
 
@@ -139,33 +143,35 @@ public class CSBoxList implements IWorldDataSave
 	{
 		if (tagName != null)
 		{
-			NBTTagList nbttaglist = new NBTTagList();
-			int k = this.getListSize();
-			for (int i = 0; i < k; i++)
+			NBTTagList list = new NBTTagList();
+
+			for (int i = 0; i < getListSize(); i++)
 			{
-				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-				int[] pos = this.getBoxPos(i);
-				nbttagcompound1.setInteger("X", pos[0]);
-				nbttagcompound1.setInteger("Y", pos[1]);
-				nbttagcompound1.setInteger("Z", pos[2]);
-				nbttagcompound1.setInteger("D", dimension.get(i));
-				nbttaglist.appendTag(nbttagcompound1);
+				NBTTagCompound data = new NBTTagCompound();
+				int[] pos = getBoxPos(i);
+				data.setInteger("X", pos[0]);
+				data.setInteger("Y", pos[1]);
+				data.setInteger("Z", pos[2]);
+				data.setInteger("D", dimension.get(i));
+				list.appendTag(data);
 			}
-			nbt.setTag(tagName, nbttaglist);
+
+			nbt.setTag(tagName, list);
 		}
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
-		NBTTagList nbttaglist = nbt.getTagList(tagName, 10);
-		for (int i = 0; i < nbttaglist.tagCount(); i++)
+		NBTTagList list = nbt.getTagList(tagName, 10);
+
+		for (int i = 0; i < list.tagCount(); i++)
 		{
-			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-			listX.add(nbttagcompound1.getInteger("X"));
-			listY.add(nbttagcompound1.getInteger("Y"));
-			listZ.add(nbttagcompound1.getInteger("Z"));
-			dimension.add(nbttagcompound1.getInteger("D"));
+			NBTTagCompound data = list.getCompoundTagAt(i);
+			listX.add(data.getInteger("X"));
+			listY.add(data.getInteger("Y"));
+			listZ.add(data.getInteger("Z"));
+			dimension.add(data.getInteger("D"));
 		}
 	}
 }

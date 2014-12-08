@@ -13,46 +13,47 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemNoFunction extends Item
 {
-	public IIcon[] MetaItemTexture = new IIcon[MoreInventoryMod.MATERIALNAME.length];
+	@SideOnly(Side.CLIENT)
+	private IIcon[] icons;
 
 	public ItemNoFunction()
 	{
-		super();
-		setMaxStackSize(64);
-		setCreativeTab(MoreInventoryMod.customTab);
-		setHasSubtypes(true);
+		this.setMaxStackSize(64);
+		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setHasSubtypes(true);
 	}
 
 	@Override
-	public String getUnlocalizedName(ItemStack par1ItemStack)
+	public String getUnlocalizedName(ItemStack itemstack)
 	{
-		return "itemnofunction" + par1ItemStack.getItemDamage();
+		return "itemnofunction" + itemstack.getItemDamage();
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List par3List)
+	public void getSubItems(Item item, CreativeTabs tab, List list)
 	{
 		for (int i = 0; i < MoreInventoryMod.MATERIALNAME.length; i++)
 		{
-			par3List.add(new ItemStack(this, 1, i));
+			list.add(new ItemStack(this, 1, i));
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerIcons(IIconRegister par1IconRegister)
+	public void registerIcons(IIconRegister iconRegister)
 	{
-		MetaItemTexture[0] = par1IconRegister.registerIcon("moreinv:leatherpack");
-		MetaItemTexture[1] = par1IconRegister.registerIcon("moreinv:brush");
-		MetaItemTexture[2] = par1IconRegister.registerIcon("moreinv:dimension_core");
-		MetaItemTexture[3] = par1IconRegister.registerIcon("moreinv:clipboard");
+		icons = new IIcon[MoreInventoryMod.MATERIALNAME.length];
+		icons[0] = iconRegister.registerIcon("moreinv:leatherpack");
+		icons[1] = iconRegister.registerIcon("moreinv:brush");
+		icons[2] = iconRegister.registerIcon("moreinv:dimension_core");
+		icons[3] = iconRegister.registerIcon("moreinv:clipboard");
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public IIcon getIconFromDamage(int par1)
+	public IIcon getIconFromDamage(int damage)
 	{
-		return MetaItemTexture[par1];
+		return icons[damage];
 	}
 }

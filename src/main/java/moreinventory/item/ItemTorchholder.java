@@ -13,121 +13,125 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemTorchholder extends Item
+public class ItemTorchHolder extends Item
 {
-	public int grade;
-	public static final int[] maxDamage = { 258, 1026, 4098 };
+	public static final int[] maxDamage = {258, 1026, 4098};
 
-	public ItemTorchholder(int arggrade)
+	private final int grade;
+
+	public ItemTorchHolder(int grade)
 	{
-		super();
-		setMaxStackSize(1);
-		grade = arggrade;
-		setMaxDamage(maxDamage[grade]);
-		this.canRepair = false;
-		setContainerItem(this);
-		setCreativeTab(MoreInventoryMod.customTab);
+		this.grade = grade;
+		this.setMaxStackSize(1);
+		this.setMaxDamage(maxDamage[grade]);
+		this.setNoRepair();
+		this.setContainerItem(this);
+		this.setCreativeTab(MoreInventoryMod.customTab);
 	}
 
 	@Override
-	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean bool)
+	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
-		list.add(itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 + " uses");
-	}
+		boolean result = false;
 
-	@Override
-	public boolean onItemUse(ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4,
-			int par5, int par6, int par7, float par8, float par9, float par10)
-	{
-		boolean torchSetFlg = false;
-		if (par1ItemStack.getItemDamage() < maxDamage[grade] - 2)
+		if (itemstack.getItemDamage() < maxDamage[grade] - 2)
 		{
-			if (new ItemStack(Blocks.torch).getItem().onItemUse(new ItemStack(Blocks.torch, 1), par2EntityPlayer,
-					par3World, par4, par5, par6, par7, par8, par9, par10))
+			if (Item.getItemFromBlock(Blocks.torch).onItemUse(new ItemStack(Blocks.torch, 1), player, world, x, y, z, side, hitX, hitY, hitZ))
 			{
-				par1ItemStack.damageItem(1, par2EntityPlayer);
-				torchSetFlg = true;
+				itemstack.damageItem(1, player);
+				result = true;
 			}
 		}
 
-		if (par2EntityPlayer.isSneaking() && !torchSetFlg)
+		if (player.isSneaking() && !result)
 		{
-			rechageTorchs(par1ItemStack, par3World, par2EntityPlayer);
+			rechargeTorches(itemstack, player);
 		}
+
 		return true;
 	}
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
+	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer player)
 	{
-		if (par3EntityPlayer.isSneaking())
+		if (player.isSneaking())
 		{
-			rechageTorchs(par1ItemStack, par2World, par3EntityPlayer);
+			rechargeTorches(itemstack, player);
 		}
-		return par1ItemStack;
+
+		return itemstack;
 	}
 
-	// Called when player sneaks and can't place torch.
-	public void rechageTorchs(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
+	public void rechargeTorches(ItemStack itemstack, EntityPlayer player)
 	{
-		InventoryPlayer inventory = par3EntityPlayer.inventory;
-		if (par1ItemStack.getItem() instanceof ItemTorchholder && par1ItemStack.getItemDamage() != 0
-				&& !par3EntityPlayer.capabilities.isCreativeMode)
+		InventoryPlayer inventory = player.inventory;
+
+		if (itemstack != null && itemstack.getItem() instanceof ItemTorchHolder && itemstack.getItemDamage() != 0 && !player.capabilities.isCreativeMode)
 		{
-			int TorchCount = 0;
-			if (par1ItemStack != null && inventory != null)
+			int count = 0;
+
+			if (itemstack != null && inventory != null)
 			{
-				int k = inventory.getSizeInventory();
-				for (int i = 0; i < k; i++)
+				for (int i = 0; i < inventory.getSizeInventory(); i++)
 				{
-					if (inventory.getStackInSlot(i) != null
-							&& inventory.getStackInSlot(i).isItemEqual(new ItemStack(Blocks.torch)))
+					if (inventory.getStackInSlot(i) != null && inventory.getStackInSlot(i).getItem() == Item.getItemFromBlock(Blocks.torch))
 					{
-						TorchCount += inventory.getStackInSlot(i).stackSize;
+						count += inventory.getStackInSlot(i).stackSize;
 					}
 				}
 			}
-			while (par1ItemStack.getItemDamage() != 0 && TorchCount != 0)
+
+			while (itemstack.getItemDamage() != 0 && count != 0)
 			{
-				par1ItemStack.setItemDamage(par1ItemStack.getItemDamage() - 1);
-				inventory.consumeInventoryItem(new ItemStack(Blocks.torch).getItem());
-				TorchCount--;
+				itemstack.setItemDamage(itemstack.getItemDamage() - 1);
+				inventory.consumeInventoryItem(Item.getItemFromBlock(Blocks.torch));
+
+				--count;
 			}
 		}
 	}
 
 	@Override
-	public boolean doesContainerItemLeaveCraftingGrid(ItemStack par1ItemStack)
+	public boolean doesContainerItemLeaveCraftingGrid(ItemStack itemstack)
 	{
 		return false;
 	}
 
 	@Override
-	public ItemStack getContainerItem(ItemStack itemStack)
+	public ItemStack getContainerItem(ItemStack itemstack)
 	{
-		if (!hasContainerItem(itemStack))
+		if (!hasContainerItem(itemstack))
 		{
 			return null;
 		}
-		itemStack.setItemDamage(itemStack.getItemDamage() + 1);
-		return itemStack;
+
+		itemstack.setItemDamage(itemstack.getItemDamage() + 1);
+
+		return itemstack;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerIcons(IIconRegister par1IconRegister)
+	public void registerIcons(IIconRegister iconRegister)
 	{
-		if (grade == 0)
+		switch (grade)
 		{
-			this.itemIcon = par1IconRegister.registerIcon("moreinv:Torchholder_iron");
+			case 0:
+				itemIcon = iconRegister.registerIcon("moreinv:Torchholder_iron");
+				break;
+			case 1:
+				itemIcon = iconRegister.registerIcon("moreinv:Torchholder_gold");
+				break;
+			case 2:
+				itemIcon = iconRegister.registerIcon("moreinv:Torchholder_diamond");
+				break;
 		}
-		else if (grade == 1)
-		{
-			this.itemIcon = par1IconRegister.registerIcon("moreinv:Torchholder_gold");
-		}
-		else if (grade == 2)
-		{
-			this.itemIcon = par1IconRegister.registerIcon("moreinv:Torchholder_diamond");
-		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
+	{
+		list.add(itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 + " uses");
 	}
 }

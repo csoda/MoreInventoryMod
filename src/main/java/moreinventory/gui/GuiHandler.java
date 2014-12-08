@@ -6,7 +6,7 @@ import moreinventory.container.ContainerPouch;
 import moreinventory.container.ContainerStorageBox;
 import moreinventory.container.ContainerTeleporter;
 import moreinventory.container.ContainerTransportManager;
-import moreinventory.item.inventory.InventoryPotionholder;
+import moreinventory.item.inventory.InventoryPotionHolder;
 import moreinventory.item.inventory.InventoryPouch;
 import moreinventory.tileentity.TileEntityCatchall;
 import moreinventory.tileentity.TileEntityTransportManager;
@@ -39,7 +39,7 @@ public class GuiHandler implements IGuiHandler
 		}
 		else if (id == 3)
 		{
-			return new ContainerPotionholder(player.inventory, new InventoryPotionholder(player.getCurrentEquippedItem()));
+			return new ContainerPotionholder(player.inventory, new InventoryPotionHolder(player.getCurrentEquippedItem()));
 		}
 		else if (id == 4)
 		{
@@ -53,7 +53,6 @@ public class GuiHandler implements IGuiHandler
 		return null;
 	}
 
-	// returns an instance of the Gui you made earlier
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{
@@ -72,7 +71,7 @@ public class GuiHandler implements IGuiHandler
 		}
 		else if (id == 3)
 		{
-			return new GuiPotionholder(player.inventory, new InventoryPotionholder(player.getCurrentEquippedItem()));
+			return new GuiPotionholder(player.inventory, new InventoryPotionHolder(player.getCurrentEquippedItem()));
 		}
 		else if (id == 4)
 		{
@@ -84,6 +83,5 @@ public class GuiHandler implements IGuiHandler
 		}
 
 		return null;
-
 	}
 }

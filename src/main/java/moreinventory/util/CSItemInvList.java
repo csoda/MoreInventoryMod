@@ -1,53 +1,57 @@
 package moreinventory.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+import com.google.common.collect.Lists;
+
 public class CSItemInvList extends CSItemList implements IWorldDataSave
 {
-	protected List<ItemStack[]> inv;
-	protected String tagName;
+	private final List<ItemStack[]> inv = Lists.newArrayList();
+	private String tagName;
 
 	public CSItemInvList()
 	{
 		super();
-		inv = new ArrayList();
 	}
 
 	public CSItemInvList(String tag)
 	{
 		this();
-		tagName = tag;
+		this.tagName = tag;
 	}
 
 	public ItemStack[] getInv(ItemStack itemstack)
 	{
-		int t = this.getItemIndex(itemstack);
-		return t != -1 ? inv.get(t) : new ItemStack[2];
+		int i = getItemIndex(itemstack);
+
+		return i != -1 ? inv.get(i) : new ItemStack[2];
 	}
 
 	@Override
 	public void addItem(ItemStack itemstack)
 	{
 		int size = itemstack.stackSize;
-		int t = getItemIndex(itemstack);
-		if (t == -1)
+		int i = getItemIndex(itemstack);
+
+		if (i == -1)
 		{
 			registerItem(itemstack);
-			t = getItemIndex(itemstack);
+			i = getItemIndex(itemstack);
 		}
-		int nowCount = count.get(t);
-		if (nowCount < Integer.MAX_VALUE - size)
+
+		int j = count.get(i);
+
+		if (j < Integer.MAX_VALUE - size)
 		{
-			count.set(t, nowCount + size);
+			count.set(i, j + size);
 		}
 		else
 		{
-			count.set(t, Integer.MAX_VALUE);
+			count.set(i, Integer.MAX_VALUE);
 		}
 	}
 
@@ -66,11 +70,13 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave
 		if (index != -1)
 		{
 			ItemStack[] items = inv.get(index);
+
 			if (items[0] != null)
 			{
 				if (CSUtil.compareStacksWithDamage(items[0], list.get(index)))
 				{
-					this.addItem(items[0]);
+					addItem(items[0]);
+
 					items[0] = null;
 				}
 				else
@@ -78,15 +84,18 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave
 					return items[0];
 				}
 			}
+
 			if (items[1] == null || items[1].stackSize != items[1].getMaxStackSize())
 			{
 				if (items[1] != null)
 				{
-					this.addItem(items[1]);
+					addItem(items[1]);
 				}
-				items[1] = this.loadNewItemStack(index);
+
+				items[1] = loadNewItemStack(index);
 			}
 		}
+
 		return null;
 	}
 
@@ -95,19 +104,24 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave
 		if (index != -1)
 		{
 			ItemStack itemstack = list.get(index).copy();
+
 			if (itemstack != null)
 			{
 				int size = itemstack.getMaxStackSize();
-				int k = count.get(index);
-				if (k < size)
+				int i = count.get(index);
+
+				if (i < size)
 				{
-					size = k;
+					size = i;
 				}
+
 				count.set(index, count.get(index) - size);
 				itemstack.stackSize = size;
+
 				return itemstack;
 			}
 		}
+
 		return null;
 	}
 
@@ -117,22 +131,25 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave
 		if (tagName != null)
 		{
 			NBTTagList nbttaglist = new NBTTagList();
-			int k = list.size();
-			for (int i = 0; i < k; i++)
+
+			for (int i = 0; i < list.size(); i++)
 			{
-				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-				NBTTagCompound itemNBT = new NBTTagCompound();
+				NBTTagCompound data1 = new NBTTagCompound();
+				NBTTagCompound data2 = new NBTTagCompound();
 				ItemStack contents = list.get(i);
+
 				if (contents != null)
 				{
-					contents.writeToNBT(itemNBT);
+					contents.writeToNBT(data2);
 				}
+
 				ItemStack itemstack = inv.get(i)[1];
-				int t = itemstack != null ? itemstack.stackSize : 0;
-				nbttagcompound1.setTag("Item", itemNBT);
-				nbttagcompound1.setInteger("Count", count.get(i) + t);
-				nbttaglist.appendTag(nbttagcompound1);
+
+				data1.setTag("Item", data2);
+				data1.setInteger("Count", count.get(i) + (itemstack != null ? itemstack.stackSize : 0));
+				nbttaglist.appendTag(data1);
 			}
+
 			nbt.setTag(tagName, nbttaglist);
 		}
 	}
@@ -141,11 +158,12 @@ public class CSItemInvList extends CSItemList implements IWorldDataSave
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		NBTTagList nbttaglist = nbt.getTagList(tagName, 10);
+
 		for (int i = 0; i < nbttaglist.tagCount(); i++)
 		{
-			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-			list.add(ItemStack.loadItemStackFromNBT(nbttagcompound1.getCompoundTag("Item")));
-			count.add(nbttagcompound1.getInteger("Count"));
+			NBTTagCompound data = nbttaglist.getCompoundTagAt(i);
+			list.add(ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")));
+			count.add(data.getInteger("Count"));
 			inv.add(new ItemStack[2]);
 			updateState(i);
 		}

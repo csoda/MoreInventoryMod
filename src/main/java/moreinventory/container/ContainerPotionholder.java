@@ -1,7 +1,7 @@
 package moreinventory.container;
 
 import moreinventory.gui.slot.SlotPotion;
-import moreinventory.item.inventory.InventoryPotionholder;
+import moreinventory.item.inventory.InventoryPotionHolder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -10,9 +10,9 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerPotionholder extends Container
 {
-	private InventoryPotionholder inv;
+	private InventoryPotionHolder inv;
 
-	public ContainerPotionholder(InventoryPlayer inventoryPlayer, InventoryPotionholder te)
+	public ContainerPotionholder(InventoryPlayer inventoryPlayer, InventoryPotionHolder te)
 	{
 		inv = te;
 

@@ -10,9 +10,23 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public final class CSUtil
 {
+	public static String getUniqueName(Block block)
+	{
+		if (block == null)
+		{
+			return "";
+		}
+
+		UniqueIdentifier unique = GameRegistry.findUniqueIdentifierFor(block);
+
+		return unique == null ? "" : unique.toString();
+	}
+
 	public static int[] getSidePos(int x, int y, int z, int side)
 	{
 		int rx = x;

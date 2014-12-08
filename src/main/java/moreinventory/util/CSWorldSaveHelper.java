@@ -13,43 +13,44 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 
-/**
- * @author c_soda This is World-Save helper. You can use this to save your original NBT data into each World.
- */
-
 public class CSWorldSaveHelper
 {
-	public World world;
-	private String saveFileName;
-	private List<IWorldDataSave> SaveList;
+	public final World world;
+	private final String saveFileName;
+	private final List<IWorldDataSave> saveList;
 
 	public CSWorldSaveHelper(World world, String name, List<IWorldDataSave> save)
 	{
 		this.world = world;
-		saveFileName = name;
-		SaveList = save;
-		loadData();
+		this.saveFileName = name;
+		this.saveList = save;
+		this.loadData();
 	}
 
 	public void saveData()
 	{
-		MinecraftServer mc = FMLCommonHandler.instance().getMinecraftServerInstance();
+		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
 
-		NBTTagCompound nbt = new NBTTagCompound();
-		int k = SaveList.size();
-		for (int i = 0; i < k; i++)
+		if (server == null)
 		{
-			SaveList.get(i).writeToNBT(nbt);
+			return;
 		}
 
-		File saveDir = this.getSaveDir(mc);
+		NBTTagCompound nbt = new NBTTagCompound();
+
+		for (IWorldDataSave save : saveList)
+		{
+			save.writeToNBT(nbt);
+		}
+
+		File saveDir = getSaveDir(server);
 
 		if (!saveDir.exists())
 		{
 			saveDir.mkdirs();
 		}
 
-		File saveFile = this.getSaveFile(mc);
+		File saveFile = getSaveFile(server);
 
 		try
 		{
@@ -57,59 +58,60 @@ public class CSWorldSaveHelper
 			{
 				saveFile.createNewFile();
 			}
-			CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(saveFile));
 
+			CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(saveFile));
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
-
 	}
 
 	public void loadData()
 	{
 		try
 		{
-			MinecraftServer mc = FMLCommonHandler.instance().getMinecraftServerInstance();
-			File saveDir = this.getSaveDir(mc);
+			MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+
+			if (server == null)
+			{
+				return;
+			}
+
+			File saveDir = getSaveDir(server);
 
 			if (!saveDir.exists())
 			{
 				saveDir.mkdirs();
+
 				return;
 			}
 
-			File saveFile = this.getSaveFile(mc);
+			File saveFile = getSaveFile(server);
 
 			if (saveFile.exists())
 			{
-				NBTTagCompound nbt = CompressedStreamTools.readCompressed(new BufferedInputStream(new FileInputStream(
-						saveFile)));
-				int k = SaveList.size();
-				for (int i = 0; i < k; i++)
+				NBTTagCompound nbt = CompressedStreamTools.readCompressed(new BufferedInputStream(new FileInputStream(saveFile)));
+
+				for (IWorldDataSave save : saveList)
 				{
-					SaveList.get(i).readFromNBT(nbt);
+					save.readFromNBT(nbt);
 				}
 			}
-
 		}
-		catch (IOException ioexception)
+		catch (IOException e)
 		{
-
-			ioexception.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
-	public File getSaveDir(MinecraftServer mc)
+	public File getSaveDir(MinecraftServer server)
 	{
-		return mc.isSinglePlayer() ? new File(mc.getFile("saves"), world.getSaveHandler().getWorldDirectoryName())
-				: new File(mc.getFolderName());
+		return server.isSinglePlayer() ? new File(server.getFile("saves"), world.getSaveHandler().getWorldDirectoryName()) : new File(server.getFolderName());
 	}
 
-	public File getSaveFile(MinecraftServer mc)
+	public File getSaveFile(MinecraftServer server)
 	{
-		return (new File(this.getSaveDir(mc).toString(), this.saveFileName + ".dat"));
+		return new File(getSaveDir(server).toString(), saveFileName + ".dat");
 	}
-
 }

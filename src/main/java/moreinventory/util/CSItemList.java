@@ -1,35 +1,31 @@
 package moreinventory.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
 
+import com.google.common.collect.Lists;
+
 public class CSItemList
 {
-
-	protected List<ItemStack> list;
-	protected List<Integer> count;
-
-	public CSItemList()
-	{
-		list = new ArrayList();
-		count = new ArrayList();
-	}
+	protected final List<ItemStack> list = Lists.newArrayList();
+	protected final List<Integer> count = Lists.newArrayList();
 
 	public int getItemCount(ItemStack itemstack)
 	{
-		int t = getItemIndex(itemstack);
-		return t != -1 ? count.get(t) : 0;
+		int i = getItemIndex(itemstack);
+
+		return i != -1 ? count.get(i) : 0;
 	}
 
 	public void addItem(ItemStack itemstack)
 	{
 		int size = itemstack.stackSize;
-		int t = getItemIndex(itemstack);
-		if (t != -1)
+		int i = getItemIndex(itemstack);
+
+		if (i != -1)
 		{
-			count.set(t, count.get(t) + size);
+			count.set(i, count.get(i) + size);
 		}
 		else
 		{
@@ -47,6 +43,7 @@ public class CSItemList
 				return i;
 			}
 		}
+
 		return -1;
 	}
 }

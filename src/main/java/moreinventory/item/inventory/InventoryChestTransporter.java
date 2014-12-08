@@ -12,48 +12,50 @@ import net.minecraft.world.World;
 
 public class InventoryChestTransporter implements IInventory
 {
+	private final ItemStack chestItem;
 
-	private ItemStack chestTP;
-	private ItemStack[] inv;
-	private ItemStack tItemBlock;
+	private ItemStack tileBlock;
+	private ItemStack[] inventoryItems;
 
-	public InventoryChestTransporter(ItemStack par1ItemStack)
+	public InventoryChestTransporter(ItemStack itemstack)
 	{
-		chestTP = par1ItemStack;
-		readFromNBT();
+		this.chestItem = itemstack;
+		this.readFromNBT();
 	}
 
-	public boolean placeBlock(World world, EntityPlayer player, int x, int y, int z, int side, float k, float l, float m)
+	public boolean placeBlock(World world, EntityPlayer player, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
-		if (tItemBlock == null)
+		if (tileBlock == null)
+		{
 			return false;
+		}
 
-		boolean flg = false;
-
-		Block block = Block.getBlockFromItem(tItemBlock.getItem());
+		boolean replaceable = false;
+		Block block = Block.getBlockFromItem(tileBlock.getItem());
 
 		if (block != null)
 		{
 			if (block.isReplaceable(world, x, y, z))
 			{
-				flg = true;
+				replaceable = true;
 			}
 
-			if (tItemBlock.getItem().onItemUse(tItemBlock, player, world, x, y, z, side, k, l, m))
+			if (tileBlock.getItem().onItemUse(tileBlock, player, world, x, y, z, side, hitX, hitY, hitZ))
 			{
-				TileEntity tileEntity;
-				if (!flg)
+				TileEntity tile;
+
+				if (!replaceable)
 				{
 					int[] pos = CSUtil.getSidePos(x, y, z, side);
-					tileEntity = world.getTileEntity(pos[0], pos[1], pos[2]);
+					tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 				}
 				else
 				{
-					tileEntity = world.getTileEntity(x, y, z);
+					tile = world.getTileEntity(x, y, z);
 				}
-				this.transferToBlock(tileEntity);
-				block.onBlockPlacedBy(world, tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord, player,
-						tItemBlock);
+
+				transferToBlock(tile);
+				block.onBlockPlacedBy(world, tile.xCoord, tile.yCoord, tile.zCoord, player, tileBlock);
 
 				return true;
 			}
@@ -64,27 +66,29 @@ public class InventoryChestTransporter implements IInventory
 
 	public boolean transferToPlayer(TileEntity tile)
 	{
-
-		if (checkMatryoshka((IInventory) tile))
+		if (checkMatryoshka((IInventory)tile))
 		{
-			NBTTagCompound nbt = chestTP.getTagCompound();
+			NBTTagCompound nbt = chestItem.getTagCompound();
+
 			if (nbt == null)
 			{
 				nbt = new NBTTagCompound();
 			}
+
 			Block block = tile.getWorldObj().getBlock(tile.xCoord, tile.yCoord, tile.zCoord);
 			int meta = tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord);
-			tItemBlock = new ItemStack(block, 1, meta);
+			tileBlock = new ItemStack(block, 1, meta);
 
 			tile.writeToNBT(nbt);
 
-			IInventory iinv = (IInventory) tile;
-			for (int i = 0; i < iinv.getSizeInventory(); i++)
+			IInventory inventory = (IInventory)tile;
+
+			for (int i = 0; i < inventory.getSizeInventory(); i++)
 			{
-				iinv.setInventorySlotContents(i, null);
+				inventory.setInventorySlotContents(i, null);
 			}
 
-			this.writeToNBT(nbt);
+			writeToNBT(nbt);
 
 			return true;
 		}
@@ -92,80 +96,80 @@ public class InventoryChestTransporter implements IInventory
 		return false;
 	}
 
-	public boolean transferToBlock(TileEntity tile)
+	public void transferToBlock(TileEntity tile)
 	{
-		NBTTagCompound nbt = chestTP.getTagCompound();
+		NBTTagCompound nbt = chestItem.getTagCompound();
+
 		if (nbt == null)
 		{
 			nbt = new NBTTagCompound();
 		}
+
 		nbt.setInteger("x", tile.xCoord);
 		nbt.setInteger("y", tile.yCoord);
 		nbt.setInteger("z", tile.zCoord);
 		tile.readFromNBT(nbt);
-
-		return false;
 	}
 
-	private boolean checkMatryoshka(IInventory iinv)
+	private boolean checkMatryoshka(IInventory inventory)
 	{
 		ItemStack itemstack;
-		for (int i = 0; i < iinv.getSizeInventory(); i++)
+
+		for (int i = 0; i < inventory.getSizeInventory(); i++)
 		{
-			itemstack = iinv.getStackInSlot(i);
+			itemstack = inventory.getStackInSlot(i);
+
 			if (itemstack != null)
 			{
-				if (itemstack.getItem() == MoreInventoryMod.ChestTransporter && itemstack.getItemDamage() != 0)
+				if (itemstack.getItem() == MoreInventoryMod.ChestTransporter && itemstack.getItemDamage() != 0 ||
+					itemstack.getItem() == MoreInventoryMod.Pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
 				{
 					return false;
 				}
-				if (itemstack.getItem() == MoreInventoryMod.Pouch)
-				{
-					InventoryPouch pouch = new InventoryPouch(itemstack);
-					if (!checkMatryoshka(pouch))
-					{
-						return false;
-					}
-				}
 			}
 		}
+
 		return true;
 	}
 
 	public String getContentsItemName(ItemStack itemstack)
 	{
 		String name = "Empty";
-		NBTTagCompound nbt = itemstack.stackTagCompound;
+		NBTTagCompound nbt = itemstack.getTagCompound();
+
 		if (nbt != null)
 		{
 			ItemStack item = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Contents"));
+
 			if (item != null)
 			{
 				name = item.getDisplayName();
 			}
 		}
+
 		return name;
 	}
 
 	@Override
 	public int getSizeInventory()
 	{
-		return inv.length;
+		return inventoryItems.length;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return inv[slot];
+		return inventoryItems[slot];
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack)
+	public void setInventorySlotContents(int slot, ItemStack itemstack)
 	{
-		this.inv[slot] = stack;
-		if (stack != null && stack.stackSize > getInventoryStackLimit())
+		inventoryItems[slot] = itemstack;
+
+		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
 		{
-			stack.stackSize = getInventoryStackLimit();
+			itemstack.stackSize = getInventoryStackLimit();
 		}
 	}
 
@@ -182,36 +186,41 @@ public class InventoryChestTransporter implements IInventory
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amt)
+	public ItemStack decrStackSize(int slot, int amount)
 	{
-		ItemStack stack = getStackInSlot(slot);
-		if (stack != null)
+		ItemStack itemstack = getStackInSlot(slot);
+
+		if (itemstack != null)
 		{
-			if (stack.stackSize <= amt)
+			if (itemstack.stackSize <= amount)
 			{
 				setInventorySlotContents(slot, null);
 			}
 			else
 			{
-				stack = stack.splitStack(amt);
-				if (stack.stackSize == 0)
+				itemstack = itemstack.splitStack(amount);
+
+				if (itemstack.stackSize == 0)
 				{
 					setInventorySlotContents(slot, null);
 				}
 			}
 		}
-		return stack;
+
+		return itemstack;
 	}
 
 	@Override
 	public ItemStack getStackInSlotOnClosing(int slot)
 	{
-		ItemStack stack = getStackInSlot(slot);
-		if (stack != null)
+		ItemStack itemstack = getStackInSlot(slot);
+
+		if (itemstack != null)
 		{
 			setInventorySlotContents(slot, null);
 		}
-		return stack;
+
+		return itemstack;
 	}
 
 	@Override
@@ -222,58 +231,54 @@ public class InventoryChestTransporter implements IInventory
 
 	public void readFromNBT()
 	{
-		NBTTagCompound nbttagcompound = chestTP.getTagCompound();
-		if (nbttagcompound == null)
+		NBTTagCompound nbt = chestItem.getTagCompound();
+
+		if (nbt == null)
 		{
 			return;
 		}
-		tItemBlock = ItemStack.loadItemStackFromNBT(nbttagcompound.getCompoundTag("tItemBlock"));
+
+		tileBlock = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("tileBlock"));
 	}
 
-	/**
-	 * Writes a tile entity to NBT.
-	 */
 	public void writeToNBT(NBTTagCompound nbt)
 	{
 		NBTTagCompound tag = new NBTTagCompound();
-		if (this.tItemBlock != null)
+
+		if (tileBlock != null)
 		{
-			tItemBlock.writeToNBT(tag);
+			tileBlock.writeToNBT(tag);
 		}
-		nbt.setTag("tItemBlock", tag);
-		chestTP.setTagCompound(nbt);
+
+		nbt.setTag("tileBlock", tag);
+		chestItem.setTagCompound(nbt);
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer)
+	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-		ItemStack itemstack = entityplayer.getCurrentEquippedItem();
-		if (itemstack != chestTP)
+		ItemStack itemstack = player.getCurrentEquippedItem();
+
+		if (itemstack != chestItem)
 		{
 			return false;
 		}
+
 		return true;
 	}
 
 	@Override
-	public void openInventory()
-	{
-	}
+	public void openInventory() {}
 
 	@Override
-	public void closeInventory()
-	{
-	}
+	public void closeInventory() {}
 
 	@Override
-	public void markDirty()
-	{
-	}
+	public void markDirty() {}
 
 	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack)
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
 		return false;
 	}
-
 }

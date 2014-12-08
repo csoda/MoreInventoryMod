@@ -9,47 +9,53 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class RecipePouch extends ShapelessOreRecipe
 {
-	public RecipePouch(ItemStack par1ItemStack, Object[] objects)
+	public RecipePouch(ItemStack itemstack, Object... objects)
 	{
-		super(par1ItemStack, objects);
+		super(itemstack, objects);
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting par1InventoryCrafting)
+	public ItemStack getCraftingResult(InventoryCrafting crafting)
 	{
-		ItemStack retItem = getRecipeOutput().copy();
+		ItemStack result = getRecipeOutput().copy();
 		ItemStack pouch = null;
-		boolean flg1 = false;
-		boolean flg2 = false;
-		for (int i = 0; i < par1InventoryCrafting.getSizeInventory(); i++)
+		boolean flag1 = false;
+		boolean flag2 = false;
+
+		for (int i = 0; i < crafting.getSizeInventory(); i++)
 		{
-			ItemStack itemstack = par1InventoryCrafting.getStackInSlot(i);
+			ItemStack itemstack = crafting.getStackInSlot(i);
+
 			if (itemstack != null)
 			{
-				if (itemstack.getItem().equals(MoreInventoryMod.Pouch))
+				if (itemstack.getItem() == MoreInventoryMod.Pouch)
 				{
 					pouch = itemstack;
-					flg1 = true;
+					flag1 = true;
 				}
-				else if (itemstack.getItem().equals(Items.ender_pearl))
+				else if (itemstack.getItem() == Items.ender_pearl)
 				{
-					flg2 = true;
+					flag2 = true;
 				}
 			}
 		}
-		if (flg1)
+
+		if (flag1)
 		{
-			int dm = pouch.getItemDamage();
-			if (flg2 && dm - dm % 17 == 68)
+			int damage = pouch.getItemDamage();
+
+			if (flag2 && damage - damage % 17 == 68)
+			{
 				return null;
-			dm = flg2 ? dm + 17 : dm - dm % 17 + retItem.getItemDamage() % 17;
-			retItem.setItemDamage(dm);
-			retItem.setStackDisplayName(pouch.getDisplayName());
-			InventoryPouch po = new InventoryPouch(pouch);
-			po.onCrafting(retItem);
+			}
+
+			damage = flag2 ? damage + 17 : damage - damage % 17 + result.getItemDamage() % 17;
+			result.setItemDamage(damage);
+			result.setStackDisplayName(pouch.getDisplayName());
+
+			new InventoryPouch(pouch).onCrafting(result);
 		}
 
-		return retItem;
+		return result;
 	}
-
 }

@@ -24,46 +24,47 @@ public class ItemPouch extends Item
 
 	public ItemPouch()
 	{
-		super();
-		setMaxStackSize(1);
-		setHasSubtypes(true);
-		setCreativeTab(MoreInventoryMod.customTab);
-		hasSubtypes = true;
+		this.setMaxStackSize(1);
+		this.setHasSubtypes(true);
+		this.setCreativeTab(MoreInventoryMod.customTab);
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack itemstack, EntityPlayer player, World world, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
+	public boolean onItemUseFirst(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
-		if (!world.isRemote && world.getBlock(par4, par5, par6).equals(Blocks.cauldron))
+		if (!world.isRemote && world.getBlock(x, y, z) == Blocks.cauldron)
 		{
-			int meta = world.getBlockMetadata(par4, par5, par6);
-			int dm = itemstack.getItemDamage();
-			int k = dm % 17;
-			if (meta > 0 && k > 0)
+			int meta = world.getBlockMetadata(x, y, z);
+			int damage = itemstack.getItemDamage();
+			int i = damage % 17;
+
+			if (meta > 0 && i > 0)
 			{
-				itemstack.setItemDamage(dm - k);
-				world.setBlockMetadataWithNotify(par4, par5, par6, meta - 1, 2);
+				itemstack.setItemDamage(damage - i);
+				world.setBlockMetadataWithNotify(x, y, z, meta - 1, 2);
+
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	@Override
-	public boolean onItemUse(ItemStack peritemstack, EntityPlayer player, World world, int par4, int par5, int par6,
-			int par7, float par8, float par9, float par10)
+	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
 		if (player.isSneaking())
 		{
-			TileEntity tileEntity = world.getTileEntity(par4, par5, par6);
-			InventoryPouch pouch = new InventoryPouch(player.getCurrentEquippedItem());
-			if (tileEntity == null)
+			TileEntity tile = world.getTileEntity(x, y, z);
+			InventoryPouch inventory = new InventoryPouch(player.getCurrentEquippedItem());
+
+			if (tile == null)
 			{
-				pouch.collectAllItemStack(player.inventory, true);
+				inventory.collectAllItemStack(player.inventory, true);
 			}
-			else if (tileEntity instanceof IInventory)
+			else if (tile instanceof IInventory)
 			{
-				pouch.transferToChest((IInventory) tileEntity);
+				inventory.transferToChest((IInventory) tile);
 			}
 
 			return true;
@@ -73,30 +74,34 @@ public class ItemPouch extends Item
 	}
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack peritemstack, World world, EntityPlayer player)
+	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer player)
 	{
-		player.openGui(MoreInventoryMod.instance, 1, world, 0, 0, 0);
-		return peritemstack;
+		if (!world.isRemote)
+		{
+			player.openGui(MoreInventoryMod.instance, 1, world, 0, 0, 0);
+		}
+
+		return itemstack;
 	}
 
-	@Override
 	@SideOnly(Side.CLIENT)
+	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
 		icons = new IIcon[17];
 		icons[0] = iconRegister.registerIcon("moreinv:pouch");
-		for (int i = 0; i < 16; i++)
+
+		for (int i = 0; i < icons.length - 1; i++)
 		{
 			icons[i + 1] = iconRegister.registerIcon("moreinv:pouch_" + MoreInventoryMod.COLORNAME[i]);
 		}
-
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public IIcon getIconFromDamage(int par1)
+	public IIcon getIconFromDamage(int damage)
 	{
-		return icons[par1 % 17];
+		return icons[damage % 17];
 	}
 
 	@Override
@@ -107,11 +112,11 @@ public class ItemPouch extends Item
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List par3List)
+	public void getSubItems(Item item, CreativeTabs tab, List list)
 	{
 		for (int i = 0; i < 17; i++)
 		{
-			par3List.add(new ItemStack(this, 1, i));
+			list.add(new ItemStack(this, 1, i));
 		}
 	}
 }

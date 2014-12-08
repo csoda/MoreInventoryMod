@@ -20,40 +20,45 @@ public class ItemPlating extends Item
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
 
-	public static final byte[] typeIndex = { 1, 2, 3, 4, 5, 6, 7, 10, 12 };
+	public static final byte[] typeIndex = {1, 2, 3, 4, 5, 6, 7, 10, 12};
 
 	public ItemPlating()
 	{
-		super();
 		this.setHasSubtypes(true);
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack itemstack, EntityPlayer player, World world, int par4, int par5, int par6,
-			int par7, float par8, float par9, float par10)
+	public boolean onItemUseFirst(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
-		if (!world.isRemote)
+		if (world.isRemote)
 		{
-			if (world.getBlock(par4, par5, par6).equals(MoreInventoryMod.StorageBox))
+			return false;
+		}
+
+		if (world.getBlock(x, y, z) == MoreInventoryMod.StorageBox)
+		{
+			int index = typeIndex[itemstack.getItemDamage()];
+			int meta = world.getBlockMetadata(x, y, z);
+			int tier1 = StorageBoxType.values()[index].Tier;
+			int tier2 = StorageBoxType.values()[meta].Tier;
+
+			if (index != 0 && (tier1 == tier2 || tier1 == tier2 + 1) && StorageBoxType.values()[index].invSize > StorageBoxType.values()[meta].invSize)
 			{
-				int k = typeIndex[itemstack.getItemDamage()];
-				int t = world.getBlockMetadata(par4, par5, par6);
-				int Tier1 = StorageBoxType.values()[k].Tier;
-				int Tier2 = StorageBoxType.values()[t].Tier;
-				if (k != 0 && (Tier1 == Tier2 || Tier1 == Tier2 + 1)
-						&& StorageBoxType.values()[k].invSize > StorageBoxType.values()[t].invSize)
+				TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
+
+				world.setBlockMetadataWithNotify(x, y, z, index, 2);
+				world.setTileEntity(x, y, z, tile.upgrade(index));
+
+				if (!player.capabilities.isCreativeMode)
 				{
-					TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(par4, par5, par6);
-					world.setBlockMetadataWithNotify(par4, par5, par6, k, 2);
-					world.setTileEntity(par4, par5, par6, tile.upgrade(k));
-					if (!player.capabilities.isCreativeMode)
-					{
-						itemstack.stackSize--;
-						player.onUpdate();
-					}
-					return true;
+					--itemstack.stackSize;
+
+					player.onUpdate();
 				}
+
+				return true;
 			}
+
 			return false;
 		}
 
@@ -61,9 +66,19 @@ public class ItemPlating extends Item
 	}
 
 	@Override
-	public String getUnlocalizedName(ItemStack par1ItemStack)
+	public String getUnlocalizedName(ItemStack itemstack)
 	{
-		return "painting:" + StorageBoxType.values()[ItemPlating.typeIndex[par1ItemStack.getItemDamage()]].name();
+		return "painting:" + StorageBoxType.values()[ItemPlating.typeIndex[itemstack.getItemDamage()]].name();
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void getSubItems(Item item, CreativeTabs tab, List list)
+	{
+		for (int i = 0; i < typeIndex.length; i++)
+		{
+			list.add(new ItemStack(this, 1, i));
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -71,8 +86,8 @@ public class ItemPlating extends Item
 	public void registerIcons(IIconRegister iconRegister)
 	{
 		icons = new IIcon[typeIndex.length];
-		int k = typeIndex.length;
-		for (int i = 0; i < k; i++)
+
+		for (int i = 0; i < typeIndex.length; i++)
 		{
 			icons[i] = iconRegister.registerIcon("moreinv:plating_" + StorageBoxType.values()[typeIndex[i]].name());
 		}
@@ -80,18 +95,8 @@ public class ItemPlating extends Item
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List par3List)
+	public IIcon getIconFromDamage(int damage)
 	{
-		for (int i = 0; i < typeIndex.length; i++)
-		{
-			par3List.add(new ItemStack(this, 1, i));
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public IIcon getIconFromDamage(int par1)
-	{
-		return icons[par1];
+		return icons[damage];
 	}
 }

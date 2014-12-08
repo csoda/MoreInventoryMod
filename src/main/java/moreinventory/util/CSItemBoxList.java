@@ -1,46 +1,41 @@
 package moreinventory.util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.world.World;
+
+import com.google.common.collect.Lists;
 
 public class CSItemBoxList extends CSBoxList
 {
-	protected List<ItemStack> itemList;
+	private final List<ItemStack> itemList = Lists.newArrayList();
 
-	public CSItemBoxList()
-	{
-		super();
-		itemList = new ArrayList();
-	}
+	public CSItemBoxList() {}
 
-	public CSItemBoxList(World world, String tag)
+	public CSItemBoxList(String tag)
 	{
-		this();
-		tagName = tag;
+		super(tag);
 	}
 
 	@Override
 	public boolean addBox(int x, int y, int z, int d)
 	{
-		return this.addBox(x, y, z, d, null);
+		return addBox(x, y, z, d, null);
 	}
 
-	public boolean addBox(int x, int y, int z, int d, ItemStack item)
+	public boolean addBox(int x, int y, int z, int d, ItemStack itemstack)
 	{
 		if (!isOnBoxList(x, y, z, d))
 		{
 			super.addBox(x, y, z, d);
-			itemList.add(item);
+			itemList.add(itemstack);
 
 			return true;
 		}
 
-		registerItem(x, y, z, d, item);
+		registerItem(x, y, z, d, itemstack);
 
 		return false;
 	}
@@ -48,13 +43,14 @@ public class CSItemBoxList extends CSBoxList
 	@Override
 	public boolean insBox(int index, int x, int y, int z, int d)
 	{
-		return this.insBox(index, x, y, z, d, null);
+		return insBox(index, x, y, z, d, null);
 	}
 
-	public boolean insBox(int index, int x, int y, int z, int d, ItemStack item)
+	public boolean insBox(int index, int x, int y, int z, int d, ItemStack itemstack)
 	{
 		super.insBox(index, x, y, z, d);
-		itemList.add(index, item);
+		itemList.add(index, itemstack);
+
 		return true;
 	}
 
@@ -82,34 +78,35 @@ public class CSItemBoxList extends CSBoxList
 	public int getItemDamage(int i)
 	{
 		ItemStack item = null;
+
 		if (i < itemList.size())
 		{
 			item = itemList.get(i);
 		}
+
 		return item != null ? item.getItemDamage() : 0;
 	}
 
-	public void registerItem(int x, int y, int z, int d, ItemStack item)
+	public void registerItem(int x, int y, int z, int d, ItemStack itemstack)
 	{
-		int[] pos = new int[3];
-		int dimID;
-		boolean flg = false;
-		int k = getListSize();
-		for (int i = 0; i < k; i++)
+		boolean flag = false;
+
+		for (int i = 0; i < itemList.size(); i++)
 		{
-			pos = getBoxPos(i);
-			dimID = getDimensionID(i);
-			if (x == pos[0] && y == pos[1] && z == pos[2] && dimID == d)
+			int[] pos = getBoxPos(i);
+			int dim = getDimensionID(i);
+
+			if (x == pos[0] && y == pos[1] && z == pos[2] && dim == d)
 			{
-				itemList.set(i, item);
-				flg = true;
+				itemList.set(i, itemstack);
+				flag = true;
 			}
 		}
-		if (!flg)
-		{
-			this.addBox(x, y, z, d, item);
-		}
 
+		if (!flag)
+		{
+			addBox(x, y, z, d, itemstack);
+		}
 	}
 
 	@Override
@@ -118,20 +115,22 @@ public class CSItemBoxList extends CSBoxList
 		if (tagName != null)
 		{
 			super.writeToNBT(nbt);
-			NBTTagList nbttaglist = new NBTTagList();
-			int k = this.getListSize();
-			for (int i = 0; i < k; i++)
+			NBTTagList list = new NBTTagList();
+
+			for (int i = 0; i < itemList.size(); i++)
 			{
-				ItemStack item = itemList.get(i);
-				if (item != null)
+				ItemStack itemstack = itemList.get(i);
+
+				if (itemstack != null)
 				{
-					NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-					nbttagcompound1.setInteger("Index", i);
-					item.writeToNBT(nbttagcompound1);
-					nbttaglist.appendTag(nbttagcompound1);
+					NBTTagCompound data = new NBTTagCompound();
+					data.setInteger("Index", i);
+					itemstack.writeToNBT(data);
+					list.appendTag(data);
 				}
 			}
-			nbt.setTag(tagName + "Item", nbttaglist);
+
+			nbt.setTag(tagName + "Item", list);
 		}
 	}
 
@@ -139,13 +138,16 @@ public class CSItemBoxList extends CSBoxList
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		NBTTagList nbttaglist = nbt.getTagList(tagName + "Item", 10);
-		itemList = new ArrayList<ItemStack>(nbttaglist.tagCount());
-		for (int i = 0; i < nbttaglist.tagCount(); i++)
+
+		itemList.clear();
+
+		NBTTagList list = nbt.getTagList(tagName + "Item", 10);
+
+		for (int i = 0; i < list.tagCount(); i++)
 		{
-			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-			int k = nbttagcompound1.getInteger("Index");
-			itemList.add(k, ItemStack.loadItemStackFromNBT(nbttagcompound1));
+			NBTTagCompound data = list.getCompoundTagAt(i);
+
+			itemList.add(data.getInteger("Index"), ItemStack.loadItemStackFromNBT(data));
 		}
 	}
 }

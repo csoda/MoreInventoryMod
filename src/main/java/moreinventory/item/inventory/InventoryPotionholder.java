@@ -9,12 +9,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 
-public class InventoryPotionholder implements IInventory
+public class InventoryPotionHolder implements IInventory
 {
 	private ItemStack usingItem;
 	private ItemStack[] inv;
 
-	public InventoryPotionholder(ItemStack par1ItemStack)
+	public InventoryPotionHolder(ItemStack par1ItemStack)
 	{
 		usingItem = par1ItemStack;
 		inv = new ItemStack[9];
