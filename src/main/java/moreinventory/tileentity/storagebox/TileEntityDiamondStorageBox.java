@@ -1,8 +1,10 @@
 package moreinventory.tileentity.storagebox;
 
-public class TileEntityDiamondStorageBox extends TileEntityStorageBox{
+public class TileEntityDiamondStorageBox extends TileEntityStorageBox
+{
 
-	public TileEntityDiamondStorageBox(){
+	public TileEntityDiamondStorageBox()
+	{
 		super(StorageBoxType.Diamond);
 	}
 }

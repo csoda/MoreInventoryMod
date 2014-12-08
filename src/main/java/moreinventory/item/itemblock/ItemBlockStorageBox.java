@@ -5,15 +5,18 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockStorageBox extends ItemBlock {
+public class ItemBlockStorageBox extends ItemBlock
+{
 
-	public ItemBlockStorageBox(Block block) {
+	public ItemBlockStorageBox(Block block)
+	{
 		super(block);
 		setHasSubtypes(true);
 	}
-	
+
 	@Override
-	public int getMetadata (int damageValue) {
+	public int getMetadata(int damageValue)
+	{
 		return damageValue;
 	}
 

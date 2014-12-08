@@ -1,8 +1,10 @@
 package moreinventory.tileentity.storagebox;
 
-public class TileEntityEmeraldStorageBox extends TileEntityStorageBox{
+public class TileEntityEmeraldStorageBox extends TileEntityStorageBox
+{
 
-	public TileEntityEmeraldStorageBox(){
+	public TileEntityEmeraldStorageBox()
+	{
 		super(StorageBoxType.Emerald);
 	}
 
