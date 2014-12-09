@@ -34,7 +34,7 @@ public class Config
 	{
 		if (config == null)
 		{
-			File file = new File(Loader.instance().getConfigDir(), "MoreInventoryMod-next.cfg");
+			File file = new File(Loader.instance().getConfigDir(), "MoreInventoryMod.cfg");
 			config = new Configuration(file);
 
 			try
