@@ -1,5 +1,6 @@
 package moreinventory.handler;
 
+import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.ItemTorchHolder;
 import moreinventory.item.inventory.InventoryPouch;
@@ -75,13 +76,13 @@ public class MIMEventHooks
 							MIMUtils.mergeItemStack(item, pouch);
 						}
 
-						if (MoreInventoryMod.isFullAutoCollectPouch)
+						if (Config.isFullAutoCollectPouch)
 						{
 							pouch.collectAllItemStack(inventory, false);
 						}
 					}
 
-					if (MoreInventoryMod.isCollectTorch && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder)
+					if (Config.isCollectTorch && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder)
 					{
 						int damage = itemstack.getItemDamage();
 						int count = item.stackSize;

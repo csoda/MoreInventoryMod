@@ -2,6 +2,7 @@ package moreinventory.block;
 
 import java.util.List;
 
+import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
@@ -244,13 +245,13 @@ public class BlockStorageBox extends BlockContainer
 			{
 				return icon_glass_air;
 			}
-			else if (MoreInventoryMod.clearGlassBox)
+			else if (Config.clearGlassBox)
 			{
 				return getGlassIcon(world, x, y, z, side);
 			}
 		}
 
-		if (MoreInventoryMod.StorageBoxsideTexture)
+		if (Config.containerBoxSideTexture)
 		{
 			return side == 0 || side == 1 ? icons_top[metadata] : side == face ? icons_face[metadata] : icons[metadata];
 		}

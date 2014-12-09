@@ -48,8 +48,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -78,7 +76,9 @@ import cpw.mods.fml.relauncher.Side;
 )
 public class MoreInventoryMod
 {
-	public static final String MODID = "MoreInventoryMod";
+	public static final String
+	MODID = "MoreInventoryMod",
+	CONFIG_LANG = "moreinv.config.";
 
 	@Instance(MODID)
 	public static MoreInventoryMod instance;
@@ -102,15 +102,7 @@ public class MoreInventoryMod
 	public static Item Potionholder;
 	public static Item Plating;
 
-	public static boolean isCollectTorch;
-	public static boolean isFullAutoCollectPouch;
-	public static boolean leftClickGUI;
-	public static boolean clearGlassBox;
-	public static int displayedItemSize;
-	private String modChest = "";
-
-	/*** Client ***/
-	public static boolean StorageBoxsideTexture;
+	protected static String modChest = "";
 
 	public static final Map<String, Integer> transportableChest = Maps.newHashMap();
 	public static final Map<String, Map<Integer, Integer>> transportableChestIcon = Maps.newHashMap();
@@ -125,42 +117,7 @@ public class MoreInventoryMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-		config.load();
-		Property prop1 = config.get(Configuration.CATEGORY_GENERAL, "isCollectTorchs", true);
-		prop1.comment = "Put away  when you pick up torch";
-		isCollectTorch = prop1.getBoolean(true);
-		Property prop2 = config.get(Configuration.CATEGORY_GENERAL, "fullAutoCollect", false);
-		prop2.comment = "Pouch collects items from your inventory whenever you pick up drop items";
-		isFullAutoCollectPouch = prop2.getBoolean(true);
-		Property prop3 = config.get("client.general", "displayedItemSize", 36);
-		prop3.comment = "How many Items are displayed in catchall(1~36)";
-		displayedItemSize = prop3.getInt();
-		Property prop4 = config.get(Configuration.CATEGORY_GENERAL, "modChestRegistry", "");
-		prop4.comment = "You can register other Mod's Chest to transport. [BlockName @ Metadata(-1~15) @ TextureIndex(1~29), …]";
-		modChest = prop4.getString();
-		Property prop6 = config.get("client.general", "SideTexture", false);
-		prop6.comment = "Use side-texture of ContainerBox";
-		StorageBoxsideTexture = prop6.getBoolean(true);
-		Property prop8 = config.get(Configuration.CATEGORY_GENERAL, "LeftClickGUI", false);
-		prop8.comment = "left-click to open Catchall's GUI";
-		leftClickGUI = prop8.getBoolean(true);
-		Property prop9 = config.get("client.general", "ClearGlassContainer", true);
-		prop9.comment = "Connect texture of GlassContainerBox";
-		clearGlassBox = prop9.getBoolean(true);
-
-		config.addCustomCategoryComment("client.color", "Color of number displayed on ContainerBox(000000 ~ ffffff)");
-		Property[] prop7 = new Property[StorageBoxType.values().length];
-		for (int i = 0; i < prop7.length; i++)
-		{
-			if (i != 8)
-			{
-				String st = StorageBoxType.values()[i].color == 0 ? "000000" : "ffffff";
-				prop7[i] = config.get("client.color", StorageBoxType.values()[i].name() + "Color", st);
-				StorageBoxType.values()[i].color = Integer.parseInt(prop7[i].getString(), 16);
-			}
-		}
-		config.save();
+		Config.syncConfig();
 
 		/*** Blocks ***/
 		Catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
@@ -210,7 +167,7 @@ public class MoreInventoryMod
 			GameRegistry.registerTileEntity(EnumSBAddon.values()[i].clazz, "moreinventory." + EnumSBAddon.values()[i].name());
 		}
 
-		/*** Message ***/
+		/*** Messages ***/
 		int i = 0;
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
