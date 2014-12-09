@@ -1,5 +1,6 @@
 package moreinventory.block;
 
+import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.TileEntityCatchall;
 import moreinventory.util.MIMUtils;
@@ -46,7 +47,7 @@ public class BlockCatchall extends BlockContainer
 			{
 				((TileEntityCatchall)world.getTileEntity(x, y, z)).transferTo(player);
 			}
-			else if (!MoreInventoryMod.leftClickGUI)
+			else if (!Config.leftClickCatchall)
 			{
 				player.openGui(MoreInventoryMod.instance, 0, world, x, y, z);
 			}
@@ -58,7 +59,7 @@ public class BlockCatchall extends BlockContainer
 	@Override
 	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
 	{
-		if (!world.isRemote && MoreInventoryMod.leftClickGUI && !player.isSneaking())
+		if (!world.isRemote && Config.leftClickCatchall && !player.isSneaking())
 		{
 			player.openGui(MoreInventoryMod.instance, 0, world, x, y, z);
 		}
