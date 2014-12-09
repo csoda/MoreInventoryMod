@@ -1,0 +1,22 @@
+[
+  {
+    "modid": "MoreInventoryMod",
+    "name": "MoreInventoryMod",
+    "description": "Adds more inventory like the container.",
+    "url": "http://forum.minecraftuser.jp/viewtopic.php?t=12786",
+    "updateUrl": "",
+    "logoFile": "",
+    "version": "2.2.0-beta3",
+    "credits": "By csoda, kegare",
+    "parent": "",
+    "authors": [
+      "csoda",
+      "kegare"
+    ],
+    "requiredMods": [
+      "Forge"
+    ],
+    "dependencies": [],
+    "dependants": []
+  }
+]

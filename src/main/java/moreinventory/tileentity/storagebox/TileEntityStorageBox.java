@@ -1,11 +1,12 @@
 package moreinventory.tileentity.storagebox;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import moreinventory.MoreInventoryMod;
-import moreinventory.item.inventory.InvPouch;
-import moreinventory.network.packet.*;
-import moreinventory.util.CSutil;
+import moreinventory.core.MoreInventoryMod;
+import moreinventory.item.inventory.InventoryPouch;
+import moreinventory.network.StorageBoxButtonMessage;
+import moreinventory.network.StorageBoxConfigMessage;
+import moreinventory.network.StorageBoxContentsMessage;
+import moreinventory.network.StorageBoxMessage;
+import moreinventory.util.MIMUtils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,22 +18,24 @@ import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-public class TileEntityStorageBox extends TileEntity implements IInventory,IStorageBoxNet
+public class TileEntityStorageBox extends TileEntity implements IInventory, IStorageBoxNet
 {
+	protected ItemStack[] storageItems;
 
-	protected ItemStack[] inv;
-	private String teName = "ContainefrBox";
 	private ItemStack contents;
-	
-	public int ContentsItemCount;
+
+	public int contentsCount;
 	public byte face;
 	public boolean isPrivate = false;
 	public boolean canInsert = true;
 	public boolean checkNBT = true;
+
 	private String ownerName = MoreInventoryMod.defaultOwner;
 	private StorageBoxType type;
-	private StorageBoxNetworkManager StorageBoxManager;
+	private StorageBoxNetworkManager storageBoxManager;
 
 	protected byte clickTime = 0;
 	protected byte clickCount = 0;
@@ -43,7 +46,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 	public int displayedStackCount;
 	@SideOnly(Side.CLIENT)
 	public int connectCount;
-	
+
 	public TileEntityStorageBox()
 	{
 		this(StorageBoxType.Wood);
@@ -52,292 +55,311 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 	public TileEntityStorageBox(StorageBoxType type)
 	{
 		this.type = type;
-		inv  =  new ItemStack[type.invSize];
-		face = 0;
+		this.storageItems = new ItemStack[type.inventorySize];
+		this.face = 0;
 	}
 
 	public StorageBoxType getStorageBoxType()
 	{
-		return this.type;
+		return type;
 	}
 
+	@Override
 	public StorageBoxNetworkManager getStorageBoxNetworkManager()
 	{
-		if(StorageBoxManager == null)
+		if (storageBoxManager == null)
 		{
 			makeNewBoxList();
 		}
 
-		return StorageBoxManager;
+		return storageBoxManager;
 	}
 
-	public void setStorageBoxNetworkManager(StorageBoxNetworkManager sbnet)
+	@Override
+	public void setStorageBoxNetworkManager(StorageBoxNetworkManager manager)
 	{
-		StorageBoxManager = sbnet;
+		storageBoxManager = manager;
 	}
 
+	@Override
 	public String getOwnerName()
 	{
-		return this.ownerName;
+		return ownerName;
 	}
 
-	public boolean isPrivate(){
-		return isPrivate;
-	}
-
-	@SideOnly(Side.CLIENT)
-	public void setOwnerName(String st)
+	@Override
+	public boolean isPrivate()
 	{
-		this.ownerName = st;
+		return isPrivate;
 	}
 
 	public void rotateBlock()
 	{
-        int t = (int)face;
-		t = t == 2 ? 5 : t == 5 ? 3 :t == 3 ? 4 : 2;
-        face = (byte)t;
-    	markDirty();
+		face = (byte)(face == 2 ? 5 : face == 5 ? 3 : face == 3 ? 4 : 2);
+
+		markDirty();
 	}
-	
-	public int getFirstItemIndex(){
-		
-		int t = 0;
-		
-		for(int i = 0; i < inv.length; i++)
+
+	public int getFirstItemIndex()
+	{
+		int index = 0;
+
+		for (int i = 0; i < storageItems.length; i++)
 		{
-			if(inv[i] != null)
+			if (storageItems[i] != null)
 			{
-				t = i;
+				index = i;
 				break;
 			}
 		}
-		
-		return t;
-	}
-	
-	public ItemStack getContents(){
 
-            return this.contents;
+		return index;
 	}
 
-    public Item getContentsItem(){
-        Item item = null;
-        ItemStack stack = this.getContents();
-        if(stack != null)
-        {
-            item = stack.getItem();
-        }
-        return item;
-    }
-	
-	public void setContents(ItemStack item)
+	public ItemStack getContents()
 	{
-		if(item != null)
+		return contents;
+	}
+
+	public Item getContentsItem()
+	{
+		Item item = null;
+		ItemStack itemstack = getContents();
+
+		if (itemstack != null)
 		{
-			this.contents = item;
+			item = itemstack.getItem();
+		}
+
+		return item;
+	}
+
+	public void setContents(ItemStack itemstack)
+	{
+		if (itemstack != null)
+		{
+			contents = itemstack;
 		}
 	}
-	
-	public int getContentsDamage(){
-		if(contents != null){
+
+	public int getContentsDamage()
+	{
+		if (contents != null)
+		{
 			return contents.getItemDamage();
+		}
+
+		return 0;
+	}
+
+	@Override
+	public int getSizeInventory()
+	{
+		return type.inventorySize + 1;
+	}
+
+	@Override
+	public ItemStack getStackInSlot(int slot)
+	{
+		return slot != type.inventorySize ? storageItems[slot] : null;
+	}
+
+	@Override
+	public void setInventorySlotContents(int slot, ItemStack itemstack)
+	{
+		if (itemstack != null)
+		{
+			if (getContents() == null)
+			{
+				registerItems(itemstack);
+			}
+
+			if (!isSameAsContents(itemstack) || slot == type.inventorySize)
+			{
+				getStorageBoxNetworkManager().linkedPutIn(itemstack, this, false);
+
+				MIMUtils.dropItem(worldObj, itemstack, xCoord, yCoord, zCoord);
+			}
+			else
+			{
+				storageItems[slot] = itemstack;
+			}
+
+			if (itemstack.stackSize > getInventoryStackLimit())
+			{
+				itemstack.stackSize = getInventoryStackLimit();
+			}
 		}
 		else
 		{
-			return 0;
+			if (slot < type.inventorySize)
+			{
+				storageItems[slot] = null;
+			}
 		}
+
+		markDirty();
 	}
 
+	@Override
+	public String getInventoryName()
+	{
+		return "TileEntityStorageBox";
+	}
 
-/*** IInventory ***/
+	@Override
+	public boolean hasCustomInventoryName()
+	{
+		return false;
+	}
 
-   @Override
-    public int getSizeInventory()
-    {
-            return this.type.invSize+1;
-    }
+	@Override
+	public ItemStack decrStackSize(int slot, int amount)
+	{
+		ItemStack itemstack = getStackInSlot(slot);
 
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-            return slot != this.type.invSize ? inv[slot] : null;
-    }
+		if (itemstack != null)
+		{
+			if (itemstack.stackSize <= amount)
+			{
+				setInventorySlotContents(slot, null);
+			}
+			else
+			{
+				itemstack = itemstack.splitStack(amount);
 
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack stack)
-    {
-    	if(stack != null)
-    	{
-    		if(getContents() == null)
-    		{
-    			registerItems(stack);
-    		}
+				if (itemstack.stackSize == 0)
+				{
+					setInventorySlotContents(slot, null);
+				}
+			}
+		}
 
-	        if(!isSameAsContents(stack)||slot == this.type.invSize)
-	        {
-	        	getStorageBoxNetworkManager().linkedPutIn(stack,this, false);
-	        	CSutil.dropItem(worldObj, stack, xCoord, yCoord, zCoord);
-	        }
-	        else
-	        {
-	            inv[slot] = stack;
-	        }
+		markDirty();
 
-	        if (stack.stackSize > getInventoryStackLimit())
-	        {
-	            stack.stackSize = getInventoryStackLimit();
-	        }
-    	}
-    	else
-    	{
-    		if(slot<this.type.invSize){
-    			inv[slot] = null;
-    		}
-    	}
+		return itemstack;
+	}
 
-          markDirty();
-    }
+	@Override
+	public ItemStack getStackInSlotOnClosing(int slot)
+	{
+		return getStackInSlot(slot);
+	}
 
-      @Override
-      public String getInventoryName() {
-            return "TileEntityStorageBox";
-      }
+	@Override
+	public int getInventoryStackLimit()
+	{
+		return 64;
+	}
 
-      @Override
-      public boolean hasCustomInventoryName() {
-            return false;
-      }
+	@Override
+	public boolean isUseableByPlayer(EntityPlayer player)
+	{
+		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 64;
+	}
 
-      @Override
-    public ItemStack decrStackSize(int slot, int amt)
-    {
-            ItemStack stack = getStackInSlot(slot);
-            if (stack != null) {
-                    if (stack.stackSize <= amt) {
-                            setInventorySlotContents(slot, null);
-                    } else {
-                            stack = stack.splitStack(amt);
-                            if (stack.stackSize == 0) {
-                                    setInventorySlotContents(slot, null);
-                            }
-                    }
-            }
-	        this.markDirty();
-            return stack;
-    }
+	@Override
+	public void openInventory() {}
 
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot)
-    {
-            return getStackInSlot(slot);
-    }
+	@Override
+	public void closeInventory() {}
 
-    @Override
-    public int getInventoryStackLimit()
-    {
-            return 64;
-    }
+	@Override
+	public void markDirty()
+	{
+		if (!worldObj.isRemote)
+		{
+			getContentItemCount();
+			getStorageBoxNetworkManager().updateOnInvChanged(worldObj, xCoord, yCoord, zCoord, getContents());
+			sendPacket();
+		}
 
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer player)
-    {
-            return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this &&
-            player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) < 64;
-    }
+		super.markDirty();
+	}
 
-      @Override
-      public void openInventory() {
-
-      }
-
-      @Override
-      public void closeInventory() {
-
-      }
-
-      public void markDirty()
-    {
-    	if(!worldObj.isRemote)
-    	{
-    		getContentItemCount();
-    		getStorageBoxNetworkManager().updateOnInvChanged(worldObj, xCoord, yCoord, zCoord, getContents());
-        	sendPacket();
-    	}
-    	super.markDirty();
-    }
-    public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
-    {
-    		
-    		 boolean flg = par2ItemStack != null && ((par1 != inv.length && (getContents() == null || isSameAsContents(par2ItemStack))) || (par1 == inv.length&&canInsert&&getStorageBoxNetworkManager().canLinkedImport(par2ItemStack,this)));
-    		 return flg;
-    }
-
-/*** MainMethod ***/
+	@Override
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
+	{
+		return itemstack != null && (slot != storageItems.length && (getContents() == null || isSameAsContents(itemstack)) ||
+			slot == storageItems.length && canInsert && getStorageBoxNetworkManager().canLinkedImport(itemstack, this));
+	}
 
 	public boolean registerItems(ItemStack itemstack)
 	{
-		if(itemstack!=null&&getContents() == null)
+		if (itemstack != null && getContents() == null)
 		{
 			contents = itemstack;
-			int dimID = worldObj.provider.dimensionId;
-			getStorageBoxNetworkManager().getBoxList().registerItem(xCoord, yCoord, zCoord, dimID, getContents());
+			getStorageBoxNetworkManager().getBoxList().registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
 			sendContents();
+
 			return true;
 		}
-			return false;
+
+		return false;
 	}
 
 	public boolean isSameAsContents(ItemStack itemstack)
 	{
-		boolean flg = itemstack != null && (this.getContents() == null || CSutil.compareStacksWithDamage(itemstack, this.getContents()));
-		if(flg&&itemstack.hasTagCompound()&&checkNBT)
+		boolean result = itemstack != null && (getContents() == null || MIMUtils.compareStacksWithDamage(itemstack, getContents()));
+
+		if (result && itemstack.hasTagCompound() && checkNBT)
 		{
-			for(int i = 0; i < this.getSizeInventory(); i++)
+			for (int i = 0; i < getSizeInventory(); i++)
 			{
 				ItemStack item = getStackInSlot(i);
-				if(item != null&&!ItemStack.areItemStackTagsEqual(itemstack, item))
+
+				if (item != null && !ItemStack.areItemStackTagsEqual(itemstack, item))
 				{
 					return false;
 				}
 			}
 		}
 
-		return flg;
+		return result;
 	}
 
-	public int getContentItemCount(){
-		ContentsItemCount = 0;
-		int k = inv.length;
-		for(int i=0;i<k;i++)
+	public int getContentItemCount()
+	{
+		contentsCount = 0;
+
+		for (int i = 0; i < storageItems.length; i++)
 		{
-			if(getStackInSlot(i)!=null)
+			if (getStackInSlot(i) != null)
 			{
-				ContentsItemCount +=getStackInSlot(i).stackSize;
+				contentsCount += getStackInSlot(i).stackSize;
 			}
 		}
-		return ContentsItemCount;
+
+		return contentsCount;
 	}
 
-	public boolean tryPutIn(ItemStack parItemStack)
+	public boolean tryPutIn(ItemStack itemstack)
 	{
-		if(isSameAsContents(parItemStack)){
-			CSutil.mergeItemStack(parItemStack,this);
+		if (isSameAsContents(itemstack))
+		{
+			MIMUtils.mergeItemStack(itemstack, this);
+
 			return true;
 		}
-		
+
 		return false;
 	}
 
-	public void collectAllItemStack(IInventory perInv){
-		if(this.getContents() != null){
-			int k = perInv.getSizeInventory();
-			for (int i = 0;i<k;i++){
-				ItemStack itemstack = perInv.getStackInSlot(i);
-				if(itemstack!=null)
+	public void collectAllItemStack(IInventory inventory)
+	{
+		if (getContents() != null)
+		{
+			for (int i = 0; i < inventory.getSizeInventory(); i++)
+			{
+				ItemStack itemstack = inventory.getStackInSlot(i);
+
+				if (itemstack != null)
 				{
-					if(itemstack.getItem() == MoreInventoryMod.Pouch)
+					if (itemstack.getItem() == MoreInventoryMod.Pouch)
 					{
-						InvPouch pouch = new InvPouch(itemstack);
-						if(pouch.isCollectedByBox)
+						InventoryPouch pouch = new InventoryPouch(itemstack);
+
+						if (pouch.isCollectedByBox)
 						{
 							pouch.collectedByBox(this);
 						}
@@ -351,97 +373,116 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 		}
 	}
 
-	public boolean canMergeItemStack(ItemStack parItemStack){
-		int t = this.type.invSize;
-		ItemStack itemstack;
-		for(int i = 0; i < t; i++){
-			itemstack = this.getStackInSlot(i);
-			if(itemstack == null){
+	public boolean canMergeItemStack(ItemStack itemstack)
+	{
+		int size = type.inventorySize;
+		ItemStack item;
+
+		for (int i = 0; i < size; i++)
+		{
+			item = getStackInSlot(i);
+
+			if (item == null)
+			{
 				return true;
 			}
 		}
-		for(int i = 0; i < t; i++){
-			itemstack = this.getStackInSlot(i);
-			if(itemstack.stackSize != itemstack.getMaxStackSize()){
-				return itemstack.getMaxStackSize() - itemstack.stackSize >=parItemStack.stackSize;
+
+		for (int i = 0; i < size; i++)
+		{
+			item = getStackInSlot(i);
+
+			if (item.stackSize != item.getMaxStackSize())
+			{
+				return item.getMaxStackSize() - item.stackSize >= itemstack.stackSize;
 			}
 		}
 
 		return false;
 	}
 
-	public ItemStack loadItemStack(int flg){
-		int count = 0;
+	public ItemStack loadItemStack(int flag)
+	{
 		int maxCount = 0;
-		ItemStack retItemStack = null;
-		
-		for(int i = 0;i<inv.length;i++)
+		ItemStack result = null;
+
+		for (int i = 0; i < storageItems.length; i++)
 		{
-			ItemStack itemstack = inv[i];
-			if(itemstack !=null)
+			ItemStack itemstack = storageItems[i];
+
+			if (itemstack != null)
 			{
-				if(retItemStack == null)
+				if (result == null)
 				{
-					retItemStack = itemstack.copy();
-					retItemStack.stackSize = 0;
-					maxCount = flg == 0 ? itemstack.getMaxStackSize() : flg;
-					if(maxCount > itemstack.getMaxStackSize())
+					result = itemstack.copy();
+					result.stackSize = 0;
+					maxCount = flag == 0 ? itemstack.getMaxStackSize() : flag;
+
+					if (maxCount > itemstack.getMaxStackSize())
 					{
 						maxCount = itemstack.getMaxStackSize();
 					}
 				}
 
-                if(ItemStack.areItemStackTagsEqual(retItemStack, itemstack))
-                {
-                    int l = maxCount - retItemStack.stackSize;
+				if (ItemStack.areItemStackTagsEqual(result, itemstack))
+				{
+					int j = maxCount - result.stackSize;
 
-                    if(itemstack.stackSize < l)
-                    {
-                        l = itemstack.stackSize;
-                    }
-                    decrStackSize(i, l);
-                    retItemStack.stackSize += l;
+					if (itemstack.stackSize < j)
+					{
+						j = itemstack.stackSize;
+					}
 
-                    if(retItemStack.stackSize == maxCount)
-                    {
-                        break;
-                    }
-                }
+					decrStackSize(i, j);
+
+					result.stackSize += j;
+
+					if (result.stackSize == maxCount)
+					{
+						break;
+					}
+				}
 			}
 		}
-		return retItemStack;
+
+		return result;
 	}
 
-	public boolean rightClickEvent(World world,EntityPlayer player,int x,int y,int z)
+	public boolean rightClickEvent(World world, EntityPlayer player, int x, int y, int z)
 	{
-		boolean imp = canInsert;
-		
-		clickCount++;
-		if(clickCount==1)
-		{
-			clickTime = 16;
-			ItemStack itemstack = player.getCurrentEquippedItem();
-	        registerItems(itemstack);
-	        canInsert = false;
-	        tryPutIn(itemstack);
-	        canInsert = imp;
-		}
-		else if(clickCount==2)
-		{
-			canInsert = false;
-			collectAllItemStack(player.inventory);
-			canInsert = imp;
-			updatePlayerInventory(player);
-			player.onUpdate();
-		}
-		else if(clickCount==3)
-		{
-			clickCount = 0;
-			getStorageBoxNetworkManager().linkedCollect(player.inventory);
-    		StorageBoxManager.updateOnTripleClicked(worldObj, xCoord, yCoord, zCoord, getContents());
-			updatePlayerInventory(player);
-			player.onUpdate();
+		boolean prevInsert = canInsert;
 
+		switch (++clickCount)
+		{
+			case 1:
+				clickTime = 16;
+
+				ItemStack itemstack = player.getCurrentEquippedItem();
+				registerItems(itemstack);
+
+				canInsert = false;
+				tryPutIn(itemstack);
+				canInsert = prevInsert;
+				break;
+			case 2:
+				canInsert = false;
+				collectAllItemStack(player.inventory);
+				canInsert = prevInsert;
+
+				updatePlayerInventory(player);
+				player.onUpdate();
+				break;
+			case 3:
+				clickCount = 0;
+
+				getStorageBoxNetworkManager().linkedCollect(player.inventory);
+				storageBoxManager.updateOnTripleClicked(worldObj, xCoord, yCoord, zCoord, getContents());
+				updatePlayerInventory(player);
+				player.onUpdate();
+				break;
+			default:
+				clickCount = 0;
+				break;
 		}
 
 		return true;
@@ -449,250 +490,263 @@ public class TileEntityStorageBox extends TileEntity implements IInventory,IStor
 
 	public void leftClickEvent(EntityPlayer player)
 	{
-		int slot = player.inventory.getFirstEmptyStack();
-		if(getContents() != null && slot != -1)
+		if (getContents() != null && player.inventory.getFirstEmptyStack() != -1)
 		{
-			int num = !player.isSneaking() ? 0 : 1;
-			ItemStack itemstack = loadItemStack(num);
-			player.inventory.addItemStackToInventory(itemstack);
+			player.inventory.addItemStackToInventory(loadItemStack(!player.isSneaking() ? 0 : 1));
 		}
 	}
-	
+
 	public void updatePlayerInventory(EntityPlayer player)
 	{
-		ItemStack[] pinv = player.inventory.mainInventory;
-		for(int i = 0; i < pinv.length; i++)
+		ItemStack[] items = player.inventory.mainInventory;
+
+		for (int i = 0; i < items.length; i++)
 		{
-			ItemStack itemstack = pinv[i];
-			if(itemstack!= null && itemstack.stackSize <=0)
+			ItemStack itemstack = items[i];
+
+			if (itemstack != null && itemstack.stackSize <= 0)
 			{
 				player.inventory.setInventorySlotContents(i, null);
-			}	
+			}
 		}
 	}
 
 	@Override
 	public void updateEntity()
 	{
-		if(clickTime > 0 && --clickTime == 0)clickCount = 0;
+		if (clickTime > 0 && --clickTime <= 0)
+		{
+			clickCount = 0;
+		}
 	}
 
-	
 	public boolean isFull()
 	{
 		return getPowerOutput(this) == 15;
 	}
+
 	public static int getPowerOutput(TileEntityStorageBox tile)
 	{
-		int ret = 0;
-		if(tile.type != StorageBoxType.Glass && tile.type != StorageBoxType.Ender && tile.getContents() != null){
-			ret = 15 * tile.ContentsItemCount / tile.type.invSize /  tile.getContents().getMaxStackSize();
+		if (tile.type != StorageBoxType.Glass && tile.type != StorageBoxType.Ender && tile.getContents() != null)
+		{
+			return 15 * tile.contentsCount / tile.type.inventorySize / tile.getContents().getMaxStackSize();
 		}
-		return ret;
+
+		return 0;
 	}
 
-/*** SBNetwork ***/
 	public void makeNewBoxList()
 	{
-		StorageBoxManager = new StorageBoxNetworkManager(worldObj, xCoord, yCoord, zCoord, ownerName);
+		storageBoxManager = new StorageBoxNetworkManager(worldObj, xCoord, yCoord, zCoord, ownerName);
 	}
 
 	public void onPlaced(EntityLivingBase entity)
 	{
-        if(entity instanceof EntityPlayer){
-            this.ownerName = ((EntityPlayer) entity).getDisplayName();
-        }
-		for(int i = 0; i < 6; i++)
+		if (entity instanceof EntityPlayer)
 		{
-			int[] pos = CSutil.getSidePos(xCoord,yCoord,zCoord,Facing.oppositeSide[i]);
+			ownerName = ((EntityPlayer)entity).getDisplayName();
+		}
+
+		for (int i = 0; i < 6; i++)
+		{
+			int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, Facing.oppositeSide[i]);
 			TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
-			if(tile!=null && tile instanceof IStorageBoxNet)
-                {
-				    StorageBoxNetworkManager sbnet = ((IStorageBoxNet)tile).getStorageBoxNetworkManager();
-                    sbnet.addNetwork(worldObj, xCoord, yCoord, zCoord);
-                    sbnet.getBoxList().registerItem(xCoord, yCoord, zCoord, this.worldObj.provider.dimensionId, getContents());
-                    return ;
+
+			if (tile != null && tile instanceof IStorageBoxNet)
+			{
+				StorageBoxNetworkManager manager = ((IStorageBoxNet)tile).getStorageBoxNetworkManager();
+				manager.addNetwork(worldObj, xCoord, yCoord, zCoord);
+				manager.getBoxList().registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
+
+				return;
 			}
 		}
-		if(StorageBoxManager ==null){
-			this.makeNewBoxList();
+
+		if (storageBoxManager == null)
+		{
+			makeNewBoxList();
 		}
 	}
 
 	public void onNeighborRemoved()
 	{
-		if(getStorageBoxNetworkManager().getBoxList().isOnBoxList(xCoord, yCoord, zCoord, worldObj.getWorldInfo().getVanillaDimension()))
+		if (getStorageBoxNetworkManager().getBoxList().isOnBoxList(xCoord, yCoord, zCoord, worldObj.getWorldInfo().getVanillaDimension()))
 		{
-			getStorageBoxNetworkManager().reCreateNetwork();
+			getStorageBoxNetworkManager().recreateNetwork();
 		}
 	}
 
-/*** Upgrade ***/
 	public TileEntityStorageBox upgrade(int type)
 	{
 		TileEntityStorageBox tile = StorageBoxType.makeEntity(type);
-		System.arraycopy(this.inv, 0, tile.inv , 0, this.inv.length);
-		tile.face = this.face;
-		tile.contents = this.contents;
-		tile.ContentsItemCount = this.ContentsItemCount;
-		tile.isPrivate = this.isPrivate;
-		tile.ownerName = this.ownerName;
+		System.arraycopy(storageItems, 0, tile.storageItems, 0, storageItems.length);
+		tile.face = face;
+		tile.contents = contents;
+		tile.contentsCount = contentsCount;
+		tile.isPrivate = isPrivate;
+		tile.ownerName = ownerName;
 
 		return tile;
 	}
 
-/*** Data ***/
+	@Override
+	public void readFromNBT(NBTTagCompound nbt)
+	{
+		super.readFromNBT(nbt);
 
-    public void readFromNBT(NBTTagCompound par1NBTTagCompound)
-    {
-        super.readFromNBT(par1NBTTagCompound);
-        NBTTagList nbttaglist = par1NBTTagCompound.getTagList("Items",10);
-        for (int i = 0; i < nbttaglist.tagCount(); ++i)
-        {
-            NBTTagCompound nbttagcompound1 = (NBTTagCompound)nbttaglist.getCompoundTagAt(i);
-            int j = nbttagcompound1.getShort("Slot2");
-            this.inv[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
-        }
-        this.contents = ItemStack.loadItemStackFromNBT(par1NBTTagCompound.getCompoundTag("Contents"));
-        this.ContentsItemCount = par1NBTTagCompound.getInteger("ContentsItemCount");
-        this.face = par1NBTTagCompound.getByte("face");
-        this.canInsert = par1NBTTagCompound.getBoolean("canInsert");
-        this.checkNBT = par1NBTTagCompound.getBoolean("checkNBT");
-        this.isPrivate = par1NBTTagCompound.getBoolean("isPrivate");
-        this.ownerName = par1NBTTagCompound.getString("owner");
-    }
+		NBTTagList list = nbt.getTagList("Items", 10);
 
+		for (int i = 0; i < list.tagCount(); ++i)
+		{
+			NBTTagCompound data = list.getCompoundTagAt(i);
+			storageItems[data.getShort("Slot2")] = ItemStack.loadItemStackFromNBT(data);
+		}
 
-    public void writeToNBT(NBTTagCompound par1NBTTagCompound)
-    {
-        super.writeToNBT(par1NBTTagCompound);
-        NBTTagList nbttaglist = new NBTTagList();
+		contents = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Contents"));
+		contentsCount = nbt.getInteger("ContentsItemCount");
+		face = nbt.getByte("face");
+		canInsert = nbt.getBoolean("canInsert");
+		checkNBT = nbt.getBoolean("checkNBT");
+		isPrivate = nbt.getBoolean("isPrivate");
+		ownerName = nbt.getString("owner");
+	}
 
-        for (int i = 0; i < this.inv.length; ++i)
-        {
-            if (this.inv[i] != null)
-            {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-                nbttagcompound1.setShort("Slot2", (short)i);
-                this.inv[i].writeToNBT(nbttagcompound1);
-                nbttaglist.appendTag(nbttagcompound1);
-            }
-        }
-        par1NBTTagCompound.setTag("Items", nbttaglist);
-        NBTTagCompound nbt = new NBTTagCompound();
-        if(this.contents != null){
-        	contents.writeToNBT(nbt);
-        }
-        par1NBTTagCompound.setTag("Contents", nbt);
-        par1NBTTagCompound.setInteger("ContentsItemCount",this.ContentsItemCount);
-        par1NBTTagCompound.setInteger("face",this.face);
-        par1NBTTagCompound.setBoolean("isPrivate", this.isPrivate);
-        par1NBTTagCompound.setBoolean("canInsert", canInsert);
-        par1NBTTagCompound.setBoolean("checkNBT",checkNBT);
-        par1NBTTagCompound.setString("owner",this.ownerName);
-    }
+	@Override
+	public void writeToNBT(NBTTagCompound nbt)
+	{
+		super.writeToNBT(nbt);
 
-  public TileEntityStorageBox updateFromMetadata(int k)
-    {
-        if (worldObj != null && worldObj.isRemote)
-        {
-            if (k != type.ordinal())
-            {
-                worldObj.setTileEntity(xCoord, yCoord, zCoord, StorageBoxType.makeEntity(k));
-                return (TileEntityStorageBox) worldObj.getTileEntity(xCoord, yCoord, zCoord);
-            }
-        }
-        return this;
-    }
+		NBTTagList list = new NBTTagList();
 
+		for (int i = 0; i < storageItems.length; ++i)
+		{
+			if (storageItems[i] != null)
+			{
+				NBTTagCompound data = new NBTTagCompound();
+				data.setShort("Slot2", (short)i);
+				storageItems[i].writeToNBT(data);
+				list.appendTag(data);
+			}
+		}
 
-/*** Packet ***/
-    @Override
-    public Packet getDescriptionPacket()
-    {
-        sendContents();
-        sendPacket();
-        return null;
-    }
+		nbt.setTag("Items", list);
 
-    public void handlePacket(int count, byte face){
-        this.ContentsItemCount = count;
-        this.face = face;
-        if(getContents() != null){
-            int maxStackSize = getContents().getMaxStackSize();
-            displayedStackSize = (byte) (ContentsItemCount % maxStackSize);
-            displayedStackCount = (ContentsItemCount -displayedStackSize) / maxStackSize;
-            if(displayedStackSize > 9999){
-                displayedStackCount = 1;
-                while (displayedStackSize > 99999){
-                    displayedStackSize /=10;
-                    displayedStackCount ++;
-                }
-            }
-        }
+		NBTTagCompound data = new NBTTagCompound();
 
-    }
+		if (contents != null)
+		{
+			contents.writeToNBT(data);
+		}
 
-    public void handlePacketContents(ItemStack itemstack){
-        this.contents = itemstack;
-    }
+		nbt.setTag("Contents", data);
+		nbt.setInteger("ContentsItemCount", contentsCount);
+		nbt.setInteger("face", face);
+		nbt.setBoolean("isPrivate", isPrivate);
+		nbt.setBoolean("canInsert", canInsert);
+		nbt.setBoolean("checkNBT", checkNBT);
+		nbt.setString("owner", ownerName);
+	}
 
-    public void handlePacketConfig(boolean isPrivate, boolean checkNBT, boolean canInsert, int connectCount, String owner){
-        this.isPrivate = isPrivate;
-        this.checkNBT = checkNBT;
-        this.canInsert = canInsert;
-        this.connectCount = connectCount;
-        this.ownerName = owner;
-    }
+	public TileEntityStorageBox updateFromMetadata(int meta)
+	{
+		if (worldObj != null && worldObj.isRemote)
+		{
+			if (meta != type.ordinal())
+			{
+				worldObj.setTileEntity(xCoord, yCoord, zCoord, StorageBoxType.makeEntity(meta));
 
-    public void handlePacketButton(byte channel, String owner){
-        if(!isPrivate()||ownerName.equals(owner)||ownerName.equals(MoreInventoryMod.defaultOwner)){
-            if(channel == 0){
-                this.isPrivate = !isPrivate;
-            }
-            else if(channel == 1)
-            {
-                this.checkNBT = !checkNBT;
-            }
-            else if(channel == 2)
-            {
-                this.canInsert = !canInsert;
-            }
+				return (TileEntityStorageBox)worldObj.getTileEntity(xCoord, yCoord, zCoord);
+			}
+		}
 
-            sendGUIPacketToClient();
-        }
-    }
+		return this;
+	}
 
-    public void sendPacket() {
-        MoreInventoryMod.packetPipeline.sendPacketToAllPlayer(this.getPacket());
-    }
+	@Override
+	public Packet getDescriptionPacket()
+	{
+		sendContents();
+		sendPacket();
 
-    public void sendContents() {
-        MoreInventoryMod.packetPipeline.sendPacketToAllPlayer(this.getPacketContents());
-    }
+		return null;
+	}
 
-    public void sendGUIPacketToClient(){
-        MoreInventoryMod.packetPipeline.sendPacketToAllPlayer(this.getPacketConfig());
-    }
+	public void handlePacket(int config1, byte config2)
+	{
+		contentsCount = config1;
+		face = config2;
 
-    public void sendGUIPacketToServer(byte channel){
-        System.out.println(channel);
-        MoreInventoryMod.packetPipeline.sendPacketToServer(this.getPacketButton(channel));
-    }
+		if (getContents() != null)
+		{
+			int size = getContents().getMaxStackSize();
+			displayedStackSize = (byte)(contentsCount % size);
+			displayedStackCount = (contentsCount - displayedStackSize) / size;
 
-    private AbstractPacket getPacket(){
-        return new PacketStorageBox(xCoord, yCoord, zCoord, this.getContentItemCount(), (byte)face);
-    }
+			if (displayedStackSize > 9999)
+			{
+				displayedStackCount = 1;
 
-    private AbstractPacket getPacketContents(){
-        return new PacketStorageBoxContents(xCoord, yCoord, zCoord, contents);
-    }
+				while (displayedStackSize > 99999)
+				{
+					displayedStackSize /= 10;
+					displayedStackCount++;
+				}
+			}
+		}
+	}
 
-    private AbstractPacket getPacketConfig(){
-        return new PacketStorageBoxConfig(xCoord, yCoord, zCoord,isPrivate, checkNBT, canInsert, getStorageBoxNetworkManager().getKnownList().getListSize(),ownerName);
-    }
+	public void handlePacketContents(ItemStack itemstack)
+	{
+		contents = itemstack;
+	}
 
-    private AbstractPacket getPacketButton(byte channel){
-        return new PacketStorageBoxButton(xCoord, yCoord, zCoord, channel);
-    }
+	public void handlePacketConfig(boolean config1, boolean config2, boolean config3, int config4, String owner)
+	{
+		isPrivate = config1;
+		checkNBT = config2;
+		canInsert = config3;
+		connectCount = config4;
+		ownerName = owner;
+	}
+
+	public void handlePacketButton(byte channel, String owner)
+	{
+		if (!isPrivate() || ownerName.equals(owner) || ownerName.equals(MoreInventoryMod.defaultOwner))
+		{
+			switch (channel)
+			{
+				case 0:
+					isPrivate = !isPrivate;
+					break;
+				case 1:
+					checkNBT = !checkNBT;
+					break;
+				case 2:
+					canInsert = !canInsert;
+					break;
+			}
+
+			sendGUIPacketToClient();
+		}
+	}
+
+	public void sendPacket()
+	{
+		MoreInventoryMod.network.sendToDimension(new StorageBoxMessage(xCoord, yCoord, zCoord, getContentItemCount(), face), worldObj.provider.dimensionId);
+	}
+
+	public void sendContents()
+	{
+		MoreInventoryMod.network.sendToDimension(new StorageBoxContentsMessage(xCoord, yCoord, zCoord, contents), worldObj.provider.dimensionId);
+	}
+
+	public void sendGUIPacketToClient()
+	{
+		MoreInventoryMod.network.sendToDimension(new StorageBoxConfigMessage(xCoord, yCoord, zCoord, isPrivate, checkNBT, canInsert, getStorageBoxNetworkManager().getKnownList().getListSize(), ownerName), worldObj.provider.dimensionId);
+	}
+
+	public void sendGUIPacketToServer(byte channel)
+	{
+		MoreInventoryMod.network.sendToServer(new StorageBoxButtonMessage(xCoord, yCoord, zCoord, channel));
+	}
 }

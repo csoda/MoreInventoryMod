@@ -6,37 +6,35 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 
-public class ContainerTeleporter extends ContainerSBAddonBase{
-
-	public ContainerTeleporter(InventoryPlayer player, TileEntityTeleporter tile){
-        this.tile = tile;
-        addSlotToContainer(new SlotConfig(tile, 0,  80, 35));
-        bindPlayerInventory(player);
+public class ContainerTeleporter extends ContainerSBAddonBase
+{
+	public ContainerTeleporter(InventoryPlayer player, TileEntityTeleporter tile)
+	{
+		this.addonBase = tile;
+		this.addSlotToContainer(new SlotConfig(tile, 0, 80, 35));
+		this.bindPlayerInventory(player);
 	}
-	
-    @Override
-    public ItemStack slotClick(int par1, int par2, int par3, EntityPlayer par4EntityPlayer)
-    {
-    	ItemStack retItemStack =null;
-    	if(par1 == 0)
-    	{
-    		SlotConfig slot1 = (SlotConfig)this.inventorySlots.get(par1);
-    		if(par2==0)
-    		{
-    			slot1.putStack(par4EntityPlayer.inventory.getItemStack());
-    		}
-    		else
-    		{
-       			slot1.removeItem();
-    		}
-    		((TileEntityTeleporter)tile).updateConnect();
-    	}
-    	else
-    	{
-    	   	retItemStack = super.slotClick(par1,par2,par3,par4EntityPlayer);
-    	   	
-    	}
-    	
-    	return retItemStack;
-    }
+
+	@Override
+	public ItemStack slotClick(int index, int button, int modifiers, EntityPlayer player)
+	{
+		if (index == 0)
+		{
+			SlotConfig slot = (SlotConfig)inventorySlots.get(index);
+
+			if (button == 0)
+			{
+				slot.putStack(player.inventory.getItemStack());
+			}
+			else
+			{
+				slot.removeItem();
+			}
+
+			((TileEntityTeleporter)addonBase).updateConnect();
+		}
+		else return super.slotClick(index, button, modifiers, player);
+
+		return null;
+	}
 }

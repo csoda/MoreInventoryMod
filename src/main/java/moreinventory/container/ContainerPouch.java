@@ -1,169 +1,182 @@
 package moreinventory.container;
 
-
 import invtweaks.api.container.ChestContainer;
 import invtweaks.api.container.ContainerSection;
 import invtweaks.api.container.ContainerSectionCallback;
-import moreinventory.MoreInventoryMod;
+
+import java.util.List;
+import java.util.Map;
+
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.gui.slot.SlotPouch;
 import moreinventory.gui.slot.SlotPouch2;
 import moreinventory.gui.slot.SlotPouchConfig;
-import moreinventory.item.inventory.InvPouch;
+import moreinventory.item.inventory.InventoryPouch;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @ChestContainer
-public class ContainerPouch extends Container{
-	protected InvPouch tileEntity;
+public class ContainerPouch extends Container
+{
+	private final InventoryPouch pouchInventory;
 
-    public ContainerPouch (InventoryPlayer inventoryPlayer, InvPouch po){
-            tileEntity = po;
+	public ContainerPouch(InventoryPlayer inventory, InventoryPouch pouchInventory)
+	{
+		this.pouchInventory = pouchInventory;
 
-            //configSlot
-            int k = po.getGrade()+2;
-            for(int i=0;i<k;i++){
-            	for(int j=0;j<3;j++){
-            		addSlotToContainer(new SlotPouchConfig(tileEntity, j + i * 3, 182 + j * 18, 24 + i * 18));
-            	}
-            }
-            for(int i=k;i<6;i++){
-            	for(int j=0;j<3;j++){
-            		addSlotToContainer(new SlotPouchConfig(tileEntity, j + i * 3, -2000, -2000));
-            	}
-            }
-            
-            for (int i = 0; i < 6; i++) {
-                    for (int j = 0; j < 9; j++) {
-                            addSlotToContainer(new SlotPouch2(tileEntity, j + i * 9 + 18, 8 + j * 18, 18 + i * 18));
-                    }
-            }
+		int k = pouchInventory.getGrade() + 2;
 
-            //commonly used vanilla code that adds the player's inventory
-            bindPlayerInventory(inventoryPlayer);
-    }
+		for (int i = 0; i < k; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				this.addSlotToContainer(new SlotPouchConfig(pouchInventory, j + i * 3, 182 + j * 18, 24 + i * 18));
+			}
+		}
 
-    @Override
-    public boolean canInteractWith(EntityPlayer player) {
-            return tileEntity.isUseableByPlayer(player);
-    }
+		for (int i = k; i < 6; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				this.addSlotToContainer(new SlotPouchConfig(pouchInventory, j + i * 3, -2000, -2000));
+			}
+		}
 
+		for (int i = 0; i < 6; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				this.addSlotToContainer(new SlotPouch2(pouchInventory, j + i * 9 + 18, 8 + j * 18, 18 + i * 18));
+			}
+		}
 
-    protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
-            for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 9; j++) {
-                            addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
-                                            8 + j * 18, 140 + i * 18));
-                    }
-            }
+		this.bindPlayerInventory(inventory);
+	}
 
-            int Iusing = inventoryPlayer.currentItem;
-            for (int i = 0; i < 9; i++) {
-            	if(i!=Iusing){
-                    addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 194+4));
-            	}
-            	else
-            	{
-            		addSlotToContainer(new SlotPouch(inventoryPlayer, i, 8 + i * 18, 194+4));
-            	}
-            }
-    }
+	@Override
+	public boolean canInteractWith(EntityPlayer player)
+	{
+		return pouchInventory != null && pouchInventory.isUseableByPlayer(player);
+	}
 
-    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
-    {
-        ItemStack itemstack = null;
-        Slot slot = (Slot)this.inventorySlots.get(par2);
+	protected void bindPlayerInventory(InventoryPlayer inventory)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				addSlotToContainer(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 140 + i * 18));
+			}
+		}
 
-        if (slot != null && slot.getHasStack())
-        {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-            if(itemstack1 !=null && itemstack1.getItem() == MoreInventoryMod.Pouch)return null;
+		for (int i = 0; i < 9; i++)
+		{
+			if (i != inventory.currentItem)
+			{
+				addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 194 + 4));
+			}
+			else
+			{
+				addSlotToContainer(new SlotPouch(inventory, i, 8 + i * 18, 194 + 4));
+			}
+		}
+	}
 
-            if (18 <= par2 && par2 < 72)
-            {
-                if (!this.mergeItemStack(itemstack1, 72, this.inventorySlots.size(), true))
-                {
-                    return null;
-                }
-            }
-            else if (!this.mergeItemStack(itemstack1, 18, 72, false))
-            {
-                return null;
-            }
+	@Override
+	public ItemStack transferStackInSlot(EntityPlayer player, int i)
+	{
+		ItemStack itemstack = null;
+		Slot slot = (Slot)inventorySlots.get(i);
 
-            if (itemstack1.stackSize == 0)
-            {
-                slot.putStack((ItemStack)null);
-            }
-            else
-            {
-                slot.onSlotChanged();
-            }
-        }
+		if (slot != null && slot.getHasStack())
+		{
+			ItemStack itemstack1 = slot.getStack();
+			itemstack = itemstack1.copy();
 
-        return itemstack;
-    }
+			if (itemstack1 != null && itemstack1.getItem() == MoreInventoryMod.Pouch)
+			{
+				return null;
+			}
 
-    @Override
-    public ItemStack slotClick(int par1, int par2, int par3, EntityPlayer par4EntityPlayer)
-    {
-    	ItemStack retItemStack =null;
-    	if(0<=par1&&par1<18)
-    	{
-    		SlotPouchConfig slot1 = (SlotPouchConfig)this.inventorySlots.get(par1);
-    		if(par2==0)
-    		{
-    			slot1.putStack(par4EntityPlayer.inventory.getItemStack());
-    		}
-    		else
-    		{
-       			slot1.removeItem();
-    		}
-    	}
-    	else
-    	{
-    	   	retItemStack = super.slotClick(par1,par2,par3,par4EntityPlayer);
-    	   	
-    	}
-    	return retItemStack;
-    }
+			if (18 <= i && i < 72)
+			{
+				if (!mergeItemStack(itemstack1, 72, inventorySlots.size(), true))
+				{
+					return null;
+				}
+			}
+			else if (!mergeItemStack(itemstack1, 18, 72, false))
+			{
+				return null;
+			}
 
-    @Override
-    public void onContainerClosed(EntityPlayer entityplayer)
-    {
-        super.onContainerClosed(entityplayer);
-    	tileEntity.closeInventory();
-    }
-    
+			if (itemstack1.stackSize == 0)
+			{
+				slot.putStack(null);
+			}
+			else
+			{
+				slot.onSlotChanged();
+			}
+		}
 
-    @ChestContainer.RowSizeCallback
-    private int getRowSize(){
+		return itemstack;
+	}
+
+	@Override
+	public ItemStack slotClick(int index, int button, int modifiers, EntityPlayer player)
+	{
+		if (0 <= index && index < 18)
+		{
+			SlotPouchConfig slot = (SlotPouchConfig)inventorySlots.get(index);
+
+			if (button == 0)
+			{
+				slot.putStack(player.inventory.getItemStack());
+			}
+			else
+			{
+				slot.removeItem();
+			}
+		}
+		else return super.slotClick(index, button, modifiers, player);
+
+		return null;
+	}
+
+	@Override
+	public void onContainerClosed(EntityPlayer player)
+	{
+		super.onContainerClosed(player);
+
+		pouchInventory.closeInventory();
+	}
+
+	@ChestContainer.RowSizeCallback
+	private int getRowSize()
+	{
 		return 54;
-    	
-    }
-    
-    //InvTweaks API.
-    
-    @ContainerSectionCallback
-    public Map<ContainerSection, List<Slot>> getSlot(){
-    	Map<ContainerSection, List<Slot>> retMap = new HashMap();
-    	List<Slot> slotList = new ArrayList();
-    	for(int i = 0; i  < 54; i++){
-    		slotList.add((Slot) this.inventorySlots.get(i+18));
-    	}
-    	retMap.put(ContainerSection.CHEST, slotList);
-    	
-    	return retMap;
-    }
+	}
 
+	@ContainerSectionCallback
+	public Map<ContainerSection, List<Slot>> getSlot()
+	{
+		Map<ContainerSection, List<Slot>> slotMap = Maps.newHashMap();
+		List<Slot> slotList = Lists.newArrayList();
 
+		for (int i = 0; i < 54; i++)
+		{
+			slotList.add((Slot)inventorySlots.get(i + 18));
+		}
+
+		slotMap.put(ContainerSection.CHEST, slotList);
+
+		return slotMap;
+	}
 }

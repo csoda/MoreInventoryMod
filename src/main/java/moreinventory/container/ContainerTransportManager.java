@@ -1,6 +1,5 @@
 package moreinventory.container;
 
-
 import moreinventory.gui.slot.SlotConfig;
 import moreinventory.tileentity.TileEntityTransportManager;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,68 +8,71 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerTransportManager extends Container {
+public class ContainerTransportManager extends Container
+{
+	private final TileEntityTransportManager transportManager;
 
-    protected TileEntityTransportManager tileEntity;
+	public ContainerTransportManager(InventoryPlayer inventory, TileEntityTransportManager tile)
+	{
+		this.transportManager = tile;
 
-    public ContainerTransportManager (InventoryPlayer inventoryPlayer, TileEntityTransportManager te){
-            tileEntity = te;
-            
-            for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                            addSlotToContainer(new SlotConfig(tileEntity, j + i * 3,  54 + 8 + j * 18, 17 + i * 18));
-                    }
-            }
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				this.addSlotToContainer(new SlotConfig(tile, j + i * 3, 54 + 8 + j * 18, 17 + i * 18));
+			}
+		}
 
-            bindPlayerInventory(inventoryPlayer);
-    }
+		this.bindPlayerInventory(inventory);
+	}
 
-    protected void bindPlayerInventory(InventoryPlayer inventoryPlayer) {
-            for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 9; j++) {
-                            addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
-                                            8 + j * 18, 84 + i * 18));
-                    }
-            }
+	protected void bindPlayerInventory(InventoryPlayer player)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				addSlotToContainer(new Slot(player, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+			}
+		}
 
-            for (int i = 0; i < 9; i++) {
-                    addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 138+4));
-            }
-    }
-    
+		for (int i = 0; i < 9; i++)
+		{
+			addSlotToContainer(new Slot(player, i, 8 + i * 18, 138 + 4));
+		}
+	}
 
-    @Override
-    public boolean canInteractWith(EntityPlayer player) {
-            return tileEntity.isUseableByPlayer(player);
-    }
+	@Override
+	public boolean canInteractWith(EntityPlayer player)
+	{
+		return transportManager != null && transportManager.isUseableByPlayer(player);
+	}
 
-    public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
-    {
-        return null;
-    }
-    
-    @Override
-    public ItemStack slotClick(int par1, int par2, int par3, EntityPlayer par4EntityPlayer)
-    {
-    	ItemStack retItemStack =null;
-    	if(0<=par1&&par1<9)
-    	{
-    		SlotConfig slot1 = (SlotConfig)this.inventorySlots.get(par1);
-    		if(par2==0)
-    		{
-    			slot1.putStack(par4EntityPlayer.inventory.getItemStack());
-    		}
-    		else
-    		{
-       			slot1.removeItem();
-    		}
-    	}
-    	else
-    	{
-    	   	retItemStack = super.slotClick(par1,par2,par3,par4EntityPlayer);
-    	   	
-    	}
-    	return retItemStack;
-    }
-    
+	@Override
+	public ItemStack transferStackInSlot(EntityPlayer player, int slot)
+	{
+		return null;
+	}
+
+	@Override
+	public ItemStack slotClick(int index, int button, int modifiers, EntityPlayer player)
+	{
+		if (0 <= index && index < 9)
+		{
+			SlotConfig slot = (SlotConfig)inventorySlots.get(index);
+
+			if (button == 0)
+			{
+				slot.putStack(player.inventory.getItemStack());
+			}
+			else
+			{
+				slot.removeItem();
+			}
+		}
+		else return super.slotClick(index, button, modifiers, player);
+
+		return null;
+	}
 }

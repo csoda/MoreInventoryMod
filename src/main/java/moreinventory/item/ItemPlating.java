@@ -1,8 +1,8 @@
 package moreinventory.item;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import moreinventory.MoreInventoryMod;
+import java.util.List;
+
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -12,79 +12,91 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
-import java.util.List;
-
-public class ItemPlating extends Item{
-	
+public class ItemPlating extends Item
+{
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
-	
+
 	public static final byte[] typeIndex = {1, 2, 3, 4, 5, 6, 7, 10, 12};
-	
-	public ItemPlating(){
-		super();
+
+	public ItemPlating()
+	{
 		this.setHasSubtypes(true);
 	}
 
 	@Override
-	public boolean onItemUseFirst(ItemStack itemstack, EntityPlayer player, World world, int par4, int par5, int par6, int par7, float par8, float par9, float par10)
-    {
-		if(!world.isRemote){
-			if(world.getBlock(par4, par5, par6).equals(MoreInventoryMod.StorageBox)){
-				int k = typeIndex[itemstack.getItemDamage()];
-				int t = world.getBlockMetadata(par4, par5, par6);
-				int Tier1 = StorageBoxType.values()[k].Tier;
-				int Tier2 = StorageBoxType.values()[t].Tier;
-				if(k!=0&&(Tier1 == Tier2||Tier1 == Tier2 + 1)&&StorageBoxType.values()[k].invSize > StorageBoxType.values()[t].invSize){
-					TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(par4, par5, par6);
-					world.setBlockMetadataWithNotify(par4, par5, par6, k, 2);
-					world.setTileEntity(par4, par5, par6, tile.upgrade(k));
-					if(!player.capabilities.isCreativeMode){
-						itemstack.stackSize--;
-						player.onUpdate();
-					}
-					return true;
-				}
-			}
-			return false;
-		}
-		else
+	public boolean onItemUseFirst(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
+	{
+		if (world.isRemote)
 		{
 			return false;
 		}
-    }
-	
-    public String getUnlocalizedName(ItemStack par1ItemStack)
-    {
-        return "painting:" + StorageBoxType.values()[ItemPlating.typeIndex[par1ItemStack.getItemDamage()]].name();
-    }
-	
+
+		if (world.getBlock(x, y, z) == MoreInventoryMod.StorageBox)
+		{
+			int index = typeIndex[itemstack.getItemDamage()];
+			int meta = world.getBlockMetadata(x, y, z);
+			int tier1 = StorageBoxType.values()[index].tier;
+			int tier2 = StorageBoxType.values()[meta].tier;
+
+			if (index != 0 && (tier1 == tier2 || tier1 == tier2 + 1) && StorageBoxType.values()[index].inventorySize > StorageBoxType.values()[meta].inventorySize)
+			{
+				TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
+
+				world.setBlockMetadataWithNotify(x, y, z, index, 2);
+				world.setTileEntity(x, y, z, tile.upgrade(index));
+
+				if (!player.capabilities.isCreativeMode)
+				{
+					--itemstack.stackSize;
+
+					player.onUpdate();
+				}
+
+				return true;
+			}
+
+			return false;
+		}
+
+		return false;
+	}
+
+	@Override
+	public String getUnlocalizedName(ItemStack itemstack)
+	{
+		return "painting:" + StorageBoxType.values()[ItemPlating.typeIndex[itemstack.getItemDamage()]].name();
+	}
+
 	@SideOnly(Side.CLIENT)
-    @Override
+	@Override
+	public void getSubItems(Item item, CreativeTabs tab, List list)
+	{
+		for (int i = 0; i < typeIndex.length; i++)
+		{
+			list.add(new ItemStack(this, 1, i));
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
 		icons = new IIcon[typeIndex.length];
-		int k = typeIndex.length;
-		for(int i = 0; i < k; i++){
-				icons[i] = iconRegister.registerIcon("moreinv:plating_" + StorageBoxType.values()[typeIndex[i]].name());
+
+		for (int i = 0; i < typeIndex.length; i++)
+		{
+			icons[i] = iconRegister.registerIcon("moreinv:plating_" + StorageBoxType.values()[typeIndex[i]].name());
 		}
 	}
-	
-	 @SideOnly(Side.CLIENT)
-     @Override
-	 public void getSubItems(Item par1, CreativeTabs par2CreativeTabs, List par3List)
-	 {
-		   for(int i=0;i<typeIndex.length;i++){
-			   par3List.add(new ItemStack(this, 1, i));
-		   }
-	 }
 
-	 @SideOnly(Side.CLIENT)
-	 @Override
-	 public IIcon getIconFromDamage(int par1)
-	 {
-	     return icons[par1];
-	 }
-	
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIconFromDamage(int damage)
+	{
+		return icons[damage];
+	}
 }
