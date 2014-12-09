@@ -55,6 +55,7 @@ import net.minecraftforge.oredict.ShapelessOreRecipe;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -72,6 +73,7 @@ import cpw.mods.fml.relauncher.Side;
 	modid = MoreInventoryMod.MODID,
 	acceptedMinecraftVersions = "[1.7.10,)",
 	dependencies = "after:InvTweaks",
+	guiFactory = "moreinventory.config.MIMGuiFactory",
 	useMetadata = true
 )
 public class MoreInventoryMod
@@ -188,6 +190,8 @@ public class MoreInventoryMod
 	public void load(FMLInitializationEvent event)
 	{
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new MIMGuiHandler());
+
+		FMLCommonHandler.instance().bus().register(MIMEventHooks.instance);
 
 		MinecraftForge.EVENT_BUS.register(MIMEventHooks.instance);
 

@@ -20,11 +20,24 @@ import net.minecraftforge.event.world.WorldEvent;
 
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class MIMEventHooks
 {
 	public static final MIMEventHooks instance = new MIMEventHooks();
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onConfigChanged(ConfigChangedEvent event)
+	{
+		if (event.modID.equals(MoreInventoryMod.MODID))
+		{
+			Config.syncConfig();
+		}
+	}
 
 	@SubscribeEvent
 	public void onLivingHurt(LivingHurtEvent event)

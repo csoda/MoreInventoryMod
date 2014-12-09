@@ -61,6 +61,7 @@ painting:Silver.name=銀メッキ
 painting:Emerald.name=エメラルドメッキ
 painting:Steel.name=鋼鉄メッキ
 
+moreinv.config.title=MoreInventoryModの設定
 moreinv.config.general.isCollectTorch=松明の格納
 moreinv.config.general.isCollectTorch.tooltip=松明を拾った際にトーチホルダーに格納します。
 moreinv.config.general.isFullAutoCollectPouch=フルオートポーチ
