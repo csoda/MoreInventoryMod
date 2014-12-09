@@ -6,10 +6,9 @@ import net.minecraft.inventory.Slot;
 
 public class SlotPouch extends Slot
 {
-
-	public SlotPouch(IInventory par1iInventory, int par2, int par3, int par4)
+	public SlotPouch(IInventory inventory, int index, int x, int y)
 	{
-		super(par1iInventory, par2, par3, par4);
+		super(inventory, index, x, y);
 	}
 
 	@Override
@@ -17,5 +16,4 @@ public class SlotPouch extends Slot
 	{
 		return false;
 	}
-
 }

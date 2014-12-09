@@ -1,10 +1,10 @@
 package moreinventory.tileentity;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.ImporterMessage;
 import moreinventory.tileentity.storagebox.IStorageBoxNet;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,12 +19,11 @@ public class TileEntityImporter extends TileEntityTransportManager
 
 	public void putInBox(IInventory inventory)
 	{
-		int[] pos = CSUtil.getSidePos(xCoord, yCoord, zCoord, topFace);
+		int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, topFace);
 		TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
 
 		if (tile != null && tile instanceof IStorageBoxNet)
 		{
-			ItemStack itemstack;
 			int size = inventory.getSizeInventory();
 
 			if (currentSlot >= size)
@@ -41,15 +40,15 @@ public class TileEntityImporter extends TileEntityTransportManager
 					currentSlot = 0;
 				}
 
-				itemstack = inventory.getStackInSlot(slot);
+				ItemStack itemstack = inventory.getStackInSlot(slot);
 
 				if (itemstack != null && canExtract(itemstack))
 				{
-					if (CSUtil.canAccessFromSide(inventory, slot, getSneak(face)) && CSUtil.canExtractFromSide(inventory, itemstack, slot, getSneak(face)))
+					if (MIMUtils.canAccessFromSide(inventory, slot, getSneak(face)) && MIMUtils.canExtractFromSide(inventory, itemstack, slot, getSneak(face)))
 					{
 						if (((TileEntityStorageBox)tile).getStorageBoxNetworkManager().linkedPutIn(itemstack, null, register))
 						{
-							CSUtil.checkNullStack(inventory, slot);
+							MIMUtils.checkNullStack(inventory, slot);
 
 							return;
 						}
@@ -63,13 +62,13 @@ public class TileEntityImporter extends TileEntityTransportManager
 	{
 		boolean result = !include;
 
-		for (int i = 0; i < inv.length; i++)
+		for (int i = 0; i < inventoryItems.length; i++)
 		{
-			ItemStack itemstack1 = inv[i];
+			ItemStack itemstack1 = inventoryItems[i];
 
 			if (itemstack1 != null)
 			{
-				if (CSUtil.compareStacksWithDamage(itemstack, itemstack1))
+				if (MIMUtils.compareStacksWithDamage(itemstack, itemstack1))
 				{
 					result = include;
 				}
@@ -82,7 +81,7 @@ public class TileEntityImporter extends TileEntityTransportManager
 	@Override
 	public void doExtract()
 	{
-		int[] pos = CSUtil.getSidePos(xCoord, yCoord, zCoord, face);
+		int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, face);
 		IInventory inventory = TileEntityHopper.func_145893_b(worldObj, pos[0], pos[1], pos[2]);
 
 		if (inventory != null)
@@ -109,12 +108,12 @@ public class TileEntityImporter extends TileEntityTransportManager
 
 	public void sendPacket()
 	{
-		MoreInventoryMod.network.sendToDimension(getPacket(false), worldObj.provider.dimensionId);
+		MoreInventoryMod.network.sendToDimension(new ImporterMessage(xCoord, yCoord, zCoord, register, include, false), worldObj.provider.dimensionId);
 	}
 
 	public void sendPacketToServer(boolean channel)
 	{
-		MoreInventoryMod.network.sendToServer(getPacket(channel));
+		MoreInventoryMod.network.sendToServer(new ImporterMessage(xCoord, yCoord, zCoord, register, include, channel));
 	}
 
 	@Override
@@ -126,29 +125,24 @@ public class TileEntityImporter extends TileEntityTransportManager
 		return null;
 	}
 
-	public void handlePacketClient(boolean register, boolean include, boolean channel)
+	public void handlePacketClient(boolean config1, boolean config2, boolean config3)
 	{
-		this.register = register;
-		this.include = include;
+		register = config1;
+		include = config2;
 	}
 
-	public void handlePacketServer(boolean register, boolean include, boolean channel)
+	public void handlePacketServer(boolean config1, boolean config2, boolean config3)
 	{
-		if (channel)
+		if (config3)
 		{
-			this.register = !this.register;
+			register = !register;
 		}
 		else
 		{
-			this.include = !this.include;
+			include = !include;
 		}
 
 		sendPacket();
-	}
-
-	protected ImporterMessage getPacket(boolean channel)
-	{
-		return new ImporterMessage(xCoord, yCoord, zCoord, register, include, channel);
 	}
 
 	@Override

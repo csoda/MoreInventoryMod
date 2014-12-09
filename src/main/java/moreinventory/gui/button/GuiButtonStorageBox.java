@@ -1,39 +1,42 @@
 package moreinventory.gui.button;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class GuiButtonStorageBox extends GuiButton
 {
 	public boolean isPushed;
 
-	public GuiButtonStorageBox(int par1, int par2, int par3, int par4, int par5, String par6Str, boolean flg)
+	public GuiButtonStorageBox(int id, int x, int y, int width, int height, String text, boolean pushed)
 	{
-		super(par1, par2, par3, par4, par5, par6Str);
-		isPushed = flg;
+		super(id, x, y, width, height, text);
+		this.isPushed = pushed;
 	}
 
 	@Override
-	public void drawButton(Minecraft par1Minecraft, int par2, int par3)
+	public void drawButton(Minecraft mc, int mouseX, int mouseY)
 	{
-		FontRenderer fontrenderer = par1Minecraft.fontRenderer;
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height;
-		this.mouseDragged(par1Minecraft, par2, par3);
-		int l = isPushed ? 0xff0000 : 6250336;
+		field_146123_n = mouseX >= xPosition && mouseY >= yPosition && mouseX < xPosition + width && mouseY < yPosition + height;
+		mouseDragged(mc, mouseX, mouseY);
 
-		if (!this.enabled)
+		int color = isPushed ? 0xff0000 : 6250336;
+
+		if (!enabled)
 		{
-			l = isPushed ? 0xff8080 : -6250336;
+			color = isPushed ? 0xff8080 : -6250336;
 		}
-		else if (this.field_146123_n)
+		else if (field_146123_n)
 		{
-			l = 0x4dff00;
+			color = 0x4dff00;
 		}
 
-		fontrenderer.drawString(this.displayString, this.xPosition + this.width / 2 - fontrenderer.getStringWidth(this.displayString) / 2, this.yPosition + (this.height - 8) / 2, l);
+		mc.fontRenderer.drawString(displayString, xPosition + width / 2 - mc.fontRenderer.getStringWidth(displayString) / 2, yPosition + (height - 8) / 2, color);
 	}
 }

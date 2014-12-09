@@ -1,6 +1,6 @@
 package moreinventory.tileentity;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.CatchallMessage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -98,7 +98,6 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 		}
 
 		player.onUpdate();
-		writeToNBT(new NBTTagCompound());
 	}
 
 	public void transferToPlayer(EntityPlayer player)
@@ -118,7 +117,6 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 		}
 
 		player.onUpdate();
-		writeToNBT(new NBTTagCompound());
 	}
 
 	public boolean transferTo(EntityPlayer player)

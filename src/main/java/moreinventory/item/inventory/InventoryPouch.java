@@ -1,10 +1,10 @@
 package moreinventory.item.inventory;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.PouchMessage;
 import moreinventory.tileentity.storagebox.StorageBoxNetworkManager;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -14,11 +14,10 @@ import net.minecraft.nbt.NBTTagList;
 
 public class InventoryPouch implements IInventory
 {
-	private ItemStack[] inv;
-	private final int invlength = 54;
-	private final int invConfiglength = 18;
+	private ItemStack[] pouchItems = new ItemStack[54 + 18];
 	private EntityPlayer usingPlayer;
 	private ItemStack usingItem;
+
 	public String customName;
 	public boolean isCollectedByBox = true;
 	public boolean isAutoCollect = true;
@@ -26,33 +25,31 @@ public class InventoryPouch implements IInventory
 
 	public InventoryPouch(EntityPlayer player, ItemStack itemstack)
 	{
-		this.inv = new ItemStack[invlength + invConfiglength];
 		this.usingPlayer = player;
 		this.usingItem = itemstack;
 		this.customName = itemstack.getDisplayName();
-
-		readFromNBT();
+		this.readFromNBT();
 	}
 
 	public InventoryPouch(ItemStack itemstack)
 	{
-		inv = new ItemStack[invlength + invConfiglength];
-		usingItem = itemstack;
-		readFromNBT();
+		this.usingItem = itemstack;
+		this.readFromNBT();
 	}
 
 	public int getGrade()
 	{
-		int dm = usingItem.getItemDamage();
-		return (dm - dm % 17) / 17;
+		int damage = usingItem.getItemDamage();
+
+		return (damage - damage % 17) / 17;
 	}
 
-	public void setConfigItem(int no, ItemStack itemstack)
+	public void setConfigItem(int slot, ItemStack itemstack)
 	{
 		if (itemstack != null && itemstack.getItem() != MoreInventoryMod.Pouch)
 		{
-			inv[no] = itemstack.copy();
-			inv[no].stackSize = 1;
+			pouchItems[slot] = itemstack.copy();
+			pouchItems[slot].stackSize = 1;
 		}
 	}
 
@@ -65,9 +62,9 @@ public class InventoryPouch implements IInventory
 	{
 		for (int i = 0; i < 18; i++)
 		{
-			if (inv[i] != null)
+			if (pouchItems[i] != null)
 			{
-				if (CSUtil.compareStacksWithDamage(inv[i], itemstack))
+				if (MIMUtils.compareStacksWithDamage(pouchItems[i], itemstack))
 				{
 					return true;
 				}
@@ -79,33 +76,35 @@ public class InventoryPouch implements IInventory
 
 	public void collectedByBox(TileEntityStorageBox tile)
 	{
-		for (int i = 18; i < invlength + 18; i++)
+		for (int i = 18; i < pouchItems.length; i++)
 		{
 			tile.tryPutIn(getStackInSlot(i));
-			CSUtil.checkNullStack(this, i);
+
+			MIMUtils.checkNullStack(this, i);
 		}
 	}
 
 	public void linkedPutIn(StorageBoxNetworkManager sbnet)
 	{
-		for (int i = 18; i < invlength + 18; i++)
+		for (int i = 18; i < pouchItems.length; i++)
 		{
 			sbnet.linkedPutIn(getStackInSlot(i), null, false);
-			CSUtil.checkNullStack(this, i);
+
+			MIMUtils.checkNullStack(this, i);
 		}
 	}
 
 	public void collectAllItemStack(IInventory inventory, boolean flag)
 	{
 		ItemStack itemstack;
-		int j = 0;
+		int origin = 0;
 
 		if (!isCollectMainInv)
 		{
-			j = 9;
+			origin = 9;
 		}
 
-		for (int i = j; i < inventory.getSizeInventory(); i++)
+		for (int i = origin; i < inventory.getSizeInventory(); i++)
 		{
 			itemstack = inventory.getStackInSlot(i);
 
@@ -126,29 +125,27 @@ public class InventoryPouch implements IInventory
 				{
 					if (isCollectableItem(itemstack))
 					{
-						CSUtil.mergeItemStack(itemstack, this);
+						MIMUtils.mergeItemStack(itemstack, this);
 					}
 				}
 			}
 		}
 
-		CSUtil.checkNull(inventory);
+		MIMUtils.checkNull(inventory);
 	}
 
 	public void transferToChest(IInventory tile)
 	{
 		if (tile.getSizeInventory() >= 27)
 		{
-			int m = invlength + 18;
-
-			for (int i = 18; i < m; i++)
+			for (int i = 18; i < pouchItems.length; i++)
 			{
 				ItemStack itemstack = getStackInSlot(i);
 
 				if (itemstack != null)
 				{
-					CSUtil.mergeItemStack(itemstack, tile);
-					CSUtil.checkNullStack(this, i);
+					MIMUtils.mergeItemStack(itemstack, tile);
+					MIMUtils.checkNullStack(this, i);
 				}
 			}
 		}
@@ -157,7 +154,7 @@ public class InventoryPouch implements IInventory
 	public void onCrafting(ItemStack itemstack)
 	{
 		InventoryPouch pouch = new InventoryPouch(itemstack);
-		pouch.inv = inv;
+		pouch.pouchItems = pouchItems;
 		pouch.isAutoCollect = isAutoCollect;
 		pouch.isCollectedByBox = isCollectedByBox;
 		pouch.isCollectMainInv = isCollectMainInv;
@@ -168,19 +165,19 @@ public class InventoryPouch implements IInventory
 	@Override
 	public int getSizeInventory()
 	{
-		return inv.length;
+		return pouchItems.length;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return inv[slot];
+		return pouchItems[slot];
 	}
 
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack itemstack)
 	{
-		inv[slot] = itemstack;
+		pouchItems[slot] = itemstack;
 
 		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
 		{
@@ -225,6 +222,7 @@ public class InventoryPouch implements IInventory
 		}
 
 		markDirty();
+
 		return itemtack;
 	}
 
@@ -263,7 +261,7 @@ public class InventoryPouch implements IInventory
 		if (usingItem != null)
 		{
 			NBTTagCompound nbt = usingItem.getTagCompound();
-			inv = new ItemStack[getSizeInventory()];
+			pouchItems = new ItemStack[getSizeInventory()];
 
 			if (nbt == null)
 			{
@@ -277,9 +275,9 @@ public class InventoryPouch implements IInventory
 				NBTTagCompound data = list.getCompoundTagAt(i);
 				int slot = data.getByte("Slot") & 0xFF;
 
-				if (slot >= 0 && slot < inv.length)
+				if (slot >= 0 && slot < pouchItems.length)
 				{
-					inv[slot] = ItemStack.loadItemStackFromNBT(data);
+					pouchItems[slot] = ItemStack.loadItemStackFromNBT(data);
 				}
 			}
 
@@ -295,13 +293,13 @@ public class InventoryPouch implements IInventory
 		{
 			NBTTagList list = new NBTTagList();
 
-			for (int i = 0; i < inv.length; i++)
+			for (int i = 0; i < pouchItems.length; i++)
 			{
-				if (inv[i] != null)
+				if (pouchItems[i] != null)
 				{
 					NBTTagCompound nbt = new NBTTagCompound();
 					nbt.setByte("Slot", (byte)i);
-					inv[i].writeToNBT(nbt);
+					pouchItems[i].writeToNBT(nbt);
 					list.appendTag(nbt);
 				}
 			}
@@ -324,10 +322,15 @@ public class InventoryPouch implements IInventory
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
+		if (player == null)
+		{
+			return false;
+		}
+
 		usingItem = usingPlayer.getCurrentEquippedItem();
 		readFromNBT();
 
-		if (!CSUtil.compareItems(player.getCurrentEquippedItem(), MoreInventoryMod.Pouch))
+		if (!MIMUtils.compareItems(player.getCurrentEquippedItem(), MoreInventoryMod.Pouch))
 		{
 			return false;
 		}
@@ -342,33 +345,33 @@ public class InventoryPouch implements IInventory
 	public void closeInventory() {}
 
 	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack)
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return 18 <= i;
+		return 18 <= slot;
 	}
 
-	public void handleClientPacket(boolean isCollectedByBox, boolean isCollectMainInv, boolean isAutoCollect)
+	public void handleClientPacket(boolean config1, boolean config2, boolean config3)
 	{
-		this.isCollectedByBox = isCollectedByBox;
-		this.isCollectMainInv = isCollectMainInv;
-		this.isAutoCollect = isAutoCollect;
+		isCollectedByBox = config1;
+		isCollectMainInv = config2;
+		isAutoCollect = config3;
 
 		writeToNBT(usingItem);
 	}
 
-	public void handleServerPacket(boolean isCollectedByBox, boolean isCollectMainInv, boolean isAutoCollect)
+	public void handleServerPacket(boolean config1, boolean config2, boolean config3)
 	{
-		if (isCollectedByBox)
+		if (config1)
 		{
-			this.isCollectedByBox = !this.isCollectedByBox;
+			isCollectedByBox = !isCollectedByBox;
 		}
-		else if (isCollectMainInv)
+		else if (config2)
 		{
-			this.isCollectMainInv = !this.isCollectMainInv;
+			isCollectMainInv = !isCollectMainInv;
 		}
-		else if (isAutoCollect)
+		else if (config3)
 		{
-			this.isAutoCollect = !this.isAutoCollect;
+			isAutoCollect = !isAutoCollect;
 		}
 
 		writeToNBT(usingItem);

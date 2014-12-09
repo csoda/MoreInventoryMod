@@ -2,7 +2,7 @@ package moreinventory.item;
 
 import java.util.List;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -39,10 +39,10 @@ public class ItemPlating extends Item
 		{
 			int index = typeIndex[itemstack.getItemDamage()];
 			int meta = world.getBlockMetadata(x, y, z);
-			int tier1 = StorageBoxType.values()[index].Tier;
-			int tier2 = StorageBoxType.values()[meta].Tier;
+			int tier1 = StorageBoxType.values()[index].tier;
+			int tier2 = StorageBoxType.values()[meta].tier;
 
-			if (index != 0 && (tier1 == tier2 || tier1 == tier2 + 1) && StorageBoxType.values()[index].invSize > StorageBoxType.values()[meta].invSize)
+			if (index != 0 && (tier1 == tier2 || tier1 == tier2 + 1) && StorageBoxType.values()[index].inventorySize > StorageBoxType.values()[meta].inventorySize)
 			{
 				TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 

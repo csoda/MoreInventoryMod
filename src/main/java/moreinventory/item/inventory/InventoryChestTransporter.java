@@ -1,7 +1,7 @@
 package moreinventory.item.inventory;
 
-import moreinventory.MoreInventoryMod;
-import moreinventory.util.CSUtil;
+import moreinventory.core.MoreInventoryMod;
+import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -12,14 +12,14 @@ import net.minecraft.world.World;
 
 public class InventoryChestTransporter implements IInventory
 {
-	private final ItemStack chestItem;
+	private final ItemStack usingItem;
 
 	private ItemStack tileBlock;
 	private ItemStack[] inventoryItems;
 
 	public InventoryChestTransporter(ItemStack itemstack)
 	{
-		this.chestItem = itemstack;
+		this.usingItem = itemstack;
 		this.readFromNBT();
 	}
 
@@ -46,12 +46,17 @@ public class InventoryChestTransporter implements IInventory
 
 				if (!replaceable)
 				{
-					int[] pos = CSUtil.getSidePos(x, y, z, side);
+					int[] pos = MIMUtils.getSidePos(x, y, z, side);
 					tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 				}
 				else
 				{
 					tile = world.getTileEntity(x, y, z);
+				}
+
+				if (tile == null)
+				{
+					return false;
 				}
 
 				transferToBlock(tile);
@@ -68,7 +73,7 @@ public class InventoryChestTransporter implements IInventory
 	{
 		if (checkMatryoshka((IInventory)tile))
 		{
-			NBTTagCompound nbt = chestItem.getTagCompound();
+			NBTTagCompound nbt = usingItem.getTagCompound();
 
 			if (nbt == null)
 			{
@@ -98,7 +103,7 @@ public class InventoryChestTransporter implements IInventory
 
 	public void transferToBlock(TileEntity tile)
 	{
-		NBTTagCompound nbt = chestItem.getTagCompound();
+		NBTTagCompound nbt = usingItem.getTagCompound();
 
 		if (nbt == null)
 		{
@@ -231,7 +236,7 @@ public class InventoryChestTransporter implements IInventory
 
 	public void readFromNBT()
 	{
-		NBTTagCompound nbt = chestItem.getTagCompound();
+		NBTTagCompound nbt = usingItem.getTagCompound();
 
 		if (nbt == null)
 		{
@@ -251,7 +256,7 @@ public class InventoryChestTransporter implements IInventory
 		}
 
 		nbt.setTag("tileBlock", tag);
-		chestItem.setTagCompound(nbt);
+		usingItem.setTagCompound(nbt);
 	}
 
 	@Override
@@ -259,7 +264,7 @@ public class InventoryChestTransporter implements IInventory
 	{
 		ItemStack itemstack = player.getCurrentEquippedItem();
 
-		if (itemstack != chestItem)
+		if (itemstack != usingItem)
 		{
 			return false;
 		}

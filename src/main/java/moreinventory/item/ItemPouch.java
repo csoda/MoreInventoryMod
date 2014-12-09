@@ -2,7 +2,7 @@ package moreinventory.item;
 
 import java.util.List;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.inventory.InventoryPouch;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -26,7 +26,7 @@ public class ItemPouch extends Item
 	{
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override

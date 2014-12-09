@@ -3,10 +3,10 @@ package moreinventory.item;
 import java.util.List;
 import java.util.Map;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.inventory.InventoryChestTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +28,7 @@ public class ItemChestTransporter extends Item
 	public ItemChestTransporter()
 	{
 		this.setMaxStackSize(1);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 		this.setHasSubtypes(true);
 	}
 
@@ -46,7 +46,7 @@ public class ItemChestTransporter extends Item
 			int meta = world.getBlockMetadata(x, y, z);
 			TileEntity tile;
 
-			if (MoreInventoryMod.transportableChest.containsKey(CSUtil.getUniqueName(block)))
+			if (MoreInventoryMod.transportableChest.containsKey(MIMUtils.getUniqueName(block)))
 			{
 				tile = world.getTileEntity(x, y, z);
 
@@ -76,7 +76,7 @@ public class ItemChestTransporter extends Item
 				}
 				else
 				{
-					Map<Integer, Integer> map = MoreInventoryMod.transportableChestIcon.get(CSUtil.getUniqueName(block));
+					Map<Integer, Integer> map = MoreInventoryMod.transportableChestIcon.get(MIMUtils.getUniqueName(block));
 
 					if (map != null && map.containsKey(meta))
 					{

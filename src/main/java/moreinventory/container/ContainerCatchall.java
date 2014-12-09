@@ -9,51 +9,47 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerCatchall extends Container
 {
-	protected TileEntityCatchall tileEntity;
+	private final TileEntityCatchall catchall;
 
-	public ContainerCatchall(InventoryPlayer inventoryPlayer, TileEntityCatchall te)
+	public ContainerCatchall(InventoryPlayer inventory, TileEntityCatchall tile)
 	{
-		tileEntity = te;
+		this.catchall = tile;
 
-		// the Slot constructor takes the IInventory and the slot number in that it binds to
-		// and the x-y coordinates it resides on-screen
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(tileEntity, i, 8 + i * 18, 72 + 4));
+			this.addSlotToContainer(new Slot(tile, i, 8 + i * 18, 72 + 4));
 		}
 
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				addSlotToContainer(new Slot(tileEntity, j + i * 9 + 9, 8 + j * 18, 18 + i * 18));
+				this.addSlotToContainer(new Slot(tile, j + i * 9 + 9, 8 + j * 18, 18 + i * 18));
 			}
 		}
 
-		// commonly used vanilla code that adds the player's inventory
-		bindPlayerInventory(inventoryPlayer);
+		this.bindPlayerInventory(inventory);
 	}
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return tileEntity.isUseableByPlayer(player);
+		return catchall != null && catchall.isUseableByPlayer(player);
 	}
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
+	protected void bindPlayerInventory(InventoryPlayer inventory)
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
-						8 + j * 18, 108 + i * 18));
+				addSlotToContainer(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 108 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 162 + 4));
+			addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 162 + 4));
 		}
 	}
 
@@ -82,7 +78,7 @@ public class ContainerCatchall extends Container
 
 			if (itemstack1.stackSize == 0)
 			{
-				slot.putStack((ItemStack) null);
+				slot.putStack(null);
 			}
 			else
 			{

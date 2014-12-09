@@ -3,7 +3,7 @@ package moreinventory.block;
 import java.util.List;
 import java.util.Map;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
 import moreinventory.tileentity.storagebox.addon.TileEntitySBAddonBase;
 import net.minecraft.block.BlockContainer;
@@ -23,36 +23,33 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockStorageBoxAddon extends BlockContainer
 {
-
 	@SideOnly(Side.CLIENT)
-	Map<String, IIcon> iconMap;
+	private Map<String, IIcon> iconMap;
 
 	public BlockStorageBoxAddon(Material material)
 	{
 		super(material);
-		setHardness(2.0F);
-		setCreativeTab(MoreInventoryMod.customTab);
+		this.setHardness(2.0F);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z,
-			EntityPlayer player, int idk, float what, float these, float are)
+	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
 	{
-		int meta = world.getBlockMetadata(x, y, z);
 		if (!world.isRemote && !player.isSneaking())
 		{
-			player.openGui(MoreInventoryMod.instance, EnumSBAddon.values()[meta].guiID, world, x, y, z);
+			player.openGui(MoreInventoryMod.instance, EnumSBAddon.values()[world.getBlockMetadata(x, y, z)].guiID, world, x, y, z);
 		}
+
 		return true;
 	}
 
 	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack par6ItemStack)
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack)
 	{
 		if (!world.isRemote)
 		{
-			TileEntitySBAddonBase tileEntity = (TileEntitySBAddonBase) world.getTileEntity(x, y, z);
-			tileEntity.onPlaced(entity);
+			((TileEntitySBAddonBase)world.getTileEntity(x, y, z)).onPlaced(entity);
 		}
 	}
 
@@ -64,9 +61,9 @@ public class BlockStorageBoxAddon extends BlockContainer
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerBlockIcons(IIconRegister par1IconRegister)
+	public void registerBlockIcons(IIconRegister iconRegister)
 	{
-		iconMap = EnumSBAddon.registerIcon(par1IconRegister);
+		iconMap = EnumSBAddon.registerIcon(iconRegister);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -85,11 +82,11 @@ public class BlockStorageBoxAddon extends BlockContainer
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubBlocks(Item unknown, CreativeTabs tab, List subItems)
+	public void getSubBlocks(Item item, CreativeTabs tab, List list)
 	{
-		for (int ix = 0; ix < EnumSBAddon.values().length; ix++)
+		for (int meta = 0; meta < EnumSBAddon.values().length; meta++)
 		{
-			subItems.add(new ItemStack(this, 1, ix));
+			list.add(new ItemStack(this, 1, meta));
 		}
 	}
 }

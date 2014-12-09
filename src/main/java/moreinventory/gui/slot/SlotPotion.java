@@ -6,17 +6,14 @@ import net.minecraft.item.ItemStack;
 
 public class SlotPotion extends Slot
 {
-	private IInventory inv;
-
-	public SlotPotion(IInventory par1iInventory, int par2, int par3, int par4)
+	public SlotPotion(IInventory inventory, int index, int x, int y)
 	{
-		super(par1iInventory, par2, par3, par4);
-		inv = par1iInventory;
+		super(inventory, index, x, y);
 	}
 
 	@Override
-	public boolean isItemValid(ItemStack par1ItemStack)
+	public boolean isItemValid(ItemStack itemstack)
 	{
-		return inv.isItemValidForSlot(0, par1ItemStack);
+		return inventory.isItemValidForSlot(0, itemstack);
 	}
 }

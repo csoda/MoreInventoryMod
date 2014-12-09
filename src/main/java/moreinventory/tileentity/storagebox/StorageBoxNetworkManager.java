@@ -1,10 +1,10 @@
 package moreinventory.tileentity.storagebox;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.inventory.InventoryPouch;
-import moreinventory.util.CSBoxList;
-import moreinventory.util.CSItemBoxList;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMBoxList;
+import moreinventory.util.MIMItemBoxList;
+import moreinventory.util.MIMUtils;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -13,142 +13,135 @@ import net.minecraftforge.common.DimensionManager;
 
 public class StorageBoxNetworkManager
 {
-	private String ownerName;
-	private CSItemBoxList StorageBoxList;
-	private CSBoxList AddonList;
+	private final String ownerName;
+	private final MIMItemBoxList storageBoxList = new MIMItemBoxList();
+	private final MIMBoxList addonList = new MIMBoxList();
 
 	public StorageBoxNetworkManager(World world, int x, int y, int z, String name)
 	{
-		ownerName = name;
-		StorageBoxList = new CSItemBoxList();
-		AddonList = new CSBoxList();
-		createNetwork(new CSBoxList(), world, x, y, z);
+		this.ownerName = name;
+		this.createNetwork(new MIMBoxList(), world, x, y, z);
 	}
 
-	public CSItemBoxList getBoxList()
+	public MIMItemBoxList getBoxList()
 	{
-
-		return StorageBoxList;
+		return storageBoxList;
 	}
 
-	public CSBoxList getAddonList()
+	public MIMBoxList getAddonList()
 	{
-
-		return AddonList;
+		return addonList;
 	}
 
-	public CSBoxList getKnownList()
+	public MIMBoxList getKnownList()
 	{
-		CSBoxList knownList = new CSBoxList();
-		knownList.addAllBox(StorageBoxList);
-		knownList.addAllBox(AddonList);
-		return knownList;
+		MIMBoxList list = new MIMBoxList();
+		list.addAllBox(storageBoxList);
+		list.addAllBox(addonList);
+
+		return list;
 	}
 
-	/*** Network ***/
-
-	private void createNetwork(CSBoxList knownList, World world, int x, int y, int z)
+	private void createNetwork(MIMBoxList list, World world, int x, int y, int z)
 	{
-
 		TileEntity tile = world.getTileEntity(x, y, z);
+
 		if (tile != null && tile instanceof IStorageBoxNet)
 		{
-			IStorageBoxNet itile = (IStorageBoxNet) tile;
-			if (knownList.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId))
+			IStorageBoxNet storage = (IStorageBoxNet)tile;
+
+			if (list.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId))
 			{
-				if (!itile.isPrivate() || itile.getOwnerName().equals(MoreInventoryMod.defaultOwner)
-						|| itile.getOwnerName().equals(this.ownerName))
+				if (!storage.isPrivate() || storage.getOwnerName().equals(MoreInventoryMod.defaultOwner) || storage.getOwnerName().equals(ownerName))
 				{
 					if (tile instanceof TileEntityStorageBox)
 					{
-						StorageBoxList.addBox(tile.xCoord, tile.yCoord, tile.zCoord,
-								tile.getWorldObj().provider.dimensionId, ((TileEntityStorageBox) tile).getContents());
+						storageBoxList.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId, ((TileEntityStorageBox)tile).getContents());
 					}
-					if (itile instanceof IStorageBoxAddon)
+
+					if (storage instanceof IStorageBoxAddon)
 					{
-						AddonList
-								.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
+						addonList.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
 					}
-					itile.setStorageBoxNetworkManager(this);
+
+					storage.setStorageBoxNetworkManager(this);
 				}
 			}
 
-			int[] pos;
 			for (int i = 0; i < 6; i++)
 			{
-				pos = CSUtil.getSidePos(x, y, z, i);
-				if (!knownList.isOnBoxList(pos[0], pos[1], pos[2], world.provider.dimensionId))
+				int[] pos = MIMUtils.getSidePos(x, y, z, i);
+
+				if (!list.isOnBoxList(pos[0], pos[1], pos[2], world.provider.dimensionId))
 				{
-					createNetwork(knownList, world, pos[0], pos[1], pos[2]);
+					createNetwork(list, world, pos[0], pos[1], pos[2]);
 				}
 			}
-
 		}
 	}
 
 	public void addNetwork(World world, int x, int y, int z)
 	{
-		CSBoxList knownList = getKnownList();
-		createNetwork(knownList, world, x, y, z);
+		createNetwork(getKnownList(), world, x, y, z);
 	}
 
-	public void reCreateNetwork()
+	public void recreateNetwork()
 	{
-		CSBoxList knownList = getKnownList();
-		int ssss = 0;
-		while (knownList.getListSize() > 0)
+		MIMBoxList list = getKnownList();
+		int count = 0;
+
+		while (list.getListSize() > 0)
 		{
-			if (knownList.getTileBeyondDim(0) == null)
+			if (list.getTileBeyondDim(0) == null)
 			{
-				knownList.removeBox(0);
+				list.removeBox(0);
 			}
 			else
 			{
-				int[] pos = knownList.getBoxPos(0);
-				World world = DimensionManager.getWorld(knownList.getDimensionID(0));
-				StorageBoxNetworkManager newNet = new StorageBoxNetworkManager(world, pos[0], pos[1], pos[2], ownerName);
-				knownList = knownList.getDifference(newNet.getKnownList());
-
+				int[] pos = list.getBoxPos(0);
+				StorageBoxNetworkManager manager = new StorageBoxNetworkManager(DimensionManager.getWorld(list.getDimensionID(0)), pos[0], pos[1], pos[2], ownerName);
+				list = list.getDifference(manager.getKnownList());
 			}
-			ssss++;
-			if (ssss > 100)
+
+			if (++count > 100)
+			{
 				break;
+			}
 		}
 	}
 
-	public CSBoxList getMatchingList(ItemStack itemstack)
+	public MIMBoxList getMatchingList(ItemStack itemstack)
 	{
-
-		CSBoxList retList = new CSBoxList();
-		int size = StorageBoxList.getListSize();
+		MIMBoxList list = new MIMBoxList();
 
 		if (itemstack != null)
 		{
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < storageBoxList.getListSize(); i++)
 			{
-				if (CSUtil.compareStacksWithDamage(itemstack, StorageBoxList.getItem(i)))
+				if (MIMUtils.compareStacksWithDamage(itemstack, storageBoxList.getItem(i)))
 				{
-					TileEntityStorageBox tile = (TileEntityStorageBox) StorageBoxList.getTileBeyondDim(i);
-					retList.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
+					TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
+
+					list.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
 				}
 			}
 		}
-		return retList;
+
+		return list;
 	}
 
-	/*** StorageBox ***/
-
-	public void linkedCollect(IInventory iinv)
+	public void linkedCollect(IInventory inventory)
 	{
-
-		for (int i = 0; i < iinv.getSizeInventory(); i++)
+		for (int i = 0; i < inventory.getSizeInventory(); i++)
 		{
-			ItemStack item = iinv.getStackInSlot(i);
+			ItemStack item = inventory.getStackInSlot(i);
+
 			if (item != null)
 			{
 				if (item.getItem() == MoreInventoryMod.Pouch)
 				{
 					InventoryPouch pouch = new InventoryPouch(item);
+
 					if (pouch.isCollectedByBox)
 					{
 						pouch.linkedPutIn(this);
@@ -162,16 +155,18 @@ public class StorageBoxNetworkManager
 		}
 	}
 
-	public boolean linkedPutIn(ItemStack itemstack, TileEntityStorageBox parTile, boolean isRegister)
+	public boolean linkedPutIn(ItemStack itemstack, TileEntityStorageBox storageBox, boolean register)
 	{
+		MIMBoxList list = getMatchingList(itemstack);
 
-		CSBoxList list = this.getMatchingList(itemstack);
 		for (int i = 0; i < list.getListSize(); i++)
 		{
-			TileEntityStorageBox tile = (TileEntityStorageBox) list.getTileBeyondDim(i);
-			if (tile != parTile && !tile.isFull())
+			TileEntityStorageBox tile = (TileEntityStorageBox)list.getTileBeyondDim(i);
+
+			if (tile != storageBox && !tile.isFull())
 			{
 				tile.tryPutIn(itemstack);
+
 				if (itemstack == null || itemstack.stackSize == 0)
 				{
 					return true;
@@ -179,18 +174,20 @@ public class StorageBoxNetworkManager
 			}
 		}
 
-		if (isRegister)
+		if (register)
 		{
-			int size = StorageBoxList.getListSize();
+			int size = storageBoxList.getListSize();
+
 			for (int i = 0; i < size; i++)
 			{
-				if (StorageBoxList.getItem(i) == null)
+				if (storageBoxList.getItem(i) == null)
 				{
-					TileEntityStorageBox tile = (TileEntityStorageBox) StorageBoxList.getTileBeyondDim(i);
-					if (tile.getStorageBoxType() != StorageBoxType.Glass
-							&& tile.getStorageBoxType() != StorageBoxType.Ender && tile.getContents() == null)
+					TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
+
+					if (tile.getStorageBoxType() != StorageBoxType.Glass && tile.getStorageBoxType() != StorageBoxType.Ender && tile.getContents() == null)
 					{
 						tile.tryPutIn(itemstack);
+
 						if (itemstack == null)
 						{
 							return true;
@@ -199,34 +196,29 @@ public class StorageBoxNetworkManager
 				}
 			}
 		}
+
 		return false;
 	}
 
-	protected boolean canLinkedImport(ItemStack itemstack, TileEntityStorageBox parTile)
+	protected boolean canLinkedImport(ItemStack itemstack, TileEntityStorageBox storageBox)
 	{
-		int size = StorageBoxList.getListSize();
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < storageBoxList.getListSize(); i++)
 		{
-			if (CSUtil.compareStacksWithDamage(itemstack, StorageBoxList.getItem(i)))
+			if (MIMUtils.compareStacksWithDamage(itemstack, storageBoxList.getItem(i)))
 			{
-				TileEntityStorageBox tile = (TileEntityStorageBox) StorageBoxList.getTileBeyondDim(i);
-				if (tile != parTile && tile.canMergeItemStack(itemstack))
+				TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
+
+				if (tile != storageBox && tile.canMergeItemStack(itemstack))
 				{
 					return true;
 				}
 			}
 		}
+
 		return false;
 	}
 
-	public void updateOnInvChanged(World world, int x, int y, int z, ItemStack item)
-	{
+	public void updateOnInvChanged(World world, int x, int y, int z, ItemStack item) {}
 
-	}
-
-	public void updateOnTripleClicked(World world, int x, int y, int z, ItemStack item)
-	{
-
-	}
-
+	public void updateOnTripleClicked(World world, int x, int y, int z, ItemStack item) {}
 }

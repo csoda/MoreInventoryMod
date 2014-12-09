@@ -1,6 +1,6 @@
 package moreinventory.tileentity.storagebox;
 
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -13,21 +13,21 @@ public class TileEntityGlassStorageBox extends TileEntityStorageBox
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack)
+	public void setInventorySlotContents(int slot, ItemStack itemstack)
 	{
-		if (stack != null)
+		if (itemstack != null)
 		{
-			getStorageBoxNetworkManager().linkedPutIn(stack, this, false);
-			CSUtil.dropItem(worldObj, stack, xCoord, yCoord, zCoord);
+			getStorageBoxNetworkManager().linkedPutIn(itemstack, this, false);
+			MIMUtils.dropItem(worldObj, itemstack, xCoord, yCoord, zCoord);
 
-			if (stack.stackSize > getInventoryStackLimit())
+			if (itemstack.stackSize > getInventoryStackLimit())
 			{
-				stack.stackSize = getInventoryStackLimit();
+				itemstack.stackSize = getInventoryStackLimit();
 			}
 		}
 		else
 		{
-			inv[slot] = null;
+			storageItems[slot] = null;
 		}
 
 		markDirty();
@@ -36,34 +36,33 @@ public class TileEntityGlassStorageBox extends TileEntityStorageBox
 	@Override
 	public boolean rightClickEvent(World world, EntityPlayer player, int x, int y, int z)
 	{
-		clickCount++;
 		if (clickTime == 0)
+		{
 			clickTime = 10;
-		if (clickCount == 3)
+		}
+
+		if (++clickCount == 3)
 		{
 			getStorageBoxNetworkManager().linkedCollect(player.inventory);
 			player.onUpdate();
 			clickTime = 0;
 			clickCount = 0;
+
 			return true;
 		}
+
 		return false;
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return getStorageBoxNetworkManager().canLinkedImport(par2ItemStack, this);
+		return getStorageBoxNetworkManager().canLinkedImport(itemstack, this);
 	}
 
 	@Override
-	public void sendPacket()
-	{
-	}
+	public void sendPacket() {}
 
 	@Override
-	public void sendContents()
-	{
-	}
-
+	public void sendContents() {}
 }

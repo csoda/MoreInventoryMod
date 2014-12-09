@@ -1,8 +1,8 @@
 package moreinventory.tileentity;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.TransportManagerMessage;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -13,12 +13,14 @@ import net.minecraft.tileentity.TileEntity;
 
 public abstract class TileEntityTransportManager extends TileEntity implements IInventory
 {
-	protected ItemStack[] inv = new ItemStack[9];
-	private byte updateTime = 20;
+	protected ItemStack[] inventoryItems = new ItemStack[9];
+
 	public byte face = 0;
 	public byte topFace = 1;
 	public byte sneak = 6;
 	public int currentSlot = 0;
+
+	private byte updateTime = 20;
 
 	public void rotateBlock()
 	{
@@ -26,7 +28,7 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 
 		for (int i = 0; i < 6; i++)
 		{
-			for (int t = 0; t < 5; t++)
+			for (int j = 0; j < 5; j++)
 			{
 				rotateTop();
 
@@ -71,12 +73,12 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 		}
 	}
 
-	public boolean haveIInventory(int dir)
+	public boolean haveIInventory(int side)
 	{
-		int[] pos = CSUtil.getSidePos(xCoord, yCoord, zCoord, dir);
+		int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, side);
 		TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
 
-		if (tile instanceof IInventory)
+		if (tile != null && tile instanceof IInventory)
 		{
 			return true;
 		}
@@ -94,18 +96,19 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 				if (--updateTime == 0)
 				{
 					updateTime = 20;
+
 					doExtract();
 				}
 			}
 		}
 	}
 
-	public void setConfigItem(int no, ItemStack itemstack)
+	public void setConfigItem(int slot, ItemStack itemstack)
 	{
 		if (itemstack != null)
 		{
-			inv[no] = itemstack.copy();
-			inv[no].stackSize = 1;
+			inventoryItems[slot] = itemstack.copy();
+			inventoryItems[slot].stackSize = 1;
 		}
 	}
 
@@ -119,23 +122,23 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 	@Override
 	public int getSizeInventory()
 	{
-		return this.inv.length;
+		return this.inventoryItems.length;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return inv[slot];
+		return inventoryItems[slot];
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack)
+	public void setInventorySlotContents(int slot, ItemStack itemstack)
 	{
-		inv[slot] = stack;
+		inventoryItems[slot] = itemstack;
 
-		if (stack != null && stack.stackSize > getInventoryStackLimit())
+		if (itemstack != null && itemstack.stackSize > getInventoryStackLimit())
 		{
-			stack.stackSize = getInventoryStackLimit();
+			itemstack.stackSize = getInventoryStackLimit();
 		}
 	}
 
@@ -146,19 +149,19 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amt)
+	public ItemStack decrStackSize(int slot, int amount)
 	{
 		ItemStack itemstack = getStackInSlot(slot);
 
 		if (itemstack != null)
 		{
-			if (itemstack.stackSize <= amt)
+			if (itemstack.stackSize <= amount)
 			{
 				setInventorySlotContents(slot, null);
 			}
 			else
 			{
-				itemstack = itemstack.splitStack(amt);
+				itemstack = itemstack.splitStack(amount);
 
 				if (itemstack.stackSize == 0)
 				{
@@ -192,7 +195,7 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) < 64;
+		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 64;
 	}
 
 	@Override
@@ -212,16 +215,16 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 	{
 		super.readFromNBT(nbt);
 		NBTTagList list = nbt.getTagList("items", 10);
-		inv = new ItemStack[getSizeInventory()];
+		inventoryItems = new ItemStack[getSizeInventory()];
 
 		for (int i = 0; i < list.tagCount(); ++i)
 		{
 			NBTTagCompound data = list.getCompoundTagAt(i);
-			int j = data.getByte("Slot") & 255;
+			int slot = data.getByte("Slot") & 255;
 
-			if (j >= 0 && j < inv.length)
+			if (slot >= 0 && slot < inventoryItems.length)
 			{
-				inv[j] = ItemStack.loadItemStackFromNBT(data);
+				inventoryItems[slot] = ItemStack.loadItemStackFromNBT(data);
 			}
 		}
 
@@ -237,13 +240,13 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 		super.writeToNBT(nbt);
 		NBTTagList list = new NBTTagList();
 
-		for (int i = 0; i < inv.length; ++i)
+		for (int i = 0; i < inventoryItems.length; ++i)
 		{
-			if (inv[i] != null)
+			if (inventoryItems[i] != null)
 			{
 				NBTTagCompound data = new NBTTagCompound();
 				data.setByte("Slot", (byte)i);
-				inv[i].writeToNBT(data);
+				inventoryItems[i].writeToNBT(data);
 				list.appendTag(data);
 			}
 		}
@@ -255,11 +258,11 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 		nbt.setInteger("currentSlot", currentSlot);
 	}
 
-	public void handleCommonPacketData(byte face, byte topFace, byte sneak)
+	public void handleCommonPacketData(byte config1, byte config2, byte config3)
 	{
-		this.face = face;
-		this.topFace = topFace;
-		this.sneak = sneak;
+		face = config1;
+		topFace = config2;
+		sneak = config3;
 	}
 
 	@Override

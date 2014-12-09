@@ -1,8 +1,8 @@
 package moreinventory.tileentity.storagebox;
 
-import moreinventory.util.CSItemBoxList;
-import moreinventory.util.CSItemInvList;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMItemBoxList;
+import moreinventory.util.MIMItemInvList;
+import moreinventory.util.MIMUtils;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -11,8 +11,8 @@ import net.minecraftforge.common.DimensionManager;
 
 public class TileEntityEnderStorageBox extends TileEntityStorageBox
 {
-	public static CSItemInvList itemList;
-	public static CSItemBoxList enderboxList;
+	public static MIMItemInvList itemList;
+	public static MIMItemBoxList enderBoxList;
 
 	public TileEntityEnderStorageBox()
 	{
@@ -30,12 +30,11 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		if (par1 == 0)
+		if (slot == 0)
 		{
-			return par2ItemStack != null && par2ItemStack.getItem() == this.getContentsItem()
-					&& par2ItemStack.getItemDamage() == this.getContentsDamage() && !par2ItemStack.hasTagCompound();
+			return itemstack != null && itemstack.getItem() == getContentsItem() && itemstack.getItemDamage() == getContentsDamage() && !itemstack.hasTagCompound();
 		}
 
 		return false;
@@ -44,47 +43,54 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	@Override
 	public int getContentItemCount()
 	{
-		int t = itemList.getItemCount(this.getContents());
-		if (inv[1] != null)
+		int count = itemList.getItemCount(getContents());
+
+		if (storageItems[1] != null)
 		{
-			t += inv[1].stackSize;
+			count += storageItems[1].stackSize;
 		}
-		this.ContentsItemCount = t;
-		return this.ContentsItemCount;
+
+		contentsCount = count;
+
+		return contentsCount;
 	}
 
 	@Override
 	public void markDirty()
 	{
 		ItemStack itemstack = itemList.updateState(itemList.getItemIndex(getContents()));
+
 		if (itemstack != null)
 		{
-			CSUtil.dropItem(worldObj, itemstack, xCoord, yCoord, zCoord);
+			MIMUtils.dropItem(worldObj, itemstack, xCoord, yCoord, zCoord);
 		}
+
 		updateDisplayedSize();
+
 		super.markDirty();
 	}
 
 	public void updateDisplayedSize()
 	{
-		int k = TileEntityEnderStorageBox.enderboxList.getListSize();
-		for (int i = 0; i < k; i++)
+		for (int i = 0; i < enderBoxList.getListSize(); i++)
 		{
-			if (CSUtil.compareStacksWithDamage(enderboxList.getItem(i), getContents()))
+			if (MIMUtils.compareStacksWithDamage(enderBoxList.getItem(i), getContents()))
 			{
-				int[] pos = enderboxList.getBoxPos(i);
-				World world = DimensionManager.getWorld(enderboxList.getDimensionID(i));
+				int[] pos = enderBoxList.getBoxPos(i);
+				World world = DimensionManager.getWorld(enderBoxList.getDimensionID(i));
+
 				if (world != null)
 				{
 					TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+
 					if (tile != null && tile instanceof TileEntityEnderStorageBox)
 					{
-						((TileEntityStorageBox) tile).getContentItemCount();
-						((TileEntityStorageBox) tile).sendPacket();
+						((TileEntityStorageBox)tile).getContentItemCount();
+						((TileEntityStorageBox)tile).sendPacket();
 					}
 					else
 					{
-						TileEntityEnderStorageBox.enderboxList.removeBox(i);
+						enderBoxList.removeBox(i);
 					}
 				}
 			}
@@ -94,18 +100,21 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	@Override
 	public boolean registerItems(ItemStack itemstack)
 	{
-		boolean ret = super.registerItems(itemstack);
-		int dimID = worldObj.provider.dimensionId;
-		enderboxList.registerItem(xCoord, yCoord, zCoord, dimID, getContents());
+		boolean result = super.registerItems(itemstack);
+
+		enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
 		itemList.registerItem(getContents());
-		this.inv = itemList.getInv(getContents());
-		return ret;
+
+		storageItems = itemList.getInv(getContents());
+
+		return result;
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readFromNBT(NBTTagCompound nbt)
 	{
-		super.readFromNBT(par1NBTTagCompound);
-		this.inv = getInv();
+		super.readFromNBT(nbt);
+
+		storageItems = getInv();
 	}
 }

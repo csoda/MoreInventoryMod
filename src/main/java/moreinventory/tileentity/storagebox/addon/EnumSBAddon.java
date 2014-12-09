@@ -1,24 +1,26 @@
 package moreinventory.tileentity.storagebox.addon;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
+
+import com.google.common.collect.Maps;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public enum EnumSBAddon
 {
-	Teleporter(5, TileEntityTeleporter.class, new String[] { "side", "top", "bottom" });
+	Teleporter(5, TileEntityTeleporter.class, new String[] {"side", "top", "bottom"});
 
 	public final int guiID;
 	public final Class<? extends TileEntity> clazz;
 	public final String[] icons;
 
-	EnumSBAddon(int guiID, Class<? extends TileEntity> clazz, String[] icons)
+	private EnumSBAddon(int guiID, Class<? extends TileEntity> clazz, String[] icons)
 	{
 		this.guiID = guiID;
 		this.clazz = clazz;
@@ -28,23 +30,19 @@ public enum EnumSBAddon
 	public static TileEntity makeEntity(int metadata)
 	{
 		int meta = validateMeta(metadata);
+
 		if (meta == metadata)
 		{
-			TileEntity te;
 			try
 			{
-				te = values()[meta].clazz.newInstance();
-				return te;
+				return values()[meta].clazz.newInstance();
 			}
-			catch (InstantiationException e)
-			{
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e)
+			catch (InstantiationException | IllegalAccessException e)
 			{
 				e.printStackTrace();
 			}
 		}
+
 		return null;
 	}
 
@@ -59,16 +57,15 @@ public enum EnumSBAddon
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static Map<String, IIcon> registerIcon(IIconRegister IconRegister)
+	public static Map<String, IIcon> registerIcon(IIconRegister iconRegister)
 	{
-		Map<String, IIcon> iconMap = new HashMap();
+		Map<String, IIcon> iconMap = Maps.newHashMap();
+
 		for (int i = 0; i < values().length; i++)
 		{
-			for (int t = 0; t < values()[i].icons.length; t++)
+			for (int j = 0; j < values()[i].icons.length; j++)
 			{
-				String name = values()[i].name() + "_" + values()[i].icons[t];
-				iconMap.put(values()[i].name() + "_" + values()[i].icons[t],
-						IconRegister.registerIcon("moreinv:" + name));
+				iconMap.put(values()[i].name() + "_" + values()[i].icons[j], iconRegister.registerIcon("moreinv:" + values()[i].name() + "_" + values()[i].icons[j]));
 			}
 		}
 
@@ -78,32 +75,27 @@ public enum EnumSBAddon
 	@SideOnly(Side.CLIENT)
 	public static IIcon getBlockTexture(Map<String, IIcon> map, IBlockAccess world, int x, int y, int z, int side)
 	{
-
-		int meta = world.getBlockMetadata(x, y, z);
-
-		return getIcon(map, side, meta);
+		return getIcon(map, side, world.getBlockMetadata(x, y, z));
 	}
 
 	@SideOnly(Side.CLIENT)
 	public static IIcon getIcon(Map<String, IIcon> map, int side, int meta)
 	{
-		EnumSBAddon en = values()[meta];
-		IIcon icon = null;
+		EnumSBAddon addon = values()[meta];
+
 		if (meta == 0)
 		{
-			if (side == 0)
+			switch (side)
 			{
-				icon = map.get(en.name() + "_" + en.icons[2]);
-			}
-			else if (side == 1)
-			{
-				icon = map.get(en.name() + "_" + en.icons[1]);
-			}
-			else
-			{
-				icon = map.get(en.name() + "_" + en.icons[0]);
+				case 0:
+					return map.get(addon.name() + "_" + addon.icons[2]);
+				case 1:
+					return map.get(addon.name() + "_" + addon.icons[1]);
+				default:
+					return map.get(addon.name() + "_" + addon.icons[0]);
 			}
 		}
-		return icon;
+
+		return null;
 	}
 }

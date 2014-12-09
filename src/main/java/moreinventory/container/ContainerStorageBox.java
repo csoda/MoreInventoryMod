@@ -9,19 +9,18 @@ import net.minecraft.item.ItemStack;
 
 public class ContainerStorageBox extends Container
 {
-	protected TileEntityStorageBox tile;
+	private final TileEntityStorageBox storageBox;
 
-	public ContainerStorageBox(InventoryPlayer inventoryPlayer, TileEntityStorageBox te)
+	public ContainerStorageBox(InventoryPlayer inventoryPlayer, TileEntityStorageBox tile)
 	{
-		tile = te;
-
-		addSlotToContainer(new SlotConfig(tile, tile.getFirstItemIndex(), 30, 16));
+		this.storageBox = tile;
+		this.addSlotToContainer(new SlotConfig(tile, tile.getFirstItemIndex(), 30, 16));
 	}
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return tile.isUseableByPlayer(player);
+		return storageBox != null && storageBox.isUseableByPlayer(player);
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package moreinventory.crafting;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.inventory.InventoryPouch;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryCrafting;

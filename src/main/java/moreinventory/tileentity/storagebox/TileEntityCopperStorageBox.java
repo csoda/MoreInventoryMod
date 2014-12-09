@@ -6,5 +6,4 @@ public class TileEntityCopperStorageBox extends TileEntityStorageBox
 	{
 		super(StorageBoxType.Copper);
 	}
-
 }

@@ -8,13 +8,9 @@ import net.minecraft.item.ItemStack;
 
 public class SlotPouchConfig extends Slot
 {
-	private InventoryPouch invpouch;
-
-	public SlotPouchConfig(IInventory par1iInventory, int par2, int par3, int par4)
+	public SlotPouchConfig(IInventory inventory, int index, int x, int y)
 	{
-		super(par1iInventory, par2, par3, par4);
-		invpouch = (InventoryPouch) this.inventory;
-
+		super(inventory, index, x, y);
 	}
 
 	@Override
@@ -24,33 +20,34 @@ public class SlotPouchConfig extends Slot
 	}
 
 	@Override
-	public boolean canTakeStack(EntityPlayer par1EntityPlayer)
+	public boolean canTakeStack(EntityPlayer player)
 	{
 		return false;
 	}
 
 	@Override
-	public boolean isItemValid(ItemStack par1ItemStack)
+	public boolean isItemValid(ItemStack itemstack)
 	{
 		return false;
 	}
 
 	@Override
-	public void putStack(ItemStack par1ItemStack)
+	public void putStack(ItemStack itemstack)
 	{
 		ItemStack item = null;
-		if (par1ItemStack != null)
+
+		if (itemstack != null)
 		{
-			item = par1ItemStack.copy();
+			item = itemstack.copy();
 			item.stackSize = 0;
 		}
-		invpouch.setConfigItem(this.getSlotIndex(), item);
-		this.onSlotChanged();
 
+		((InventoryPouch)inventory).setConfigItem(getSlotIndex(), item);
+		onSlotChanged();
 	}
 
 	public void removeItem()
 	{
-		invpouch.setInventorySlotContents(this.getSlotIndex(), (ItemStack) null);
+		inventory.setInventorySlotContents(this.getSlotIndex(), (ItemStack) null);
 	}
 }

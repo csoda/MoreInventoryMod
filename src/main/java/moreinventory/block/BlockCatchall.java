@@ -1,17 +1,19 @@
 package moreinventory.block;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.TileEntityCatchall;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
@@ -22,7 +24,7 @@ public class BlockCatchall extends BlockContainer
 	public BlockCatchall(Material material)
 	{
 		super(material);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 		this.setStepSound(Block.soundTypeWood);
 		this.setHardness(1.0F);
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.75F, 1.0F);
@@ -32,8 +34,7 @@ public class BlockCatchall extends BlockContainer
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack)
 	{
-		int l = MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-		world.setBlockMetadataWithNotify(x, y, z, l, 2);
+		world.setBlockMetadataWithNotify(x, y, z, MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3, 2);
 	}
 
 	@Override
@@ -43,14 +44,14 @@ public class BlockCatchall extends BlockContainer
 		{
 			if (!player.isSneaking())
 			{
-				TileEntityCatchall tileEntity = (TileEntityCatchall) world.getTileEntity(x, y, z);
-				tileEntity.transferTo(player);
+				((TileEntityCatchall)world.getTileEntity(x, y, z)).transferTo(player);
 			}
 			else if (!MoreInventoryMod.leftClickGUI)
 			{
 				player.openGui(MoreInventoryMod.instance, 0, world, x, y, z);
 			}
 		}
+
 		return true;
 	}
 
@@ -67,29 +68,29 @@ public class BlockCatchall extends BlockContainer
 	public void breakBlock(World world, int x, int y, int z, Block par5, int par6)
 	{
 		dropItems(world, x, y, z);
+
 		super.breakBlock(world, x, y, z, par5, par6);
 	}
 
 	private void dropItems(World world, int x, int y, int z)
 	{
-		TileEntity tileEntity = world.getTileEntity(x, y, z);
+		TileEntity tile = world.getTileEntity(x, y, z);
 
-		if (!(tileEntity instanceof IInventory))
+		if (tile == null || !(tile instanceof IInventory))
 		{
 			return;
 		}
 
-		IInventory inventory = (IInventory) tileEntity;
+		IInventory inventory = (IInventory)tile;
 
 		for (int i = 0; i < inventory.getSizeInventory(); i++)
 		{
-			ItemStack item = inventory.getStackInSlot(i);
-			CSUtil.dropItem(world, item, x, y, z);
+			MIMUtils.dropItem(world, inventory.getStackInSlot(i), x, y, z);
 		}
 	}
 
 	@Override
-	public TileEntity createNewTileEntity(World world, int num)
+	public TileEntity createNewTileEntity(World world, int metadata)
 	{
 		return new TileEntityCatchall();
 	}
@@ -114,8 +115,12 @@ public class BlockCatchall extends BlockContainer
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerBlockIcons(IIconRegister par1IconRegister)
+	public void registerBlockIcons(IIconRegister iconRegister) {}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIcon(int side, int metadata)
 	{
-		this.blockIcon = par1IconRegister.registerIcon("planks_oak");
+		return Blocks.planks.getIcon(1, 0);
 	}
 }

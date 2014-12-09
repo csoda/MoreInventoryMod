@@ -2,11 +2,11 @@ package moreinventory.block;
 
 import java.util.List;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -38,13 +38,14 @@ public class BlockStorageBox extends BlockContainer
 	private IIcon[] icons_glass;
 	@SideOnly(Side.CLIENT)
 	private IIcon icon_glass_air;
-	private byte[][] glassIndex = { { 2, 5, 3, 4 }, { 2, 5, 3, 4 }, { 1, 4, 0, 5 }, { 1, 5, 0, 4 }, { 1, 3, 0, 2 }, { 1, 2, 0, 3 } };
+	@SideOnly(Side.CLIENT)
+	private byte[][] glassIndex;
 
 	public BlockStorageBox(Material material)
 	{
 		super(material);
 		this.setHardness(2.0F);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override
@@ -55,16 +56,18 @@ public class BlockStorageBox extends BlockContainer
 			return true;
 		}
 
-		TileEntityStorageBox tileEntity = (TileEntityStorageBox) world.getTileEntity(x, y, z);
+		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 		ItemStack itemstack = player.getCurrentEquippedItem();
-		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.NoFunctionItems && itemstack.getItemDamage() == 3 && tileEntity.getStorageBoxType() != StorageBoxType.Glass)
+
+		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.NoFunctionItems && itemstack.getItemDamage() == 3 && tile.getStorageBoxType() != StorageBoxType.Glass)
 		{
-			tileEntity.sendGUIPacketToClient();
+			tile.sendGUIPacketToClient();
 			player.openGui(MoreInventoryMod.instance, 4, world, x, y, z);
+
 			return true;
 		}
 
-		return tileEntity.rightClickEvent(world, player, x, y, z);
+		return tile.rightClickEvent(world, player, x, y, z);
 	}
 
 	@Override
@@ -72,158 +75,73 @@ public class BlockStorageBox extends BlockContainer
 	{
 		if (!world.isRemote)
 		{
-			TileEntityStorageBox tileEntity = (TileEntityStorageBox) world.getTileEntity(x, y, z);
-			tileEntity.leftClickEvent(player);
+			((TileEntityStorageBox)world.getTileEntity(x, y, z)).leftClickEvent(player);
 		}
 	}
 
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
 	{
-		TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(x, y, z);
-		if (block.equals(this))
-			tile.onNeighborRemoved();
+		if (block == this)
+		{
+			((TileEntityStorageBox)world.getTileEntity(x, y, z)).onNeighborRemoved();
+		}
 	}
 
 	@Override
-	public void breakBlock(World world, int x, int y, int z, Block par5, int par6)
+	public void breakBlock(World world, int x, int y, int z, Block block, int metadata)
 	{
 		dropItems(world, x, y, z);
-		super.breakBlock(world, x, y, z, par5, par6);
+
+		super.breakBlock(world, x, y, z, block, metadata);
 	}
 
 	private void dropItems(World world, int x, int y, int z)
 	{
-		TileEntity tileEntity = world.getTileEntity(x, y, z);
+		TileEntity tile = world.getTileEntity(x, y, z);
 
-		if (!(tileEntity instanceof IInventory) || tileEntity instanceof TileEntityEnderStorageBox)
+		if (tile == null || !(tile instanceof IInventory) || tile instanceof TileEntityEnderStorageBox)
 		{
 			return;
 		}
 
-		IInventory inventory = (IInventory) tileEntity;
+		IInventory inventory = (IInventory) tile;
 
 		for (int i = 0; i < inventory.getSizeInventory(); i++)
 		{
-			ItemStack item = inventory.getStackInSlot(i);
-			CSUtil.dropItem(world, item, x, y, z);
+			MIMUtils.dropItem(world, inventory.getStackInSlot(i), x, y, z);
 		}
 	}
 
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack par6ItemStack)
 	{
-		int l = MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
+		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 
-		TileEntityStorageBox tileEntity = (TileEntityStorageBox) world.getTileEntity(x, y, z);
-		tileEntity.onPlaced(entity);
-		if (l == 0)
+		tile.onPlaced(entity);
+
+		switch (MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3)
 		{
-			tileEntity.face = 2;
+			case 0:
+				tile.face = 2;
+				break;
+			case 1:
+				tile.face = 5;
+				break;
+			case 2:
+				tile.face = 3;
+				break;
+			case 3:
+				tile.face = 4;
+				break;
 		}
-
-		if (l == 1)
-		{
-			tileEntity.face = 5;
-		}
-
-		if (l == 2)
-		{
-			tileEntity.face = 3;
-		}
-
-		if (l == 3)
-		{
-			tileEntity.face = 4;
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister par1IconRegister)
-	{
-		icons = new IIcon[StorageBoxType.values().length];
-		icons_top = new IIcon[StorageBoxType.values().length];
-		icons_face = new IIcon[StorageBoxType.values().length];
-		icons_glass = new IIcon[16];
-		for (int i = 0; i < StorageBoxType.values().length; i++)
-		{
-			if (i != 8)
-			{
-				this.icons[i] = par1IconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_side");
-				this.icons_top[i] = par1IconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_top");
-				this.icons_face[i] = par1IconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_face");
-			}
-			else
-			{
-				this.icons[i] = par1IconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "0");
-				this.icons_top[i] = icons[i];
-				this.icons_face[i] = icons[i];
-			}
-		}
-		for (int i = 0; i < 16; i++)
-		{
-			icons_glass[i] = par1IconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[8].name() + i);
-		}
-		icon_glass_air = par1IconRegister.registerIcon("moreinv:Box_Glass_Air");
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public IIcon getIcon(int side, int metadata)
-	{
-		return side == 0 || side == 1 ? icons_top[metadata] : icons[metadata];
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
-	{
-		TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(x, y, z);
-		int metadata = world.getBlockMetadata(x, y, z);
-		int face = tile.face;
-		if (metadata == 8)
-		{
-			int pos[] = CSUtil.getSidePos(x, y, z, side);
-			if (world.getBlock(pos[0], pos[1], pos[2]).equals(this)
-					|| world.getBlock(pos[0], pos[1], pos[2]).isNormalCube())
-			{
-				return icon_glass_air;
-			}
-			else if (MoreInventoryMod.clearGlassBox)
-			{
-				return this.getGlassIcon(world, x, y, z, side);
-			}
-		}
-
-		if (MoreInventoryMod.StorageBoxsideTexture)
-		{
-			return side == 0 || side == 1 ? icons_top[metadata] : side == face ? icons_face[metadata] : icons[metadata];
-		}
-
-		return getIcon(side, metadata);
-	}
-
-	@SideOnly(Side.CLIENT)
-	private IIcon getGlassIcon(IBlockAccess world, int x, int y, int z, int side)
-	{
-		byte index = 0;
-		for (int i = 0; i < 4; i++)
-		{
-			int pos[] = CSUtil.getSidePos(x, y, z, glassIndex[side][i]);
-			if (world.getBlock(pos[0], pos[1], pos[2]).equals(this))
-			{
-				index |= 1 << i;
-			}
-		}
-		return this.icons_glass[index];
 	}
 
 	@Override
 	public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axe)
 	{
-		TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(x, y, z);
-		tile.rotateBlock();
+		((TileEntityStorageBox)world.getTileEntity(x, y, z)).rotateBlock();
+
 		return true;
 	}
 
@@ -252,9 +170,9 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
-	public int damageDropped(int par1)
+	public int damageDropped(int metadata)
 	{
-		return par1;
+		return metadata;
 	}
 
 	@Override
@@ -267,16 +185,109 @@ public class BlockStorageBox extends BlockContainer
 	public int getComparatorInputOverride(World world, int x, int y, int z, int side)
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
+
 		return tile instanceof TileEntityStorageBox ? TileEntityStorageBox.getPowerOutput((TileEntityStorageBox)tile) : 0;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubBlocks(Item unknown, CreativeTabs tab, List subItems)
+	public void registerBlockIcons(IIconRegister iconRegister)
 	{
-		for (int ix = 0; ix < StorageBoxType.values().length; ix++)
+		icons = new IIcon[StorageBoxType.values().length];
+		icons_top = new IIcon[StorageBoxType.values().length];
+		icons_face = new IIcon[StorageBoxType.values().length];
+		icons_glass = new IIcon[16];
+
+		for (int i = 0; i < StorageBoxType.values().length; i++)
 		{
-			subItems.add(new ItemStack(this, 1, ix));
+			if (i != 8)
+			{
+				icons[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_side");
+				icons_top[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_top");
+				icons_face[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_face");
+			}
+			else
+			{
+				icons[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "0");
+				icons_top[i] = icons[i];
+				icons_face[i] = icons[i];
+			}
+		}
+
+		for (int i = 0; i < 16; i++)
+		{
+			icons_glass[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[8].name() + i);
+		}
+
+		icon_glass_air = iconRegister.registerIcon("moreinv:Box_Glass_Air");
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIcon(int side, int metadata)
+	{
+		return side == 0 || side == 1 ? icons_top[metadata] : icons[metadata];
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
+	{
+		int metadata = world.getBlockMetadata(x, y, z);
+		int face = ((TileEntityStorageBox)world.getTileEntity(x, y, z)).face;
+
+		if (metadata == 8)
+		{
+			int pos[] = MIMUtils.getSidePos(x, y, z, side);
+
+			if (world.getBlock(pos[0], pos[1], pos[2]) == this || world.getBlock(pos[0], pos[1], pos[2]).isNormalCube())
+			{
+				return icon_glass_air;
+			}
+			else if (MoreInventoryMod.clearGlassBox)
+			{
+				return getGlassIcon(world, x, y, z, side);
+			}
+		}
+
+		if (MoreInventoryMod.StorageBoxsideTexture)
+		{
+			return side == 0 || side == 1 ? icons_top[metadata] : side == face ? icons_face[metadata] : icons[metadata];
+		}
+
+		return getIcon(side, metadata);
+	}
+
+	@SideOnly(Side.CLIENT)
+	private IIcon getGlassIcon(IBlockAccess world, int x, int y, int z, int side)
+	{
+		if (glassIndex == null)
+		{
+			glassIndex = new byte[][] {{2, 5, 3, 4}, {2, 5, 3, 4}, {1, 4, 0, 5}, {1, 5, 0, 4}, {1, 3, 0, 2}, {1, 2, 0, 3}};
+		}
+
+		byte index = 0;
+
+		for (int i = 0; i < 4; i++)
+		{
+			int pos[] = MIMUtils.getSidePos(x, y, z, glassIndex[side][i]);
+
+			if (world.getBlock(pos[0], pos[1], pos[2]) == this)
+			{
+				index |= 1 << i;
+			}
+		}
+
+		return icons_glass[index];
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void getSubBlocks(Item item, CreativeTabs tab, List list)
+	{
+		for (int i = 0; i < StorageBoxType.values().length; i++)
+		{
+			list.add(new ItemStack(this, 1, i));
 		}
 	}
 }

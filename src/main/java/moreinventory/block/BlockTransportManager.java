@@ -2,7 +2,7 @@ package moreinventory.block;
 
 import java.util.List;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.TileEntityExporter;
 import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
@@ -24,9 +24,9 @@ public class BlockTransportManager extends BlockContainer
 	public BlockTransportManager(Material material)
 	{
 		super(material);
-		setHardness(1.0F);
-		setCreativeTab(MoreInventoryMod.customTab);
-		setBlockBounds(0.075F, 0.075F, 0.075F, 0.925F, 0.925F, 0.925F);
+		this.setHardness(1.0F);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
+		this.setBlockBounds(0.075F, 0.075F, 0.075F, 0.925F, 0.925F, 0.925F);
 	}
 
 	@Override
@@ -41,9 +41,9 @@ public class BlockTransportManager extends BlockContainer
 	}
 
 	@Override
-	public int damageDropped(int par1)
+	public int damageDropped(int metadata)
 	{
-		return par1;
+		return metadata;
 	}
 
 	@Override
@@ -70,33 +70,28 @@ public class BlockTransportManager extends BlockContainer
 		return false;
 	}
 
-	/*
-	 * @Override private boolean isIndirectlyPowered(World par1World, int par2, int par3, int par4, int par5) { return par5 != 0 && par1World.getIndirectPowerOutput(par2, par3 - 1, par4, 0) ? true : (par5 != 1 && par1World.getIndirectPowerOutput(par2, par3 + 1, par4, 1) ? true : (par5 != 2 && par1World.getIndirectPowerOutput(par2, par3, par4 - 1, 2) ? true : (par5 != 3 && par1World.getIndirectPowerOutput(par2, par3, par4 + 1, 3) ? true : (par5 != 5 && par1World.getIndirectPowerOutput(par2 + 1, par3, par4, 5) ? true : (par5 != 4 && par1World.getIndirectPowerOutput(par2 - 1, par3, par4, 4) ? true : (par1World.getIndirectPowerOutput(par2, par3, par4, 0) ? true : (par1World.getIndirectPowerOutput(par2, par3 + 2, par4, 1) ? true : (par1World.getIndirectPowerOutput(par2, par3 + 1, par4 - 1, 2) ? true : (par1World.getIndirectPowerOutput(par2, par3 + 1, par4 + 1, 3) ? true : (par1World.getIndirectPowerOutput(par2 - 1, par3 + 1, par4, 4) ? true : par1World.getIndirectPowerOutput(par2 + 1, par3
-	 * + 1, par4, 5))))))))))); }
-	 */
-
 	@Override
-	public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axe)
+	public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection direction)
 	{
-		TileEntityTransportManager tile = (TileEntityTransportManager) world.getTileEntity(x, y, z);
-		tile.rotateBlock();
+		((TileEntityTransportManager)world.getTileEntity(x, y, z)).rotateBlock();
+
 		return true;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerBlockIcons(IIconRegister par1IconRegister)
+	public void registerBlockIcons(IIconRegister iconRegister)
 	{
-		this.blockIcon = par1IconRegister.registerIcon("anvil_base");
+		blockIcon = iconRegister.registerIcon("anvil_base");
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void getSubBlocks(Item unknown, CreativeTabs tab, List subItems)
+	public void getSubBlocks(Item item, CreativeTabs tab, List list)
 	{
-		for (int ix = 0; ix < 2; ix++)
+		for (int meta = 0; meta < 2; meta++)
 		{
-			subItems.add(new ItemStack(this, 1, ix));
+			list.add(new ItemStack(this, 1, meta));
 		}
 	}
 }

@@ -12,22 +12,26 @@ import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
-// @ChestContainer
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class GuiPouch extends GuiContainer
 {
-	private InventoryPouch pouch;
-	private int grade;
-	private EntityPlayer player;
-	private static final ResourceLocation GuiIndex = new ResourceLocation("moreinv:GUI/Pouch.png");
+	private static final ResourceLocation pouchGuiTexture = new ResourceLocation("moreinv:GUI/Pouch.png");
 
-	public GuiPouch(InventoryPlayer inventoryPlayer, InventoryPouch ininv)
+	private final EntityPlayer usingPlayer;
+	private final InventoryPouch pouch;
+	private final int grade;
+
+	public GuiPouch(InventoryPlayer inventory, InventoryPouch pouchInventory)
 	{
-		super(new ContainerPouch(inventoryPlayer, ininv));
-		xSize = 176;
-		ySize = 223;
-		pouch = ininv;
-		grade = pouch.getGrade() + 2;
-		player = inventoryPlayer.player;
+		super(new ContainerPouch(inventory, pouchInventory));
+		this.xSize = 176;
+		this.ySize = 223;
+		this.usingPlayer = inventory.player;
+		this.pouch = pouchInventory;
+		this.grade = pouch.getGrade() + 2;
 	}
 
 	@Override
@@ -50,19 +54,16 @@ public class GuiPouch extends GuiContainer
 	public void updateScreen()
 	{
 		super.updateScreen();
-		pouch.isUseableByPlayer(player);
 
-		GuiButtonConfig bt;
-		bt = (GuiButtonConfig) this.buttonList.get(0);
-		bt.isPushed = pouch.isCollectedByBox;
-		bt = (GuiButtonConfig) this.buttonList.get(1);
-		bt.isPushed = pouch.isCollectMainInv;
-		bt = (GuiButtonConfig) this.buttonList.get(2);
-		bt.isPushed = pouch.isAutoCollect;
+		pouch.isUseableByPlayer(usingPlayer);
+
+		((GuiButtonConfig)buttonList.get(0)).isPushed = pouch.isCollectedByBox;
+		((GuiButtonConfig)buttonList.get(1)).isPushed = pouch.isCollectMainInv;
+		((GuiButtonConfig)buttonList.get(2)).isPushed = pouch.isAutoCollect;
 	}
 
 	@Override
-	protected void drawGuiContainerForegroundLayer(int param1, int param2)
+	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		fontRendererObj.drawString(pouch.customName, 8, 6, 4210752);
 		fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 96 + 2, 4210752);
@@ -70,9 +71,9 @@ public class GuiPouch extends GuiContainer
 	}
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
+	protected void drawGuiContainerBackgroundLayer(float ticks, int mouseX, int mouseY)
 	{
-		mc.getTextureManager().bindTexture(GuiIndex);
+		mc.getTextureManager().bindTexture(pouchGuiTexture);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 		drawTexturedModalRect(guiLeft + xSize, guiTop + 3, xSize + 8, 0, 68, 20);

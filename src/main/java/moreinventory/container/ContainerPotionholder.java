@@ -8,45 +8,45 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerPotionholder extends Container
+public class ContainerPotionHolder extends Container
 {
-	private InventoryPotionHolder inv;
+	private final InventoryPotionHolder holderInventory;
 
-	public ContainerPotionholder(InventoryPlayer inventoryPlayer, InventoryPotionHolder te)
+	public ContainerPotionHolder(InventoryPlayer inventory, InventoryPotionHolder holderInventory)
 	{
-		inv = te;
+		this.holderInventory = holderInventory;
 
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 3; j++)
 			{
-				addSlotToContainer(new SlotPotion(inv, j + i * 3, 54 + 8 + j * 18, 17 + i * 18));
+				this.addSlotToContainer(new SlotPotion(holderInventory, j + i * 3, 54 + 8 + j * 18, 17 + i * 18));
 			}
 		}
 
-		bindPlayerInventory(inventoryPlayer);
+		this.bindPlayerInventory(inventory);
 	}
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
+	protected void bindPlayerInventory(InventoryPlayer inventory)
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+				addSlotToContainer(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 138 + 4));
+			addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 138 + 4));
 		}
 	}
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return inv.isUseableByPlayer(player);
+		return holderInventory != null && holderInventory.isUseableByPlayer(player);
 	}
 
 	@Override
@@ -59,11 +59,15 @@ public class ContainerPotionholder extends Container
 		{
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
-			if (!inv.isItemValidForSlot(0, itemstack1))
+
+			if (!holderInventory.isItemValidForSlot(0, itemstack1))
+			{
 				return null;
+			}
+
 			if (i < 9)
 			{
-				if (!mergeItemStack(itemstack1, 9, this.inventorySlots.size(), true))
+				if (!mergeItemStack(itemstack1, 9, inventorySlots.size(), true))
 				{
 					return null;
 				}
@@ -72,9 +76,10 @@ public class ContainerPotionholder extends Container
 			{
 				return null;
 			}
+
 			if (itemstack1.stackSize == 0)
 			{
-				slot.putStack((ItemStack) null);
+				slot.putStack(null);
 			}
 			else
 			{
@@ -84,5 +89,4 @@ public class ContainerPotionholder extends Container
 
 		return itemstack;
 	}
-
 }

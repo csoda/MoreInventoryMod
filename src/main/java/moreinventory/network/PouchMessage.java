@@ -1,7 +1,7 @@
 package moreinventory.network;
 
 import io.netty.buffer.ByteBuf;
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.inventory.InventoryPouch;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;

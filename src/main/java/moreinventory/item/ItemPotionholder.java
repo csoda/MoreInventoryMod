@@ -1,6 +1,6 @@
 package moreinventory.item;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.inventory.InventoryPotionHolder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -15,7 +15,7 @@ public class ItemPotionHolder extends Item
 	{
 		this.setTextureName("moreinv:Potionholder");
 		this.setMaxStackSize(1);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override

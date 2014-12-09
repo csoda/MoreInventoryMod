@@ -7,12 +7,9 @@ import net.minecraft.item.ItemStack;
 
 public class SlotConfig extends Slot
 {
-	private IInventory iinv;
-
-	public SlotConfig(IInventory par1iInventory, int par2, int par3, int par4)
+	public SlotConfig(IInventory inventory, int index, int x, int y)
 	{
-		super(par1iInventory, par2, par3, par4);
-		iinv = this.inventory;
+		super(inventory, index, x, y);
 	}
 
 	@Override
@@ -22,37 +19,32 @@ public class SlotConfig extends Slot
 	}
 
 	@Override
-	public boolean canTakeStack(EntityPlayer par1EntityPlayer)
+	public boolean canTakeStack(EntityPlayer player)
 	{
 		return false;
 	}
 
 	@Override
-	public boolean isItemValid(ItemStack par1ItemStack)
+	public boolean isItemValid(ItemStack itemstack)
 	{
 		return false;
 	}
 
 	@Override
-	public void putStack(ItemStack par1ItemStack)
-	{
-		this.setConfigItem(this.getSlotIndex(), par1ItemStack);
-		this.onSlotChanged();
-
-	}
-
-	public void removeItem()
-	{
-		iinv.setInventorySlotContents(this.getSlotIndex(), (ItemStack) null);
-	}
-
-	private void setConfigItem(int no, ItemStack itemstack)
+	public void putStack(ItemStack itemstack)
 	{
 		if (itemstack != null)
 		{
 			ItemStack itemstack1 = itemstack.copy();
 			itemstack1.stackSize = 0;
-			iinv.setInventorySlotContents(no, itemstack1);
+			inventory.setInventorySlotContents(getSlotIndex(), itemstack1);
 		}
+
+		onSlotChanged();
+	}
+
+	public void removeItem()
+	{
+		inventory.setInventorySlotContents(getSlotIndex(), null);
 	}
 }

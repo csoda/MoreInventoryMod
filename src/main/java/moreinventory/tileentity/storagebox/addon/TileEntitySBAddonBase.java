@@ -1,6 +1,6 @@
 package moreinventory.tileentity.storagebox.addon;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.SBAddonBaseConfigMessage;
 import moreinventory.network.SBAddonBaseMessage;
 import moreinventory.tileentity.storagebox.IStorageBoxAddon;
@@ -17,37 +17,33 @@ import net.minecraft.world.World;
 
 public abstract class TileEntitySBAddonBase extends TileEntity implements IInventory, IStorageBoxAddon
 {
+	protected ItemStack[] storageItems;
 
-	private StorageBoxNetworkManager StorageBoxManager;
-	protected ItemStack[] inv;
-	private boolean isPrivate = false;
+	private StorageBoxNetworkManager storageBoxManager;
 	private String ownerName = MoreInventoryMod.defaultOwner;
+	private boolean isPrivate = false;
 
 	@Override
 	public StorageBoxNetworkManager getStorageBoxNetworkManager()
 	{
-		if (StorageBoxManager == null)
+		if (storageBoxManager == null)
 		{
-			StorageBoxManager = new StorageBoxNetworkManager(worldObj, xCoord, yCoord, zCoord, ownerName);
+			storageBoxManager = new StorageBoxNetworkManager(worldObj, xCoord, yCoord, zCoord, ownerName);
 		}
-		return StorageBoxManager;
+
+		return storageBoxManager;
 	}
 
 	@Override
-	public void setStorageBoxNetworkManager(StorageBoxNetworkManager SBNetManager)
+	public void setStorageBoxNetworkManager(StorageBoxNetworkManager manager)
 	{
-		StorageBoxManager = SBNetManager;
+		storageBoxManager = manager;
 	}
 
 	@Override
 	public String getOwnerName()
 	{
 		return ownerName;
-	}
-
-	public void setOwnerName(String newName)
-	{
-		ownerName = newName;
 	}
 
 	public boolean isOwner(String name)
@@ -61,9 +57,9 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 		return isPrivate;
 	}
 
-	public void setPrivate(boolean flg)
+	public void setPrivate(boolean flag)
 	{
-		isPrivate = flg;
+		isPrivate = flag;
 	}
 
 	public void togglePrivate(String name)
@@ -71,38 +67,33 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 		if (ownerName.equals(name) || ownerName.equals(MoreInventoryMod.defaultOwner))
 		{
 			isPrivate = !isPrivate;
+
 			sendCommonPacket();
 		}
 	}
 
 	@Override
-	public void onSBNetInvChanged(World world, int x, int y, int z, int id, int damage)
-	{
-	}
+	public void onSBNetInvChanged(World world, int x, int y, int z, int id, int damage) {}
 
 	@Override
-	public void onTripleClicked(World world, int x, int y, int z, int id, int damage)
-	{
-	}
-
-	/*** IInventory ***/
+	public void onTripleClicked(World world, int x, int y, int z, int id, int damage) {}
 
 	@Override
 	public int getSizeInventory()
 	{
-		return inv.length;
+		return storageItems.length;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return inv[slot];
+		return storageItems[slot];
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack)
+	public void setInventorySlotContents(int slot, ItemStack itemstack)
 	{
-		inv[slot] = stack;
+		storageItems[slot] = itemstack;
 	}
 
 	@Override
@@ -118,26 +109,30 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	}
 
 	@Override
-	public ItemStack decrStackSize(int slot, int amt)
+	public ItemStack decrStackSize(int slot, int amount)
 	{
-		ItemStack stack = getStackInSlot(slot);
-		if (stack != null)
+		ItemStack itemstack = getStackInSlot(slot);
+
+		if (itemstack != null)
 		{
-			if (stack.stackSize <= amt)
+			if (itemstack.stackSize <= amount)
 			{
 				setInventorySlotContents(slot, null);
 			}
 			else
 			{
-				stack = stack.splitStack(amt);
-				if (stack.stackSize == 0)
+				itemstack = itemstack.splitStack(amount);
+
+				if (itemstack.stackSize == 0)
 				{
 					setInventorySlotContents(slot, null);
 				}
 			}
 		}
-		this.markDirty();
-		return stack;
+
+		markDirty();
+
+		return itemstack;
 	}
 
 	@Override
@@ -155,24 +150,17 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player)
 	{
-		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this &&
-				player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) < 64;
+		return worldObj.getTileEntity(xCoord, yCoord, zCoord) == this && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 64;
 	}
 
 	@Override
-	public void openInventory()
-	{
-
-	}
+	public void openInventory() {}
 
 	@Override
-	public void closeInventory()
-	{
-
-	}
+	public void closeInventory() {}
 
 	@Override
-	public boolean isItemValidForSlot(int par1, ItemStack par2ItemStack)
+	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
 		return false;
 	}
@@ -181,67 +169,79 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	{
 		if (entity instanceof EntityPlayer)
 		{
-			this.ownerName = ((EntityPlayer) entity).getDisplayName();
+			ownerName = ((EntityPlayer)entity).getDisplayName();
 		}
-		getStorageBoxNetworkManager().reCreateNetwork();
+
+		getStorageBoxNetworkManager().recreateNetwork();
 	}
 
 	public void onNeighborRemoved()
 	{
-		if (getStorageBoxNetworkManager().getBoxList().isOnBoxList(xCoord, yCoord, zCoord,
-				worldObj.getWorldInfo().getVanillaDimension()))
+		if (getStorageBoxNetworkManager().getBoxList().isOnBoxList(xCoord, yCoord, zCoord, worldObj.getWorldInfo().getVanillaDimension()))
 		{
-			this.getStorageBoxNetworkManager().reCreateNetwork();
+			getStorageBoxNetworkManager().recreateNetwork();
 		}
 	}
 
 	@Override
-	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readFromNBT(NBTTagCompound nbt)
 	{
-		super.readFromNBT(par1NBTTagCompound);
-		if (inv != null)
+		super.readFromNBT(nbt);
+
+		if (storageItems != null)
 		{
-			NBTTagList nbttaglist = par1NBTTagCompound.getTagList("Items", 10);
-			for (int i = 0; i < nbttaglist.tagCount(); ++i)
+			NBTTagList list = nbt.getTagList("Items", 10);
+
+			for (int i = 0; i < list.tagCount(); ++i)
 			{
-				NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
-				int j = nbttagcompound1.getShort("Slot");
-				this.inv[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
+				NBTTagCompound data = list.getCompoundTagAt(i);
+				storageItems[data.getShort("Slot")] = ItemStack.loadItemStackFromNBT(data);
 			}
 		}
-		if (par1NBTTagCompound.hasKey("isPrivate"))
-			this.isPrivate = par1NBTTagCompound.getBoolean("isPrivate");
-		if (par1NBTTagCompound.hasKey("owner"))
-			this.ownerName = par1NBTTagCompound.getString("owner");
+
+		if (nbt.hasKey("isPrivate"))
+		{
+			isPrivate = nbt.getBoolean("isPrivate");
+		}
+
+		if (nbt.hasKey("owner"))
+		{
+			ownerName = nbt.getString("owner");
+		}
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
+	public void writeToNBT(NBTTagCompound nbt)
 	{
-		super.writeToNBT(par1NBTTagCompound);
-		if (inv != null)
+		super.writeToNBT(nbt);
+
+		if (storageItems != null)
 		{
-			NBTTagList nbttaglist = new NBTTagList();
-			for (int i = 0; i < this.inv.length; ++i)
+			NBTTagList list = new NBTTagList();
+
+			for (int i = 0; i < storageItems.length; ++i)
 			{
-				if (this.inv[i] != null)
+				if (storageItems[i] != null)
 				{
-					NBTTagCompound nbttagcompound1 = new NBTTagCompound();
-					nbttagcompound1.setShort("Slot", (short) i);
-					this.inv[i].writeToNBT(nbttagcompound1);
-					nbttaglist.appendTag(nbttagcompound1);
+					NBTTagCompound data = new NBTTagCompound();
+					data.setShort("Slot", (short)i);
+					storageItems[i].writeToNBT(data);
+					list.appendTag(data);
 				}
 			}
-			par1NBTTagCompound.setTag("Items", nbttaglist);
+
+			nbt.setTag("Items", list);
 		}
-		par1NBTTagCompound.setBoolean("isPrivate", this.isPrivate);
-		par1NBTTagCompound.setString("owner", this.ownerName);
+
+		nbt.setBoolean("isPrivate", isPrivate);
+		nbt.setString("owner", ownerName);
 	}
 
 	@Override
 	public Packet getDescriptionPacket()
 	{
 		sendCommonPacket();
+
 		return null;
 	}
 
@@ -260,27 +260,28 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 		MoreInventoryMod.network.sendToServer(new SBAddonBaseConfigMessage(xCoord, yCoord, zCoord, channel, flag));
 	}
 
-	public void handlePacket(boolean isPrivate, String owner)
+	public void handlePacket(boolean flag, String owner)
 	{
-		this.isPrivate = isPrivate;
-		this.ownerName = owner;
+		isPrivate = flag;
+		ownerName = owner;
 	}
 
-	public void handleConfigPacketClient(byte channel, boolean flg)
+	public void handleConfigPacketClient(byte channel, boolean flag)
 	{
 		if (channel == 0)
 		{
-			this.isPrivate = flg;
+			isPrivate = flag;
 		}
 	}
 
-	public void handleConfigPacketServer(byte channel, boolean flg, String owner)
+	public void handleConfigPacketServer(byte channel, boolean flag, String owner)
 	{
 		if (!isPrivate() || ownerName.equals(owner) || ownerName.equals(MoreInventoryMod.defaultOwner))
 		{
 			if (channel == 0)
 			{
-				this.isPrivate = !this.isPrivate;
+				isPrivate = !isPrivate;
+
 				sendCommonGuiPacketToClient((byte) 0, this.isPrivate);
 			}
 		}

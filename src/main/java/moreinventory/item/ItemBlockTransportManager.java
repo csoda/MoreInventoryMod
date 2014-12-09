@@ -1,7 +1,7 @@
 package moreinventory.item;
 
 import moreinventory.tileentity.TileEntityTransportManager;
-import moreinventory.util.CSUtil;
+import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,7 +40,7 @@ public class ItemBlockTransportManager extends ItemBlock
 
 		if (!world.getBlock(x, y, z).isReplaceable(world, x, y, z))
 		{
-			int[] pos = CSUtil.getSidePos(x, y, z, side);
+			int[] pos = MIMUtils.getSidePos(x, y, z, side);
 			tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 		}
 		else

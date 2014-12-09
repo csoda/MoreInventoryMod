@@ -2,7 +2,7 @@ package moreinventory.item;
 
 import java.util.List;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -26,7 +26,7 @@ public class ItemTorchHolder extends Item
 		this.setMaxDamage(maxDamage[grade]);
 		this.setNoRepair();
 		this.setContainerItem(this);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override

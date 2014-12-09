@@ -2,7 +2,7 @@ package moreinventory.item;
 
 import java.util.List;
 
-import moreinventory.MoreInventoryMod;
+import moreinventory.core.MoreInventoryMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -19,7 +19,7 @@ public class ItemNoFunction extends Item
 	public ItemNoFunction()
 	{
 		this.setMaxStackSize(64);
-		this.setCreativeTab(MoreInventoryMod.customTab);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 		this.setHasSubtypes(true);
 	}
 
