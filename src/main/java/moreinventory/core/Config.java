@@ -80,18 +80,8 @@ public class Config
 		prop.comment += " [default: " + prop.getDefault() + "]";
 		propOrder.add(prop.getName());
 		leftClickCatchall = prop.getBoolean(leftClickCatchall);
-		boolean first = !config.hasKey(category, "transportableChests");
-		prop = config.get(category, "transportableChests", new String[0]);
-		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
-		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
-		prop.comment += Configuration.NEW_LINE + Configuration.NEW_LINE;
-		prop.comment += "BlockName @ Metadata(-1~15) @ TextureIndex(1~29)";
-		prop.comment += Configuration.NEW_LINE;
-		prop.comment += "..";
-		propOrder.add(prop.getName());
-		transportableChests = prop.getStringList();
 
-		if (first)
+		if (transportableChests == null)
 		{
 			List<String> chests = Lists.newArrayList();
 
@@ -108,8 +98,17 @@ public class Config
 			chests.add("MultiPageChest:multipagechest@-1@11");
 
 			transportableChests = chests.toArray(new String[chests.size()]);
-			prop.set(transportableChests);
 		}
+
+		prop = config.get(category, "transportableChests", transportableChests);
+		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+		prop.comment += Configuration.NEW_LINE + Configuration.NEW_LINE;
+		prop.comment += "BlockName @ Metadata(-1~15) @ TextureIndex(1~29)";
+		prop.comment += Configuration.NEW_LINE;
+		prop.comment += "..";
+		propOrder.add(prop.getName());
+		transportableChests = prop.getStringList();
 
 		ItemChestTransporter.refreshTransportableChests(transportableChests);
 
