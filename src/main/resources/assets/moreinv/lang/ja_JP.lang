@@ -70,6 +70,7 @@ moreinv.config.general.leftClickCatchall=ガラクタ入れを左クリック
 moreinv.config.general.leftClickCatchall.tooltip=ガラクタ入れを左クリックした際にガラクタ入れのインベントリを開きます。
 moreinv.config.general.transportableChests=移動可能なチェスト
 moreinv.config.general.transportableChests.tooltip=トランスポーターで移動可能なチェストとアイコンを指定します。
+moreinv.config.general.transportableChests.select=移動可能なチェストを選択してください
 moreinv.config.general.containerBoxSideTexture=コンテナの側面テクスチャ
 moreinv.config.general.containerBoxSideTexture.tooltip=コンテナの側面テクスチャを使用します。
 moreinv.config.general.clearGlassBox=透き通ったガラスコンテナ

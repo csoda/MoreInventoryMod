@@ -1,6 +1,9 @@
 package moreinventory.util;
 
+import java.util.Comparator;
 import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
+import java.util.regex.Pattern;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -10,11 +13,26 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+
+import com.google.common.base.Strings;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 public final class MIMUtils
 {
+	private static ForkJoinPool pool;
+
+	public static ForkJoinPool getPool()
+	{
+		if (pool == null || pool.isShutdown())
+		{
+			pool = new ForkJoinPool();
+		}
+
+		return pool;
+	}
+
 	public static String getUniqueName(Block block)
 	{
 		if (block == null)
@@ -241,5 +259,210 @@ public final class MIMUtils
 	public static boolean canInsertFromSide(IInventory inventory, ItemStack itemstack, int slot, int side)
 	{
 		return !inventory.isItemValidForSlot(slot, itemstack) ? false : !(inventory instanceof ISidedInventory) || ((ISidedInventory) inventory).canInsertItem(slot, itemstack, side);
+	}
+
+	public static int compareWithNull(Object o1, Object o2)
+	{
+		return (o1 == null ? 1 : 0) - (o2 == null ? 1 : 0);
+	}
+
+	public static final Comparator<Block> blockComparator = new Comparator<Block>()
+	{
+		@Override
+		public int compare(Block o1, Block o2)
+		{
+			int i = compareWithNull(o1, o2);
+
+			if (i == 0 && o1 != null && o2 != null)
+			{
+				UniqueIdentifier unique1 = GameRegistry.findUniqueIdentifierFor(o1);
+				UniqueIdentifier unique2 = GameRegistry.findUniqueIdentifierFor(o2);
+
+				i = compareWithNull(unique1, unique2);
+
+				if (i == 0 && unique1 != null && unique2 != null)
+				{
+					i = (unique1.modId.equals("minecraft") ? 0 : 1) - (unique2.modId.equals("minecraft") ? 0 : 1);
+
+					if (i == 0)
+					{
+						i = unique1.modId.compareTo(unique2.modId);
+
+						if (i == 0)
+						{
+							i = unique1.name.compareTo(unique1.name);
+						}
+					}
+				}
+			}
+
+			return i;
+		}
+	};
+
+	public static final Comparator<Item> itemComparator = new Comparator<Item>()
+	{
+		@Override
+		public int compare(Item o1, Item o2)
+		{
+			int i = compareWithNull(o1, o2);
+
+			if (i == 0 && o1 != null && o2 != null)
+			{
+				UniqueIdentifier unique1 = GameRegistry.findUniqueIdentifierFor(o1);
+				UniqueIdentifier unique2 = GameRegistry.findUniqueIdentifierFor(o2);
+
+				i = compareWithNull(unique1, unique2);
+
+				if (i == 0 && unique1 != null && unique2 != null)
+				{
+					i = (unique1.modId.equals("minecraft") ? 0 : 1) - (unique2.modId.equals("minecraft") ? 0 : 1);
+
+					if (i == 0)
+					{
+						i = unique1.modId.compareTo(unique2.modId);
+
+						if (i == 0)
+						{
+							i = unique1.name.compareTo(unique1.name);
+						}
+					}
+				}
+			}
+
+			return i;
+		}
+	};
+
+	public static final Comparator<ItemStack> itemStackComparator = new Comparator<ItemStack>()
+	{
+		@Override
+		public int compare(ItemStack o1, ItemStack o2)
+		{
+			int i = compareWithNull(o1, o2);
+
+			if (i == 0 && o1 != null && o2 != null)
+			{
+				i = itemComparator.compare(o1.getItem(), o2.getItem());
+
+				if (i == 0)
+				{
+					i = Integer.compare(o1.getItemDamage(), o2.getItemDamage());
+
+					if (i == 0)
+					{
+						i = Integer.compare(o1.stackSize, o2.stackSize);
+
+						if (i == 0)
+						{
+							NBTTagCompound nbt1 = o1.getTagCompound();
+							NBTTagCompound nbt2 = o2.getTagCompound();
+
+							i = compareWithNull(nbt1, nbt2);
+
+							if (i == 0 && nbt1 != null && nbt2 != null)
+							{
+								i = Byte.compare(nbt1.getId(), nbt2.getId());
+							}
+						}
+					}
+				}
+			}
+
+			return i;
+		}
+	};
+
+	public static final Comparator<BlockMeta> blockMetaComparator = new Comparator<BlockMeta>()
+	{
+		@Override
+		public int compare(BlockMeta o1, BlockMeta o2)
+		{
+			int i = MIMUtils.compareWithNull(o1, o2);
+
+			if (i == 0 && o1 != null && o2 != null)
+			{
+				i = blockComparator.compare(o1.block, o2.block);
+
+				if (i == 0)
+				{
+					i = Integer.compare(o1.meta, o2.meta);
+				}
+			}
+
+			return i;
+		}
+	};
+
+	public static boolean containsIgnoreCase(String s1, String s2)
+	{
+		if (Strings.isNullOrEmpty(s1) || Strings.isNullOrEmpty(s2))
+		{
+			return false;
+		}
+
+		return Pattern.compile(Pattern.quote(s2), Pattern.CASE_INSENSITIVE).matcher(s1).find();
+	}
+
+	public static boolean blockMetaFilter(BlockMeta entry, String filter)
+	{
+		if (entry == null || Strings.isNullOrEmpty(filter))
+		{
+			return false;
+		}
+
+		try
+		{
+			if (containsIgnoreCase(getUniqueName(entry.block), filter))
+			{
+				return true;
+			}
+		}
+		catch (Throwable e) {}
+
+		ItemStack itemstack = new ItemStack(entry.block, 1, entry.meta);
+
+		if (itemstack.getItem() == null)
+		{
+			try
+			{
+				if (containsIgnoreCase(entry.block.getUnlocalizedName(), filter))
+				{
+					return true;
+				}
+			}
+			catch (Throwable e) {}
+
+			try
+			{
+				if (containsIgnoreCase(entry.block.getLocalizedName(), filter))
+				{
+					return true;
+				}
+			}
+			catch (Throwable e) {}
+		}
+		else
+		{
+			try
+			{
+				if (containsIgnoreCase(itemstack.getUnlocalizedName(), filter))
+				{
+					return true;
+				}
+			}
+			catch (Throwable e) {}
+
+			try
+			{
+				if (containsIgnoreCase(itemstack.getDisplayName(), filter))
+				{
+					return true;
+				}
+			}
+			catch (Throwable e) {}
+		}
+
+		return false;
 	}
 }
