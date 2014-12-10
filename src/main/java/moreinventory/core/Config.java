@@ -3,6 +3,7 @@ package moreinventory.core;
 import java.io.File;
 import java.util.List;
 
+import moreinventory.item.ItemChestTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.config.Configuration;
@@ -10,7 +11,6 @@ import net.minecraftforge.common.config.Property;
 
 import org.apache.logging.log4j.Level;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -87,13 +87,10 @@ public class Config
 		prop.comment += "..";
 		propOrder.add(prop.getName());
 		transportableChests = prop.getStringList();
-		MoreInventoryMod.modChest = Joiner.on(",").skipNulls().join(transportableChests);
-
-		config.setCategoryPropertyOrder(category, propOrder);
+		ItemChestTransporter.refreshTransportableChests(transportableChests);
 
 		if (FMLCommonHandler.instance().getSide().isClient())
 		{
-			category = "client";
 			prop = config.get(category, "containerBoxSideTexture", true);
 			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
 			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
@@ -106,10 +103,9 @@ public class Config
 			prop.comment += " [default: " + prop.getDefault() + "]";
 			propOrder.add(prop.getName());
 			clearGlassBox = prop.getBoolean(clearGlassBox);
-
-			config.addCustomCategoryComment(category, "If multiplayer, client-side only.");
-			config.setCategoryPropertyOrder(category, propOrder);
 		}
+
+		config.setCategoryPropertyOrder(category, propOrder);
 
 		category = "color";
 

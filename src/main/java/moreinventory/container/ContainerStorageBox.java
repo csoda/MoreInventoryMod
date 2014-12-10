@@ -1,6 +1,6 @@
 package moreinventory.container;
 
-import moreinventory.gui.slot.SlotConfig;
+import moreinventory.slot.SlotConfig;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

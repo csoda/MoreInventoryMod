@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import moreinventory.core.MoreInventoryMod;
-import moreinventory.gui.slot.SlotPouch;
-import moreinventory.gui.slot.SlotPouch2;
-import moreinventory.gui.slot.SlotPouchConfig;
-import moreinventory.item.inventory.InventoryPouch;
+import moreinventory.inventory.InventoryPouch;
+import moreinventory.slot.SlotPouch;
+import moreinventory.slot.SlotPouch2;
+import moreinventory.slot.SlotPouchConfig;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;

@@ -1,7 +1,7 @@
 package moreinventory.tileentity.storagebox;
 
 import moreinventory.core.MoreInventoryMod;
-import moreinventory.item.inventory.InventoryPouch;
+import moreinventory.inventory.InventoryPouch;
 import moreinventory.util.MIMBoxList;
 import moreinventory.util.MIMItemBoxList;
 import moreinventory.util.MIMUtils;

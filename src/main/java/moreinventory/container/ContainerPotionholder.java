@@ -1,7 +1,7 @@
 package moreinventory.container;
 
-import moreinventory.gui.slot.SlotPotion;
-import moreinventory.item.inventory.InventoryPotionHolder;
+import moreinventory.inventory.InventoryPotionHolder;
+import moreinventory.slot.SlotPotion;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
