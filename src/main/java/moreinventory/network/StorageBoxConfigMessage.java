@@ -1,16 +1,14 @@
 package moreinventory.network;
 
-import io.netty.buffer.ByteBuf;
-import moreinventory.tileentity.storagebox.TileEntityStorageBox;
-import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import moreinventory.tileentity.storagebox.TileEntityStorageBox;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.tileentity.TileEntity;
 
 public class StorageBoxConfigMessage implements IMessage, IMessageHandler<StorageBoxConfigMessage, IMessage>
 {
@@ -58,7 +56,6 @@ public class StorageBoxConfigMessage implements IMessage, IMessageHandler<Storag
 		ByteBufUtils.writeUTF8String(buf, owner);
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
 	public IMessage onMessage(StorageBoxConfigMessage message, MessageContext ctx)
 	{

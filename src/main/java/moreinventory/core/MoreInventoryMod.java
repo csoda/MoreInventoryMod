@@ -162,7 +162,8 @@ public class MoreInventoryMod
 		int i = 0;
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
-		network.registerMessage(TransportManagerMessage.class, TransportManagerMessage.class, i++, Side.CLIENT);
+		network.registerMessage(TransportManagerMessage.Client.class, TransportManagerMessage.class, i++, Side.CLIENT);
+        network.registerMessage(TransportManagerMessage.Server.class, TransportManagerMessage.class, i++, Side.SERVER);
 		network.registerMessage(CatchallMessage.class, CatchallMessage.class, i++, Side.CLIENT);
 		network.registerMessage(ImporterMessage.Client.class, ImporterMessage.class, i++, Side.CLIENT);
 		network.registerMessage(ImporterMessage.Server.class, ImporterMessage.class, i++, Side.SERVER);

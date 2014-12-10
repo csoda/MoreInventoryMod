@@ -62,7 +62,7 @@ public class GuiTransportManager extends GuiContainer
 			{
 				((GuiButtonConfigString)buttonList.get(i)).isPushed = i == button.id;
 			}
-
+            System.out.println(transportManager.sneak);
 			transportManager.sendCommonPacketToServer();
 		}
 
