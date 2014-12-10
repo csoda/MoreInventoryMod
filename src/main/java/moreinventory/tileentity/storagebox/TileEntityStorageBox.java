@@ -355,7 +355,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 				if (itemstack != null)
 				{
-					if (itemstack.getItem() == MoreInventoryMod.Pouch)
+					if (itemstack.getItem() == MoreInventoryMod.pouch)
 					{
 						InventoryPouch pouch = new InventoryPouch(itemstack);
 

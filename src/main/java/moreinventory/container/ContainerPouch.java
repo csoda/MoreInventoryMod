@@ -99,7 +99,7 @@ public class ContainerPouch extends Container
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 
-			if (itemstack1 != null && itemstack1.getItem() == MoreInventoryMod.Pouch)
+			if (itemstack1 != null && itemstack1.getItem() == MoreInventoryMod.pouch)
 			{
 				return null;
 			}

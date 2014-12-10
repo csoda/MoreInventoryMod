@@ -15,6 +15,6 @@ public class SlotPouch2 extends Slot
 	@Override
 	public boolean isItemValid(ItemStack itemstack)
 	{
-		return itemstack == null || itemstack.getItem() != MoreInventoryMod.Pouch;
+		return itemstack == null || itemstack.getItem() != MoreInventoryMod.pouch;
 	}
 }

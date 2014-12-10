@@ -23,6 +23,6 @@ public class CreativeTabMoreInventoryMod extends CreativeTabs
 	@Override
 	public Item getTabIconItem()
 	{
-		return MoreInventoryMod.Torchholder[0];
+		return MoreInventoryMod.torchHolder[0];
 	}
 }

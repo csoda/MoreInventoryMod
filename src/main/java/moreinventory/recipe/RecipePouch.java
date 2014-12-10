@@ -28,7 +28,7 @@ public class RecipePouch extends ShapelessOreRecipe
 
 			if (itemstack != null)
 			{
-				if (itemstack.getItem() == MoreInventoryMod.Pouch)
+				if (itemstack.getItem() == MoreInventoryMod.pouch)
 				{
 					pouch = itemstack;
 					flag1 = true;

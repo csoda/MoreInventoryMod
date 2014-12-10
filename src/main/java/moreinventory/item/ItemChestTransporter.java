@@ -18,6 +18,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
@@ -31,27 +33,18 @@ public class ItemChestTransporter extends Item
 	public static void refreshTransportableChests(String... chests)
 	{
 		transportableChests.clear();
-		transportableChests.put(MIMUtils.getUniqueName(Blocks.chest), -1, 0);
-		transportableChests.put(MIMUtils.getUniqueName(Blocks.trapped_chest), -1, 0);
-		transportableChests.put(MIMUtils.getUniqueName(MoreInventoryMod.StorageBox), -1, 0);
 
-		// Config
 		for (String entry : chests)
 		{
 			String[] args = entry.trim().split("@");
-			int index = args[2].trim().length() > 0 ? Byte.parseByte(args[2].trim()) : 0;
 
-			transportableChests.put(args[0].trim(), Integer.parseInt(args[1].trim()), index);
+			if (args.length < 2)
+			{
+				continue;
+			}
+
+			transportableChests.put(args[0].trim(), Integer.parseInt(args[1].trim()), args.length > 2 && args[2].trim().length() > 0 ? NumberUtils.toInt(args[2].trim()) & 29 : 0);
 		}
-
-		// Modded
-		for (int i = 0; i < 7; i++)
-		{
-			transportableChests.put("IronChest:BlockIronChest", i, i + 1);
-		}
-
-		transportableChests.put("BambooMod:jpChest", -1, 10);
-		transportableChests.put("MultiPageChest:multipagechest", -1, 11);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -104,7 +97,7 @@ public class ItemChestTransporter extends Item
 				{
 					itemstack.setItemDamage(2);
 				}
-				else if (block == MoreInventoryMod.StorageBox)
+				else if (block == MoreInventoryMod.storageBox)
 				{
 					itemstack.setItemDamage(world.getBlockMetadata(x, y, z) + 3);
 				}
@@ -141,7 +134,7 @@ public class ItemChestTransporter extends Item
 				}
 				else
 				{
-					player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(MoreInventoryMod.ChestTransporter));
+					player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(MoreInventoryMod.transporter));
 				}
 			}
 		}
@@ -306,8 +299,8 @@ public class ItemChestTransporter extends Item
 
 				if (itemstack != null)
 				{
-					if (itemstack.getItem() == MoreInventoryMod.ChestTransporter && itemstack.getItemDamage() != 0 ||
-						itemstack.getItem() == MoreInventoryMod.Pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
+					if (itemstack.getItem() == MoreInventoryMod.transporter && itemstack.getItemDamage() != 0 ||
+						itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
 					{
 						return false;
 					}

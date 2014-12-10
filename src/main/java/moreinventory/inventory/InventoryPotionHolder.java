@@ -226,7 +226,7 @@ public class InventoryPotionHolder implements IInventory
 
 		readFromNBT();
 
-		if (player.getCurrentEquippedItem().getItem() != MoreInventoryMod.Potionholder)
+		if (player.getCurrentEquippedItem().getItem() != MoreInventoryMod.potionHolder)
 		{
 			return false;
 		}

@@ -5,6 +5,8 @@ import java.util.List;
 
 import moreinventory.item.ItemChestTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
+import moreinventory.util.MIMUtils;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -78,6 +80,7 @@ public class Config
 		prop.comment += " [default: " + prop.getDefault() + "]";
 		propOrder.add(prop.getName());
 		leftClickCatchall = prop.getBoolean(leftClickCatchall);
+		boolean first = !config.hasKey(category, "transportableChests");
 		prop = config.get(category, "transportableChests", new String[0]);
 		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
 		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
@@ -87,6 +90,27 @@ public class Config
 		prop.comment += "..";
 		propOrder.add(prop.getName());
 		transportableChests = prop.getStringList();
+
+		if (first)
+		{
+			List<String> chests = Lists.newArrayList();
+
+			chests.add(MIMUtils.getUniqueName(Blocks.chest) + "@-1@0");
+			chests.add(MIMUtils.getUniqueName(Blocks.trapped_chest) + "@-1@0");
+			chests.add(MIMUtils.getUniqueName(MoreInventoryMod.storageBox) + "@-1@0");
+
+			for (int i = 0; i < 7; i++)
+			{
+				chests.add("IronChest:BlockIronChest@" + i + "@" + (i + 1));
+			}
+
+			chests.add("BambooMod:jpChest@-1@10");
+			chests.add("MultiPageChest:multipagechest@-1@11");
+
+			transportableChests = chests.toArray(new String[chests.size()]);
+			prop.set(transportableChests);
+		}
+
 		ItemChestTransporter.refreshTransportableChests(transportableChests);
 
 		if (FMLCommonHandler.instance().getSide().isClient())

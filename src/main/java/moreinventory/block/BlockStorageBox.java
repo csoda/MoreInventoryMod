@@ -60,7 +60,7 @@ public class BlockStorageBox extends BlockContainer
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 		ItemStack itemstack = player.getCurrentEquippedItem();
 
-		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.NoFunctionItems && itemstack.getItemDamage() == 3 && tile.getStorageBoxType() != StorageBoxType.Glass)
+		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.noFunctionItems && itemstack.getItemDamage() == 3 && tile.getStorageBoxType() != StorageBoxType.Glass)
 		{
 			tile.sendGUIPacketToClient();
 			player.openGui(MoreInventoryMod.instance, 4, world, x, y, z);
