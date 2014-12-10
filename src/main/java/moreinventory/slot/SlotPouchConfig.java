@@ -48,6 +48,6 @@ public class SlotPouchConfig extends Slot
 
 	public void removeItem()
 	{
-		inventory.setInventorySlotContents(this.getSlotIndex(), (ItemStack) null);
+		inventory.setInventorySlotContents(getSlotIndex(), null);
 	}
 }

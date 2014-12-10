@@ -1,8 +1,9 @@
 package moreinventory.core;
 
-import java.io.File;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.common.Loader;
 import moreinventory.item.ItemChestTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.util.MIMUtils;
@@ -10,14 +11,10 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-
 import org.apache.logging.log4j.Level;
 
-import com.google.common.collect.Lists;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.common.Loader;
+import java.io.File;
+import java.util.List;
 
 public class Config
 {

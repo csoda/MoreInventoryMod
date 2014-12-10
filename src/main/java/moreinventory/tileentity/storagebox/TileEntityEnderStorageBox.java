@@ -32,12 +32,7 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		if (slot == 0)
-		{
-			return itemstack != null && itemstack.getItem() == getContentsItem() && itemstack.getItemDamage() == getContentsDamage() && !itemstack.hasTagCompound();
-		}
-
-		return false;
+		return slot == 0 && itemstack != null && itemstack.getItem() == getContentsItem() && itemstack.getItemDamage() == getContentsDamage() && !itemstack.hasTagCompound();
 	}
 
 	@Override

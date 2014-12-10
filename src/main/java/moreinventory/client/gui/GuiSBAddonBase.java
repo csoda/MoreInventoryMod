@@ -1,5 +1,7 @@
 package moreinventory.client.gui;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.gui.button.GuiButtonConfigString;
 import moreinventory.client.gui.button.GuiButtonInvisible;
 import moreinventory.container.ContainerSBAddonBase;
@@ -10,11 +12,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public abstract class GuiSBAddonBase extends GuiContainer

@@ -1,14 +1,12 @@
 package moreinventory.client.gui;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.container.ContainerTeleporter;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiTeleporter extends GuiSBAddonBase

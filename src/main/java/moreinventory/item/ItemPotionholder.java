@@ -35,8 +35,6 @@ public class ItemPotionHolder extends Item
 				else
 				{
 					inventory.throwPotion(world, player);
-
-					first = null;
 				}
 			}
 		}

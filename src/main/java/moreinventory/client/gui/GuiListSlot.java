@@ -1,14 +1,14 @@
 package moreinventory.client.gui;
 
-import java.util.List;
-import java.util.Set;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.List;
+import java.util.Set;
 
 @SideOnly(Side.CLIENT)
 public abstract class GuiListSlot<E> extends GuiSlot

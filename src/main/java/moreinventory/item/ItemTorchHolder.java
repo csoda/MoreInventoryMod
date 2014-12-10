@@ -70,7 +70,7 @@ public class ItemTorchHolder extends Item
 		{
 			int count = 0;
 
-			if (itemstack != null && inventory != null)
+			if (inventory != null)
 			{
 				for (int i = 0; i < inventory.getSizeInventory(); i++)
 				{

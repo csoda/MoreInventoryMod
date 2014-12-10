@@ -1,7 +1,6 @@
 package moreinventory.util;
 
 import com.google.common.base.Objects;
-
 import net.minecraft.block.Block;
 
 public class BlockMeta

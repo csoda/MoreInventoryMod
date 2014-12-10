@@ -11,7 +11,8 @@ import net.minecraft.world.World;
 
 public class InventoryPotionHolder implements IInventory
 {
-	private final ItemStack usingItem;
+	private ItemStack usingItem;
+
 	private final ItemStack[] holderItems = new ItemStack[9];
 
 	public InventoryPotionHolder(ItemStack itemstack)
@@ -221,17 +222,12 @@ public class InventoryPotionHolder implements IInventory
 
 		if (current != usingItem)
 		{
-			current = usingItem;
+			usingItem = current;
 		}
 
 		readFromNBT();
 
-		if (player.getCurrentEquippedItem().getItem() != MoreInventoryMod.potionHolder)
-		{
-			return false;
-		}
-
-		return true;
+		return player.getCurrentEquippedItem().getItem() == MoreInventoryMod.potionHolder;
 	}
 
 	@Override
@@ -243,11 +239,6 @@ public class InventoryPotionHolder implements IInventory
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		if (itemstack == null)
-		{
-			return false;
-		}
-
-		return itemstack.getItem() == Items.glass_bottle || itemstack.getItem() == Items.potionitem;
+		return itemstack != null && (itemstack.getItem() == Items.glass_bottle || itemstack.getItem() == Items.potionitem);
 	}
 }

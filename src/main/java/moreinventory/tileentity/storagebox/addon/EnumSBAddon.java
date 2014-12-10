@@ -1,16 +1,14 @@
 package moreinventory.tileentity.storagebox.addon;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
-import com.google.common.collect.Maps;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.Map;
 
 public enum EnumSBAddon
 {

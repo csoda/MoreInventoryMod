@@ -1,10 +1,15 @@
 package moreinventory.client.gui;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.RecursiveAction;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import cpw.mods.fml.client.config.GuiButtonExt;
+import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.util.ArrayListExtended;
 import moreinventory.util.BlockMeta;
@@ -21,20 +26,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-
 import org.lwjgl.input.Keyboard;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import cpw.mods.fml.client.config.GuiButtonExt;
-import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.RecursiveAction;
 
 @SideOnly(Side.CLIENT)
 public class GuiSelectTransportableChest extends GuiScreen
@@ -156,7 +153,7 @@ public class GuiSelectTransportableChest extends GuiScreen
 			filterTextField.textboxKeyTyped(c, code);
 
 			String text = filterTextField.getText();
-			boolean changed = text != prev;
+			boolean changed = !text.equals(prev);
 
 			if (Strings.isNullOrEmpty(text) && changed)
 			{
@@ -232,8 +229,8 @@ public class GuiSelectTransportableChest extends GuiScreen
 	class ChestList extends GuiListSlot<BlockMeta>
 	{
 		private final ArrayListExtended<BlockMeta>
-		chests = new ArrayListExtended(),
-		contents = new ArrayListExtended();
+		chests = new ArrayListExtended<>(),
+		contents = new ArrayListExtended<>();
 		private final Set<BlockMeta> selected = Sets.newTreeSet(MIMUtils.blockMetaComparator);
 		private final Map<String, List<BlockMeta>> filterCache = Maps.newHashMap();
 
