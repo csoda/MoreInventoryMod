@@ -22,7 +22,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.google.common.collect.Table.Cell;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -45,11 +44,6 @@ public class ItemChestTransporter extends Item
 			}
 
 			transportableChests.put(args[0].trim(), Integer.parseInt(args[1].trim()), args.length > 2 && args[2].trim().length() > 0 ? NumberUtils.toInt(args[2].trim()) & 29 : 0);
-		}
-
-		for (Cell<String, Integer, Integer> chest : transportableChests.cellSet())
-		{
-			System.out.println(chest.getRowKey() + "@" + chest.getColumnKey() + "@" + chest.getValue());
 		}
 	}
 
