@@ -78,12 +78,7 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 		int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, side);
 		TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
 
-		if (tile != null && tile instanceof IInventory)
-		{
-			return true;
-		}
-
-		return false;
+		return tile != null && tile instanceof IInventory;
 	}
 
 	@Override

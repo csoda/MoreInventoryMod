@@ -1,16 +1,16 @@
 package moreinventory.network;
 
-import io.netty.buffer.ByteBuf;
-import moreinventory.core.MoreInventoryMod;
-import moreinventory.inventory.InventoryPouch;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import moreinventory.core.MoreInventoryMod;
+import moreinventory.inventory.InventoryPouch;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 
 public class PouchMessage implements IMessage
 {

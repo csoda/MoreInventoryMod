@@ -1,18 +1,14 @@
 package moreinventory.handler;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import moreinventory.util.IWorldDataSave;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.FMLCommonHandler;
+
+import java.io.*;
+import java.util.List;
 
 public class MIMWorldSaveHelper
 {

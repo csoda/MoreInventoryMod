@@ -1,10 +1,8 @@
 package moreinventory.util;
 
-import java.util.Comparator;
-import java.util.Random;
-import java.util.concurrent.ForkJoinPool;
-import java.util.regex.Pattern;
-
+import com.google.common.base.Strings;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
@@ -14,10 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
-import com.google.common.base.Strings;
-
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
+import java.util.regex.Pattern;
 
 public final class MIMUtils
 {
@@ -78,12 +76,7 @@ public final class MIMUtils
 
 	public static boolean compareItems(ItemStack item1, Item item2)
 	{
-		if (item1 != null)
-		{
-			return item1.getItem() == item2;
-		}
-
-		return false;
+		return item1 != null && item1.getItem() == item2;
 	}
 
 	public static boolean compareItems(Item item1, ItemStack item2)
@@ -206,7 +199,6 @@ public final class MIMUtils
 
 				if (itemstack.stackSize == 0)
 				{
-					itemstack = null;
 					return flag;
 				}
 			}
@@ -237,9 +229,9 @@ public final class MIMUtils
 		{
 			int[] slots = ((ISidedInventory)inventory).getAccessibleSlotsFromSide(side);
 
-			for (int i = 0; i < slots.length; i++)
+			for (int slot1 : slots)
 			{
-				if (slots[i] == slot)
+				if (slot1 == slot)
 				{
 					return true;
 				}
@@ -258,7 +250,8 @@ public final class MIMUtils
 
 	public static boolean canInsertFromSide(IInventory inventory, ItemStack itemstack, int slot, int side)
 	{
-		return !inventory.isItemValidForSlot(slot, itemstack) ? false : !(inventory instanceof ISidedInventory) || ((ISidedInventory) inventory).canInsertItem(slot, itemstack, side);
+		return inventory.isItemValidForSlot(slot, itemstack) && (!(inventory instanceof ISidedInventory) || ((ISidedInventory)inventory).canInsertItem(
+				slot, itemstack, side));
 	}
 
 	public static int compareWithNull(Object o1, Object o2)

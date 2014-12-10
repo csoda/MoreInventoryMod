@@ -1,17 +1,10 @@
 package moreinventory.handler;
 
-import moreinventory.client.gui.GuiCatchall;
-import moreinventory.client.gui.GuiPotionHolder;
-import moreinventory.client.gui.GuiPouch;
-import moreinventory.client.gui.GuiStorageBox;
-import moreinventory.client.gui.GuiTeleporter;
-import moreinventory.client.gui.GuiTransportManager;
-import moreinventory.container.ContainerCatchall;
-import moreinventory.container.ContainerPotionHolder;
-import moreinventory.container.ContainerPouch;
-import moreinventory.container.ContainerStorageBox;
-import moreinventory.container.ContainerTeleporter;
-import moreinventory.container.ContainerTransportManager;
+import cpw.mods.fml.common.network.IGuiHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import moreinventory.client.gui.*;
+import moreinventory.container.*;
 import moreinventory.inventory.InventoryPotionHolder;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.tileentity.TileEntityCatchall;
@@ -20,9 +13,6 @@ import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.IGuiHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class MIMGuiHandler implements IGuiHandler
 {

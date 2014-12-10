@@ -1,12 +1,11 @@
 package moreinventory.util;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 {
@@ -99,7 +98,7 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 	{
 		if (index != -1)
 		{
-			ItemStack itemstack = list.get(index).copy();
+			ItemStack itemstack = ItemStack.copyItemStack(list.get(index));
 
 			if (itemstack != null)
 			{

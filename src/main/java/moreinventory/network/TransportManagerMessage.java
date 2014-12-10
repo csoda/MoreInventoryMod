@@ -52,38 +52,38 @@ public class TransportManagerMessage implements IMessage
 	}
 
 
-    public static class Client implements IMessageHandler<TransportManagerMessage, IMessage>
-    {
-        @SideOnly(Side.CLIENT)
-        @Override
-        public IMessage onMessage(TransportManagerMessage message, MessageContext ctx)
-        {
-            WorldClient world = FMLClientHandler.instance().getWorldClient();
-            TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
+	public static class Client implements IMessageHandler<TransportManagerMessage, IMessage>
+	{
+		@SideOnly(Side.CLIENT)
+		@Override
+		public IMessage onMessage(TransportManagerMessage message, MessageContext ctx)
+		{
+			WorldClient world = FMLClientHandler.instance().getWorldClient();
+			TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
 
-            if (tile != null && tile instanceof TileEntityTransportManager)
-            {
-                ((TileEntityTransportManager)tile).handleCommonPacketData(message.face, message.topFace, message.sneak);
-            }
+			if (tile != null && tile instanceof TileEntityTransportManager)
+			{
+				((TileEntityTransportManager)tile).handleCommonPacketData(message.face, message.topFace, message.sneak);
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 
-    public static class Server implements IMessageHandler<TransportManagerMessage, IMessage>
-    {
-        @Override
-        public IMessage onMessage(TransportManagerMessage message, MessageContext ctx)
-        {
-            WorldServer world = ctx.getServerHandler().playerEntity.getServerForPlayer();
-            TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
+	public static class Server implements IMessageHandler<TransportManagerMessage, IMessage>
+	{
+		@Override
+		public IMessage onMessage(TransportManagerMessage message, MessageContext ctx)
+		{
+			WorldServer world = ctx.getServerHandler().playerEntity.getServerForPlayer();
+			TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
 
-            if (tile != null && tile instanceof TileEntityTransportManager)
-            {
-                ((TileEntityTransportManager)tile).handleCommonPacketData(message.face, message.topFace, message.sneak);
-            }
+			if (tile != null && tile instanceof TileEntityTransportManager)
+			{
+				((TileEntityTransportManager)tile).handleCommonPacketData(message.face, message.topFace, message.sneak);
+			}
 
-            return null;
-        }
-    }
+			return null;
+		}
+	}
 }

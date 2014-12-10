@@ -1,16 +1,6 @@
 package moreinventory.client.config;
 
-import java.util.List;
-
-import moreinventory.core.Config;
-import moreinventory.core.MoreInventoryMod;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Configuration;
-
 import com.google.common.collect.Lists;
-
 import cpw.mods.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.GuiConfigEntries;
@@ -18,6 +8,14 @@ import cpw.mods.fml.client.config.GuiConfigEntries.CategoryEntry;
 import cpw.mods.fml.client.config.IConfigElement;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import moreinventory.core.Config;
+import moreinventory.core.MoreInventoryMod;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
+import net.minecraftforge.common.config.ConfigElement;
+import net.minecraftforge.common.config.Configuration;
+
+import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class MIMConfigGui extends GuiConfig

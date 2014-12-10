@@ -62,10 +62,8 @@ public class TileEntityImporter extends TileEntityTransportManager
 	{
 		boolean result = !include;
 
-		for (int i = 0; i < inventoryItems.length; i++)
+		for (ItemStack itemstack1 : inventoryItems)
 		{
-			ItemStack itemstack1 = inventoryItems[i];
-
 			if (itemstack1 != null)
 			{
 				if (MIMUtils.compareStacksWithDamage(itemstack, itemstack1))

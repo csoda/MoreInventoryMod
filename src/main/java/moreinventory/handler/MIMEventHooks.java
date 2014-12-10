@@ -1,5 +1,10 @@
 package moreinventory.handler;
 
+import com.google.common.collect.Lists;
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
@@ -17,13 +22,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.WorldEvent;
-
-import com.google.common.collect.Lists;
-
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class MIMEventHooks
 {
@@ -121,7 +119,7 @@ public class MIMEventHooks
 	{
 		if (!event.world.isRemote)
 		{
-			if (MoreInventoryMod.saveHelper == null || MoreInventoryMod.saveHelper.world.getSaveHandler().getWorldDirectoryName() != event.world.getSaveHandler().getWorldDirectoryName())
+			if (MoreInventoryMod.saveHelper == null || !MoreInventoryMod.saveHelper.world.getSaveHandler().getWorldDirectoryName().equals(event.world.getSaveHandler().getWorldDirectoryName()))
 			{
 				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
 				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");

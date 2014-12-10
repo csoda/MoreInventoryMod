@@ -1,5 +1,7 @@
 package moreinventory.client.renderer;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.model.ModelImporter;
 import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
@@ -7,16 +9,14 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityTransportManagerRenderer extends TileEntitySpecialRenderer
 {
 	private static final ResourceLocation[] transportManagerTextures = new ResourceLocation[5];
+
+	static
 	{
 		transportManagerTextures[0] = new ResourceLocation("textures/blocks/anvil_base.png");
 		transportManagerTextures[1] = new ResourceLocation("moreinv:textures/blocks/Importer.png");

@@ -1,5 +1,7 @@
 package moreinventory.item;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
@@ -11,8 +13,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemBlockTransportManager extends ItemBlock
 {

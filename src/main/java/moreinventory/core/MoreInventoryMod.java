@@ -1,5 +1,17 @@
 package moreinventory.core;
 
+import com.google.common.collect.Lists;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
 import moreinventory.block.BlockCatchall;
 import moreinventory.block.BlockStorageBox;
 import moreinventory.block.BlockStorageBoxAddon;
@@ -7,26 +19,8 @@ import moreinventory.block.BlockTransportManager;
 import moreinventory.handler.MIMEventHooks;
 import moreinventory.handler.MIMGuiHandler;
 import moreinventory.handler.MIMWorldSaveHelper;
-import moreinventory.item.ItemBlockSBAddon;
-import moreinventory.item.ItemBlockStorageBox;
-import moreinventory.item.ItemBlockTransportManager;
-import moreinventory.item.ItemChestTransporter;
-import moreinventory.item.ItemNoFunction;
-import moreinventory.item.ItemPlating;
-import moreinventory.item.ItemPotionHolder;
-import moreinventory.item.ItemPouch;
-import moreinventory.item.ItemSpanner;
-import moreinventory.item.ItemTorchHolder;
-import moreinventory.network.CatchallMessage;
-import moreinventory.network.ImporterMessage;
-import moreinventory.network.PouchMessage;
-import moreinventory.network.SBAddonBaseConfigMessage;
-import moreinventory.network.SBAddonBaseMessage;
-import moreinventory.network.StorageBoxButtonMessage;
-import moreinventory.network.StorageBoxConfigMessage;
-import moreinventory.network.StorageBoxContentsMessage;
-import moreinventory.network.StorageBoxMessage;
-import moreinventory.network.TransportManagerMessage;
+import moreinventory.item.*;
+import moreinventory.network.*;
 import moreinventory.recipe.RecipePouch;
 import moreinventory.recipe.RecipeTorchHolder;
 import moreinventory.tileentity.TileEntityCatchall;
@@ -47,20 +41,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
-
-import com.google.common.collect.Lists;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 @Mod
 (
@@ -163,7 +143,7 @@ public class MoreInventoryMod
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
 		network.registerMessage(TransportManagerMessage.Client.class, TransportManagerMessage.class, i++, Side.CLIENT);
-        network.registerMessage(TransportManagerMessage.Server.class, TransportManagerMessage.class, i++, Side.SERVER);
+		network.registerMessage(TransportManagerMessage.Server.class, TransportManagerMessage.class, i++, Side.SERVER);
 		network.registerMessage(CatchallMessage.class, CatchallMessage.class, i++, Side.CLIENT);
 		network.registerMessage(ImporterMessage.Client.class, ImporterMessage.class, i++, Side.CLIENT);
 		network.registerMessage(ImporterMessage.Server.class, ImporterMessage.class, i++, Side.SERVER);
@@ -173,11 +153,11 @@ public class MoreInventoryMod
 		network.registerMessage(StorageBoxButtonMessage.class, StorageBoxButtonMessage.class, i++, Side.SERVER);
 		network.registerMessage(SBAddonBaseMessage.class, SBAddonBaseMessage.class, i++, Side.CLIENT);
 		network.registerMessage(SBAddonBaseConfigMessage.Client.class, SBAddonBaseConfigMessage.class, i++, Side.CLIENT);
-		network.registerMessage(SBAddonBaseConfigMessage.Server.class, SBAddonBaseConfigMessage.class, i++, Side.SERVER);
+		network.registerMessage(SBAddonBaseConfigMessage.Server.class, SBAddonBaseConfigMessage.class, i, Side.SERVER);
 	}
 
 	@EventHandler
-	public void load(FMLInitializationEvent event)
+	public void init(FMLInitializationEvent event)
 	{
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new MIMGuiHandler());
 

@@ -330,12 +330,7 @@ public class InventoryPouch implements IInventory
 		usingItem = usingPlayer.getCurrentEquippedItem();
 		readFromNBT();
 
-		if (!MIMUtils.compareItems(player.getCurrentEquippedItem(), MoreInventoryMod.pouch))
-		{
-			return false;
-		}
-
-		return true;
+		return MIMUtils.compareItems(player.getCurrentEquippedItem(), MoreInventoryMod.pouch);
 	}
 
 	@Override

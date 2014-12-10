@@ -1,5 +1,8 @@
 package moreinventory.client;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.renderer.ItemCatchallRenderer;
 import moreinventory.client.renderer.TileEntityCatchallRenderer;
 import moreinventory.client.renderer.TileEntityStorageBoxRenderer;
@@ -11,9 +14,6 @@ import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import moreinventory.util.MIMUtils;
 import net.minecraftforge.client.MinecraftForgeClient;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ClientProxy extends CommonProxy

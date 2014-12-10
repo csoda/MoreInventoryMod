@@ -1,12 +1,11 @@
 package moreinventory.util;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 public class MIMItemBoxList extends MIMBoxList
 {
