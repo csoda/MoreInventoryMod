@@ -52,7 +52,7 @@ public class MIMEventHooks
 				{
 					ItemStack itemstack = player.inventory.getStackInSlot(i);
 
-					if (MIMUtils.compareItems(itemstack, MoreInventoryMod.ChestTransporter) && itemstack.getItemDamage() != 0 && itemstack != player.inventory.getCurrentItem())
+					if (MIMUtils.compareItems(itemstack, MoreInventoryMod.transporter) && itemstack.getItemDamage() != 0 && itemstack != player.inventory.getCurrentItem())
 					{
 						if (player.getFoodStats().getFoodLevel() < 10 || i > 9)
 						{
@@ -80,7 +80,7 @@ public class MIMEventHooks
 
 				if (itemstack != null)
 				{
-					if (itemstack.getItem() == MoreInventoryMod.Pouch)
+					if (itemstack.getItem() == MoreInventoryMod.pouch)
 					{
 						InventoryPouch pouch = new InventoryPouch(itemstack);
 

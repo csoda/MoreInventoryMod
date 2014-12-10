@@ -52,7 +52,7 @@ public class PouchMessage implements IMessage
 			EntityPlayer player = FMLClientHandler.instance().getClientPlayerEntity();
 			ItemStack itemstack = player.getCurrentEquippedItem();
 
-			if (itemstack != null && itemstack.getItem() == MoreInventoryMod.Pouch)
+			if (itemstack != null && itemstack.getItem() == MoreInventoryMod.pouch)
 			{
 				InventoryPouch pouch = new InventoryPouch(player, itemstack);
 
@@ -71,7 +71,7 @@ public class PouchMessage implements IMessage
 			EntityPlayer player = ctx.getServerHandler().playerEntity;
 			ItemStack itemstack = player.getCurrentEquippedItem();
 
-			if (itemstack != null && itemstack.getItem() == MoreInventoryMod.Pouch)
+			if (itemstack != null && itemstack.getItem() == MoreInventoryMod.pouch)
 			{
 				InventoryPouch pouch = new InventoryPouch(player, itemstack);
 

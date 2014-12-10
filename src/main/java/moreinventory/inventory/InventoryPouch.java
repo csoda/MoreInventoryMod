@@ -46,7 +46,7 @@ public class InventoryPouch implements IInventory
 
 	public void setConfigItem(int slot, ItemStack itemstack)
 	{
-		if (itemstack != null && itemstack.getItem() != MoreInventoryMod.Pouch)
+		if (itemstack != null && itemstack.getItem() != MoreInventoryMod.pouch)
 		{
 			pouchItems[slot] = itemstack.copy();
 			pouchItems[slot].stackSize = 1;
@@ -110,7 +110,7 @@ public class InventoryPouch implements IInventory
 
 			if (itemstack != null)
 			{
-				if (itemstack.getItem() == MoreInventoryMod.Pouch)
+				if (itemstack.getItem() == MoreInventoryMod.pouch)
 				{
 					InventoryPouch pouch = new InventoryPouch(itemstack);
 
@@ -330,7 +330,7 @@ public class InventoryPouch implements IInventory
 		usingItem = usingPlayer.getCurrentEquippedItem();
 		readFromNBT();
 
-		if (!MIMUtils.compareItems(player.getCurrentEquippedItem(), MoreInventoryMod.Pouch))
+		if (!MIMUtils.compareItems(player.getCurrentEquippedItem(), MoreInventoryMod.pouch))
 		{
 			return false;
 		}

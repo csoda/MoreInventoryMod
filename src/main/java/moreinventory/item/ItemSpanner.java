@@ -1,5 +1,6 @@
 package moreinventory.item;
 
+import moreinventory.core.MoreInventoryMod;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -13,6 +14,7 @@ public class ItemSpanner extends Item
 	{
 		this.setTextureName("moreinv:spanner_CS");
 		this.setMaxStackSize(1);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override

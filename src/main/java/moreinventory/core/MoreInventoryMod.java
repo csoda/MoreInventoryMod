@@ -87,17 +87,18 @@ public class MoreInventoryMod
 
 	public static MIMWorldSaveHelper saveHelper;
 
-	public static Block Catchall;
-	public static Block StorageBox;
-	public static Block TransportManager;
-	public static Block StorageBoxAddon;
-	public static Item[] Torchholder = new Item[3];
-	public static Item ChestTransporter;
-	public static Item Pouch;
-	public static Item NoFunctionItems;
-	public static Item Spanner;
-	public static Item Potionholder;
-	public static Item Plating;
+	public static final Block catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
+	public static final Block storageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
+	public static final Block transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
+	public static final Block storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
+
+	public static final Item[] torchHolder = new Item[3];
+	public static final Item transporter = new ItemChestTransporter().setUnlocalizedName("transporter");
+	public static final Item noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
+	public static final Item potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
+	public static final Item spanner = new ItemSpanner().setUnlocalizedName("spanner");
+	public static final Item plating = new ItemPlating().setUnlocalizedName("painting");
+	public static final Item pouch = new ItemPouch().setUnlocalizedName("pouch");
 
 	public static final String[] MATERIALNAME = {"Leather Pack", "Brush", "Dimension Core", "Clipboard"};
 	public static final String[] COLORNAME = {"White", "Orange", "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray", "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red", "Black"};
@@ -109,41 +110,26 @@ public class MoreInventoryMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		Config.syncConfig();
-
-		/*** Blocks ***/
-		Catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
-		StorageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
-		TransportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
-		StorageBoxAddon = new BlockStorageBoxAddon(Material.iron);
-		GameRegistry.registerBlock(Catchall, ItemBlock.class, "catchall");
-		GameRegistry.registerBlock(StorageBox, ItemBlockStorageBox.class, "containerbox");
-		GameRegistry.registerBlock(TransportManager, ItemBlockTransportManager.class, "transportmanager");
-		GameRegistry.registerBlock(StorageBoxAddon, ItemBlockSBAddon.class, "StorageBoxAddon");
-
-		/*** Items ***/
-		ChestTransporter = new ItemChestTransporter().setUnlocalizedName("transporter");
-		NoFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
-		Potionholder = new ItemPotionHolder().setUnlocalizedName("potionholder");
-		Spanner = new ItemSpanner().setUnlocalizedName("spanner").setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
-		Plating = new ItemPlating().setUnlocalizedName("painting").setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
-		Pouch = new ItemPouch().setUnlocalizedName("pouch");
+		GameRegistry.registerBlock(catchall, ItemBlock.class, "catchall");
+		GameRegistry.registerBlock(storageBox, ItemBlockStorageBox.class, "containerbox");
+		GameRegistry.registerBlock(transportManager, ItemBlockTransportManager.class, "transportmanager");
+		GameRegistry.registerBlock(storageBoxAddon, ItemBlockSBAddon.class, "StorageBoxAddon");
 
 		final String[] gradeName = { "Iron", "Gold", "Diamond" };
 		for (int i = 0; i < 3; i++)
 		{
-			Torchholder[i] = new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
-			GameRegistry.registerItem(Torchholder[i], "torchholder" + gradeName[i]);
+			torchHolder[i] = new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
+
+			GameRegistry.registerItem(torchHolder[i], "torchholder" + gradeName[i]);
 		}
 
-		GameRegistry.registerItem(ChestTransporter, "transporter");
-		GameRegistry.registerItem(NoFunctionItems, "itemnofunction");
-		GameRegistry.registerItem(Potionholder, "potionholder");
-		GameRegistry.registerItem(Spanner, "spanner");
-		GameRegistry.registerItem(Plating, "painting");
-		GameRegistry.registerItem(Pouch, "pouch");
+		GameRegistry.registerItem(transporter, "transporter");
+		GameRegistry.registerItem(noFunctionItems, "itemnofunction");
+		GameRegistry.registerItem(potionHolder, "potionholder");
+		GameRegistry.registerItem(spanner, "spanner");
+		GameRegistry.registerItem(plating, "painting");
+		GameRegistry.registerItem(pouch, "pouch");
 
-		/*** TileEntity ***/
 		GameRegistry.registerTileEntity(TileEntityCatchall.class, "containerCatchall");
 		GameRegistry.registerTileEntity(TileEntityTransportManager.class, "TileEntityTransportManagerMeta");
 		GameRegistry.registerTileEntity(TileEntityImporter.class, "TilEntityImporter");
@@ -159,7 +145,8 @@ public class MoreInventoryMod
 			GameRegistry.registerTileEntity(EnumSBAddon.values()[i].clazz, "moreinventory." + EnumSBAddon.values()[i].name());
 		}
 
-		/*** Messages ***/
+		Config.syncConfig();
+
 		int i = 0;
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
@@ -185,18 +172,18 @@ public class MoreInventoryMod
 
 		MinecraftForge.EVENT_BUS.register(MIMEventHooks.instance);
 
-		GameRegistry.addShapedRecipe(new ItemStack(Torchholder[0], 1, ItemTorchHolder.maxDamage[0] - 2),
+		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[0], 1, ItemTorchHolder.maxDamage[0] - 2),
 			"I L", "I I", "III",
 			'I', new ItemStack(Items.iron_ingot),
 			'L', new ItemStack(Items.leather)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(Torchholder[1], 1, ItemTorchHolder.maxDamage[1] - 2),
+		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[1], 1, ItemTorchHolder.maxDamage[1] - 2),
 			"I L", "I I", "ISI",
 			'I', new ItemStack(Items.gold_ingot),
 			'L', new ItemStack(Items.leather),
 			'S', new ItemStack(Items.blaze_rod)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(Torchholder[2], 1, ItemTorchHolder.maxDamage[2] - 2),
+		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[2], 1, ItemTorchHolder.maxDamage[2] - 2),
 			"I L", "I I", "ISI",
 			'I', new ItemStack(Items.diamond),
 			'L', new ItemStack(Items.leather),
@@ -205,93 +192,93 @@ public class MoreInventoryMod
 
 		for (int i = 0; i < 2; ++i)
 		{
-			GameRegistry.addRecipe(new RecipeTorchHolder(new ItemStack(Blocks.torch), Lists.newArrayList(new ItemStack(Torchholder[i], 1, OreDictionary.WILDCARD_VALUE))));
+			GameRegistry.addRecipe(new RecipeTorchHolder(new ItemStack(Blocks.torch), Lists.newArrayList(new ItemStack(torchHolder[i], 1, OreDictionary.WILDCARD_VALUE))));
 		}
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(Catchall),
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(catchall),
 			"P P", "PCP", "HHH",
 			'P', "plankWood",
 			'H', "slabWood",
 			'C', new ItemStack(Blocks.chest)
 		));
 
-		GameRegistry.addShapedRecipe(new ItemStack(Spanner),
+		GameRegistry.addShapedRecipe(new ItemStack(spanner),
 			"SSS", " I ", "SSS",
 			'S', new ItemStack(Blocks.stone),
 			'I', new ItemStack(Items.iron_ingot)
 		);
 
-		GameRegistry.addShapedRecipe(new ItemStack(Potionholder),
+		GameRegistry.addShapedRecipe(new ItemStack(potionHolder),
 			"SLS", "BBB",
 			'S', new ItemStack(Items.string),
 			'L', new ItemStack(Items.leather),
 			'B', new ItemStack(Items.glass_bottle)
 		);
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ChestTransporter),
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(transporter),
 			"P P", "PHP", "HHH",
 			'H', "slabWood",
 			'P', "plankWood"
 		));
 
-		GameRegistry.addShapedRecipe(new ItemStack(TransportManager, 1, 0),
+		GameRegistry.addShapedRecipe(new ItemStack(transportManager, 1, 0),
 			" B ", "SBS", "SSS",
 			'B', new ItemStack(Blocks.lapis_block),
 			'S', new ItemStack(Blocks.stone)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(TransportManager, 1, 1),
+		GameRegistry.addShapedRecipe(new ItemStack(transportManager, 1, 1),
 			" B ", "SBS", "SSS",
 			'B', new ItemStack(Blocks.redstone_block),
 			'S', new ItemStack(Blocks.stone)
 		);
 
-		GameRegistry.addShapedRecipe(new ItemStack(Pouch),
+		GameRegistry.addShapedRecipe(new ItemStack(pouch),
 			"PPP", "BLB", "PBP",
 			'L', new ItemStack(Items.diamond),
 			'P', new ItemStack(Items.leather),
-			'B', new ItemStack(NoFunctionItems, 1, 0)
+			'B', new ItemStack(noFunctionItems, 1, 0)
 		);
 
 		for (int i = 0; i < 16; i++)
 		{
-			GameRegistry.addRecipe(new RecipePouch(new ItemStack(Pouch, 1, i + 1), "dye" + COLORNAME[i], new ItemStack(Pouch, 1, OreDictionary.WILDCARD_VALUE)));
+			GameRegistry.addRecipe(new RecipePouch(new ItemStack(pouch, 1, i + 1), "dye" + COLORNAME[i], new ItemStack(pouch, 1, OreDictionary.WILDCARD_VALUE)));
 		}
 
-		ItemStack upgradePouch = new ItemStack(Pouch);
+		ItemStack upgradePouch = new ItemStack(pouch);
 		upgradePouch.setStackDisplayName(upgradePouch.getDisplayName() + "(Upgrade)");
-		GameRegistry.addRecipe(new RecipePouch(upgradePouch, new ItemStack(Items.ender_pearl), new ItemStack(Pouch, 1, OreDictionary.WILDCARD_VALUE)));
+		GameRegistry.addRecipe(new RecipePouch(upgradePouch, new ItemStack(Items.ender_pearl), new ItemStack(pouch, 1, OreDictionary.WILDCARD_VALUE)));
 
-		GameRegistry.addShapedRecipe(new ItemStack(NoFunctionItems, 1, 0),
+		GameRegistry.addShapedRecipe(new ItemStack(noFunctionItems, 1, 0),
 			"LLL", "LSL", "LLL",
 			'L', new ItemStack(Items.leather),
 			'S', new ItemStack(Items.string)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(NoFunctionItems, 4, 1),
+		GameRegistry.addShapedRecipe(new ItemStack(noFunctionItems, 4, 1),
 			" WW", " WW", "S  ",
 			'W', new ItemStack(Blocks.wool),
 			'S', new ItemStack(Items.stick)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(NoFunctionItems, 1, 2),
+		GameRegistry.addShapedRecipe(new ItemStack(noFunctionItems, 1, 2),
 			"ODO", "DED", "ODO",
 			'O', new ItemStack(Blocks.obsidian),
 			'D', new ItemStack(Items.diamond),
 			'E', new ItemStack(Items.ender_eye)
 		);
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(NoFunctionItems, 1, 3),
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(noFunctionItems, 1, 3),
 			"WIW", "WPW", "WPW",
 			'W', "slabWood",
 			'I', new ItemStack(Items.iron_ingot),
 			'P', new ItemStack(Items.paper)
 		));
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(StorageBox, 1, 0),
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(storageBox, 1, 0),
 			"IHI", "I I", "IHI",
 			'I', "logWood",
-			'C', new ItemStack(StorageBox, 1, 0),
+			'C', new ItemStack(storageBox, 1, 0),
 			'H', "slabWood"
 		));
 
-		ItemStack woodStorageBox = new ItemStack(StorageBox, 1, 0);
+		ItemStack woodStorageBox = new ItemStack(storageBox, 1, 0);
 		ItemStack halfStone = new ItemStack(Blocks.stone_slab);
 
 		for (int i = 0; i < StorageBoxType.values().length; i++)
@@ -300,7 +287,7 @@ public class MoreInventoryMod
 			{
 				for (int j = 0; j < StorageBoxType.values()[i].materials.length; j++)
 				{
-					GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(StorageBox, 3, i), true,
+					GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(storageBox, 3, i), true,
 						"IHI", "ICI", "IHI",
 						'I', StorageBoxType.values()[i].materials[j],
 						'C', woodStorageBox,
@@ -310,32 +297,32 @@ public class MoreInventoryMod
 			}
 		}
 
-		GameRegistry.addShapedRecipe(new ItemStack(StorageBox, 32, 8),
+		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 32, 8),
 			"IHI", "I I", "IHI",
 			'H', new ItemStack(Blocks.glass_pane),
 			'I', new ItemStack(Blocks.glass)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(StorageBox, 1, 9),
+		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 1, 9),
 			"IHI", "I I", "IHI",
 			'H', new ItemStack(Blocks.stone_slab, 1, 3),
 			'I', new ItemStack(Blocks.cobblestone)
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(StorageBox, 2, 11),
+		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 2, 11),
 			"OOO", "CEC", "OOO",
 			'O', new ItemStack(Blocks.obsidian),
-			'C', new ItemStack(NoFunctionItems, 1, 2),
-			'E', new ItemStack(StorageBox, 1, 10)
+			'C', new ItemStack(noFunctionItems, 1, 2),
+			'E', new ItemStack(storageBox, 1, 10)
 		);
 
-		GameRegistry.addRecipe(new ItemStack(StorageBoxAddon, 1, 0),
+		GameRegistry.addRecipe(new ItemStack(storageBoxAddon, 1, 0),
 			"SSS", "CEC", "SSS",
 			'S', new ItemStack(Blocks.end_stone),
-			'C', new ItemStack(NoFunctionItems, 1, 2),
-			'E', new ItemStack(StorageBox, 1, 10)
+			'C', new ItemStack(noFunctionItems, 1, 2),
+			'E', new ItemStack(storageBox, 1, 10)
 		);
 
 		ItemStack lava = new ItemStack(Items.lava_bucket);
-		ItemStack brush = new ItemStack(NoFunctionItems, 1, 1);
+		ItemStack brush = new ItemStack(noFunctionItems, 1, 1);
 
 		for (int i = 0; i < ItemPlating.typeIndex.length; i++)
 		{
@@ -345,7 +332,7 @@ public class MoreInventoryMod
 			{
 				Object ingot = StorageBoxType.values()[j].materials[k];
 
-				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(Plating, 1, i), ingot, ingot, lava, brush));
+				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), ingot, ingot, lava, brush));
 			}
 		}
 

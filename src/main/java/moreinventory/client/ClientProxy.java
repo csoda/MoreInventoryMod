@@ -25,6 +25,6 @@ public class ClientProxy extends CommonProxy
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCatchall.class, new TileEntityCatchallRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTransportManager.class, new TileEntityTransportManagerRenderer());
 
-		MinecraftForgeClient.registerItemRenderer(MIMUtils.getItemBlock(MoreInventoryMod.Catchall), new ItemCatchallRenderer());
+		MinecraftForgeClient.registerItemRenderer(MIMUtils.getItemBlock(MoreInventoryMod.catchall), new ItemCatchallRenderer());
 	}
 }

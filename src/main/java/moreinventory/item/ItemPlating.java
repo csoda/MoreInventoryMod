@@ -25,6 +25,7 @@ public class ItemPlating extends Item
 	public ItemPlating()
 	{
 		this.setHasSubtypes(true);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override
@@ -35,7 +36,7 @@ public class ItemPlating extends Item
 			return false;
 		}
 
-		if (world.getBlock(x, y, z) == MoreInventoryMod.StorageBox)
+		if (world.getBlock(x, y, z) == MoreInventoryMod.storageBox)
 		{
 			int index = typeIndex[itemstack.getItemDamage()];
 			int meta = world.getBlockMetadata(x, y, z);

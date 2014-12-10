@@ -138,7 +138,7 @@ public class StorageBoxNetworkManager
 
 			if (item != null)
 			{
-				if (item.getItem() == MoreInventoryMod.Pouch)
+				if (item.getItem() == MoreInventoryMod.pouch)
 				{
 					InventoryPouch pouch = new InventoryPouch(item);
 
