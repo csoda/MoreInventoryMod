@@ -1,8 +1,5 @@
 package moreinventory.core;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import moreinventory.block.BlockCatchall;
 import moreinventory.block.BlockStorageBox;
 import moreinventory.block.BlockStorageBoxAddon;
@@ -52,8 +49,8 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
@@ -61,7 +58,6 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -103,11 +99,6 @@ public class MoreInventoryMod
 	public static Item Spanner;
 	public static Item Potionholder;
 	public static Item Plating;
-
-	protected static String modChest = "";
-
-	public static final Map<String, Integer> transportableChest = Maps.newHashMap();
-	public static final Map<String, Map<Integer, Integer>> transportableChestIcon = Maps.newHashMap();
 
 	public static final String[] MATERIALNAME = {"Leather Pack", "Brush", "Dimension Core", "Clipboard"};
 	public static final String[] COLORNAME = {"White", "Orange", "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray", "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red", "Black"};
@@ -364,55 +355,33 @@ public class MoreInventoryMod
 		chestRegistry();
 	}
 
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{
-		modChestRegistry();
-	}
-
 	private void chestRegistry()
 	{
-		transportableChest.put(MIMUtils.getUniqueName(Blocks.chest), -1);
-		transportableChest.put(MIMUtils.getUniqueName(Blocks.trapped_chest), -1);
-		transportableChest.put(MIMUtils.getUniqueName(StorageBox), -1);
+		ItemChestTransporter.transportableChests.put(MIMUtils.getUniqueName(Blocks.chest), -1, 0);
+		ItemChestTransporter.transportableChests.put(MIMUtils.getUniqueName(Blocks.trapped_chest), -1, 0);
+		ItemChestTransporter.transportableChests.put(MIMUtils.getUniqueName(StorageBox), -1, 0);
 
-		modChest = modChest.trim();
+		//Config
+		String chests = Joiner.on(",").skipNulls().join(Config.transportableChests).trim();
 
-		if (modChest.length() > 0)
+		if (chests.length() > 0)
 		{
-			for (String entry : modChest.split(","))
+			for (String entry : chests.split(","))
 			{
 				String[] args = entry.split("@");
-				String name = args[0].trim();
-				int damage = Integer.parseInt(args[1].trim());
+				int index = args[2].trim().length() > 0 ? Byte.parseByte(args[2].trim()) : 0;
 
-				transportableChest.put(name, damage);
-
-				if (!transportableChestIcon.containsKey(name))
-				{
-					transportableChestIcon.put(name, new HashMap<Integer, Integer>());
-				}
-
-				int i = args[2].trim().length() > 0 ? Byte.parseByte(args[2].trim()) : 0;
-				transportableChestIcon.get(name).put(damage, i);
+				ItemChestTransporter.transportableChests.put(args[0].trim(), Integer.parseInt(args[1].trim()), index);
 			}
 		}
-	}
 
-	private void modChestRegistry()
-	{
-		transportableChest.put("IronChest:BlockIronChest", -1);
+		//Modded
 
 		for (int i = 0; i < 7; i++)
 		{
-			Map<Integer, Integer> map = Maps.newHashMap();
-			map.put(i, i + 1);
-			transportableChestIcon.put("IronChest:BlockIronChest", map);
+			ItemChestTransporter.transportableChests.put("IronChest:BlockIronChest", i, i + 1);
 		}
 
-		transportableChest.put("MultiPageChest:multipagechest", -1);
-		Map<Integer, Integer> map = Maps.newHashMap();
-		map.put(-1, 11);
-		transportableChestIcon.put("MultiPageChest:multipagechest", map);
+		ItemChestTransporter.transportableChests.put("MultiPageChest:multipagechest", -1, 11);
 	}
 }

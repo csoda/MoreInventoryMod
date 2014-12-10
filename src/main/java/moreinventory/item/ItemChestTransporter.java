@@ -1,7 +1,6 @@
 package moreinventory.item;
 
 import java.util.List;
-import java.util.Map;
 
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
@@ -18,11 +17,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemChestTransporter extends Item
 {
+	public static final Table<String, Integer, Integer> transportableChests = HashBasedTable.create();
+
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
 
@@ -47,7 +52,12 @@ public class ItemChestTransporter extends Item
 			int meta = world.getBlockMetadata(x, y, z);
 			TileEntity tile;
 
-			if (MoreInventoryMod.transportableChest.containsKey(MIMUtils.getUniqueName(block)))
+			if (transportableChests.contains(MIMUtils.getUniqueName(block), -1))
+			{
+				meta = -1;
+			}
+
+			if (meta == -1 || transportableChests.contains(MIMUtils.getUniqueName(block), meta))
 			{
 				tile = world.getTileEntity(x, y, z);
 
@@ -70,24 +80,11 @@ public class ItemChestTransporter extends Item
 				}
 				else if (block == MoreInventoryMod.StorageBox)
 				{
-					itemstack.setItemDamage(meta + 3);
+					itemstack.setItemDamage(world.getBlockMetadata(x, y, z) + 3);
 				}
 				else
 				{
-					Map<Integer, Integer> map = MoreInventoryMod.transportableChestIcon.get(MIMUtils.getUniqueName(block));
-
-					if (map != null && map.containsKey(meta))
-					{
-						itemstack.setItemDamage(map.get(meta) + 19);
-					}
-					else if (map != null && map.containsKey(-1))
-					{
-						itemstack.setItemDamage(map.get(-1) + 19);
-					}
-					else
-					{
-						itemstack.setItemDamage(19);
-					}
+					itemstack.setItemDamage(transportableChests.get(MIMUtils.getUniqueName(block), meta) + 19);
 				}
 
 				world.setBlockToAir(x, y, z);
