@@ -3,6 +3,7 @@ package moreinventory.core;
 import java.io.File;
 import java.util.List;
 
+import moreinventory.item.ItemChestTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.config.Configuration;
@@ -86,6 +87,7 @@ public class Config
 		prop.comment += "..";
 		propOrder.add(prop.getName());
 		transportableChests = prop.getStringList();
+		ItemChestTransporter.refreshTransportableChests(transportableChests);
 
 		if (FMLCommonHandler.instance().getSide().isClient())
 		{

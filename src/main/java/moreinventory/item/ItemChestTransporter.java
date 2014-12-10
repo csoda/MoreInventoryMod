@@ -28,6 +28,32 @@ public class ItemChestTransporter extends Item
 {
 	public static final Table<String, Integer, Integer> transportableChests = HashBasedTable.create();
 
+	public static void refreshTransportableChests(String... chests)
+	{
+		transportableChests.clear();
+		transportableChests.put(MIMUtils.getUniqueName(Blocks.chest), -1, 0);
+		transportableChests.put(MIMUtils.getUniqueName(Blocks.trapped_chest), -1, 0);
+		transportableChests.put(MIMUtils.getUniqueName(MoreInventoryMod.StorageBox), -1, 0);
+
+		// Config
+		for (String entry : chests)
+		{
+			String[] args = entry.trim().split("@");
+			int index = args[2].trim().length() > 0 ? Byte.parseByte(args[2].trim()) : 0;
+
+			transportableChests.put(args[0].trim(), Integer.parseInt(args[1].trim()), index);
+		}
+
+		// Modded
+		for (int i = 0; i < 7; i++)
+		{
+			transportableChests.put("IronChest:BlockIronChest", i, i + 1);
+		}
+
+		transportableChests.put("BambooMod:jpChest", -1, 10);
+		transportableChests.put("MultiPageChest:multipagechest", -1, 11);
+	}
+
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
 

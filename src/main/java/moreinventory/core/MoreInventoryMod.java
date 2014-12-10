@@ -35,7 +35,6 @@ import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
-import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -49,7 +48,6 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -58,6 +56,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -351,37 +350,11 @@ public class MoreInventoryMod
 		}
 
 		proxy.registerRenderers();
-
-		chestRegistry();
 	}
 
-	private void chestRegistry()
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event)
 	{
-		ItemChestTransporter.transportableChests.put(MIMUtils.getUniqueName(Blocks.chest), -1, 0);
-		ItemChestTransporter.transportableChests.put(MIMUtils.getUniqueName(Blocks.trapped_chest), -1, 0);
-		ItemChestTransporter.transportableChests.put(MIMUtils.getUniqueName(StorageBox), -1, 0);
-
-		//Config
-		String chests = Joiner.on(",").skipNulls().join(Config.transportableChests).trim();
-
-		if (chests.length() > 0)
-		{
-			for (String entry : chests.split(","))
-			{
-				String[] args = entry.split("@");
-				int index = args[2].trim().length() > 0 ? Byte.parseByte(args[2].trim()) : 0;
-
-				ItemChestTransporter.transportableChests.put(args[0].trim(), Integer.parseInt(args[1].trim()), index);
-			}
-		}
-
-		//Modded
-
-		for (int i = 0; i < 7; i++)
-		{
-			ItemChestTransporter.transportableChests.put("IronChest:BlockIronChest", i, i + 1);
-		}
-
-		ItemChestTransporter.transportableChests.put("MultiPageChest:multipagechest", -1, 11);
+		ItemChestTransporter.refreshTransportableChests(Config.transportableChests);
 	}
 }
