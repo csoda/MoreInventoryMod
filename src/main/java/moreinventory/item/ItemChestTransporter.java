@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import moreinventory.core.MoreInventoryMod;
-import moreinventory.item.inventory.InventoryPouch;
+import moreinventory.inventory.InventoryPouch;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;

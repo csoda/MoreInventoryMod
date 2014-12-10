@@ -1,7 +1,7 @@
 package moreinventory.item;
 
 import moreinventory.core.MoreInventoryMod;
-import moreinventory.item.inventory.InventoryPotionHolder;
+import moreinventory.inventory.InventoryPotionHolder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;

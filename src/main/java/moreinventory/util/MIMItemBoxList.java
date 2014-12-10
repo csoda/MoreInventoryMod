@@ -119,7 +119,7 @@ public class MIMItemBoxList extends MIMBoxList
 
 			for (int i = 0; i < itemList.size(); i++)
 			{
-				ItemStack itemstack = itemList.get(i);
+				ItemStack itemstack = getItem(i);
 
 				if (itemstack != null)
 				{

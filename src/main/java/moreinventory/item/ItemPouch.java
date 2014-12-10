@@ -3,7 +3,7 @@ package moreinventory.item;
 import java.util.List;
 
 import moreinventory.core.MoreInventoryMod;
-import moreinventory.item.inventory.InventoryPouch;
+import moreinventory.inventory.InventoryPouch;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;

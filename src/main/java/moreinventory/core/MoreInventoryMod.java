@@ -7,8 +7,6 @@ import moreinventory.block.BlockCatchall;
 import moreinventory.block.BlockStorageBox;
 import moreinventory.block.BlockStorageBoxAddon;
 import moreinventory.block.BlockTransportManager;
-import moreinventory.crafting.RecipePouch;
-import moreinventory.crafting.RecipeTorchHolder;
 import moreinventory.handler.MIMEventHooks;
 import moreinventory.handler.MIMGuiHandler;
 import moreinventory.handler.MIMWorldSaveHelper;
@@ -32,6 +30,8 @@ import moreinventory.network.StorageBoxConfigMessage;
 import moreinventory.network.StorageBoxContentsMessage;
 import moreinventory.network.StorageBoxMessage;
 import moreinventory.network.TransportManagerMessage;
+import moreinventory.recipe.RecipePouch;
+import moreinventory.recipe.RecipeTorchHolder;
 import moreinventory.tileentity.TileEntityCatchall;
 import moreinventory.tileentity.TileEntityExporter;
 import moreinventory.tileentity.TileEntityImporter;
@@ -73,7 +73,7 @@ import cpw.mods.fml.relauncher.Side;
 	modid = MoreInventoryMod.MODID,
 	acceptedMinecraftVersions = "[1.7.10,)",
 	dependencies = "after:InvTweaks",
-	guiFactory = "moreinventory.config.MIMGuiFactory",
+	guiFactory = "moreinventory.client.config.MIMGuiFactory",
 	useMetadata = true
 )
 public class MoreInventoryMod
@@ -85,7 +85,7 @@ public class MoreInventoryMod
 	@Instance(MODID)
 	public static MoreInventoryMod instance;
 
-	@SidedProxy(modId = MODID, clientSide = "moreinventory.core.ClientProxy", serverSide = "moreinventory.core.CommonProxy")
+	@SidedProxy(modId = MODID, clientSide = "moreinventory.client.ClientProxy", serverSide = "moreinventory.core.CommonProxy")
 	public static CommonProxy proxy;
 
 	public static final SimpleNetworkWrapper network = new SimpleNetworkWrapper(MODID);

@@ -2,8 +2,8 @@ package moreinventory.handler;
 
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
+import moreinventory.inventory.InventoryPouch;
 import moreinventory.item.ItemTorchHolder;
-import moreinventory.item.inventory.InventoryPouch;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
 import moreinventory.util.MIMItemBoxList;

@@ -2,7 +2,7 @@ package moreinventory.network;
 
 import io.netty.buffer.ByteBuf;
 import moreinventory.core.MoreInventoryMod;
-import moreinventory.item.inventory.InventoryPouch;
+import moreinventory.inventory.InventoryPouch;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import cpw.mods.fml.client.FMLClientHandler;
