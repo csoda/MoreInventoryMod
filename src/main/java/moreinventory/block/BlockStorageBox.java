@@ -1,7 +1,7 @@
 package moreinventory.block;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.storagebox.StorageBoxType;
@@ -24,8 +24,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 public class BlockStorageBox extends BlockContainer
 {
@@ -46,7 +46,7 @@ public class BlockStorageBox extends BlockContainer
 	{
 		super(material);
 		this.setHardness(2.0F);
-		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
+        this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override

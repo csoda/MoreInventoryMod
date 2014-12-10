@@ -86,18 +86,18 @@ public class MoreInventoryMod
 
 	public static MIMWorldSaveHelper saveHelper;
 
-	public static final Block catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
-	public static final Block storageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
-	public static final Block transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
-	public static final Block storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
+	public static Block catchall;
+	public static Block storageBox;
+	public static Block transportManager;
+	public static Block storageBoxAddon;
 
-	public static final Item[] torchHolder = new Item[3];
-	public static final Item transporter = new ItemChestTransporter().setUnlocalizedName("transporter");
-	public static final Item noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
-	public static final Item potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
-	public static final Item spanner = new ItemSpanner().setUnlocalizedName("spanner");
-	public static final Item plating = new ItemPlating().setUnlocalizedName("painting");
-	public static final Item pouch = new ItemPouch().setUnlocalizedName("pouch");
+	public static Item[] torchHolder;
+	public static Item transporter;
+	public static Item noFunctionItems;
+	public static Item potionHolder;
+	public static Item spanner;
+	public static Item plating;
+	public static Item pouch;
 
 	public static final String[] MATERIALNAME = {"Leather Pack", "Brush", "Dimension Core", "Clipboard"};
 	public static final String[] COLORNAME = {"White", "Orange", "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray", "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red", "Black"};
@@ -109,6 +109,19 @@ public class MoreInventoryMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
+        catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
+        storageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
+        transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
+        storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
+
+        torchHolder = new Item[3];
+        transporter = new ItemChestTransporter().setUnlocalizedName("transporter");
+        noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
+        potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
+        spanner = new ItemSpanner().setUnlocalizedName("spanner");
+        plating = new ItemPlating().setUnlocalizedName("painting");
+        pouch = new ItemPouch().setUnlocalizedName("pouch");
+
 		GameRegistry.registerBlock(catchall, ItemBlock.class, "catchall");
 		GameRegistry.registerBlock(storageBox, ItemBlockStorageBox.class, "containerbox");
 		GameRegistry.registerBlock(transportManager, ItemBlockTransportManager.class, "transportmanager");

@@ -1,12 +1,10 @@
 package moreinventory.container;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import invtweaks.api.container.ChestContainer;
 import invtweaks.api.container.ContainerSection;
 import invtweaks.api.container.ContainerSectionCallback;
-
-import java.util.List;
-import java.util.Map;
-
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.slot.SlotPouch;
@@ -18,8 +16,8 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
 
 @ChestContainer
 public class ContainerPouch extends Container

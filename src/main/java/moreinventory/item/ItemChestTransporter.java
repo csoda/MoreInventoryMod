@@ -1,7 +1,9 @@
 package moreinventory.item;
 
-import java.util.List;
-
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.tileentity.storagebox.StorageBoxType;
@@ -17,14 +19,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.List;
 
 public class ItemChestTransporter extends Item
 {

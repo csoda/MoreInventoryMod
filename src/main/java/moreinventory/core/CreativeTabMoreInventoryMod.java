@@ -9,7 +9,7 @@ public class CreativeTabMoreInventoryMod extends CreativeTabs
 {
 	public CreativeTabMoreInventoryMod()
 	{
-		super("MoreInvnentoryMod");
+		super("MoreInventoryMod");
 	}
 
 	@SideOnly(Side.CLIENT)
