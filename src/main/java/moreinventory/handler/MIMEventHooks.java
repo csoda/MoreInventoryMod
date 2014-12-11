@@ -3,12 +3,14 @@ package moreinventory.handler;
 import com.google.common.collect.Lists;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.item.ItemTorchHolder;
+import moreinventory.network.ConfigSyncMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
 import moreinventory.util.MIMItemBoxList;
@@ -35,6 +37,13 @@ public class MIMEventHooks
 		{
 			Config.syncConfig();
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	@SubscribeEvent
+	public void onClientConnected(FMLNetworkEvent.ClientConnectedToServerEvent event)
+	{
+		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
 	}
 
 	@SubscribeEvent
@@ -69,8 +78,9 @@ public class MIMEventHooks
 	{
 		if (event.entityPlayer instanceof EntityPlayerMP)
 		{
+			EntityPlayerMP player = (EntityPlayerMP)event.entityPlayer;
 			ItemStack item = event.item.getEntityItem();
-			InventoryPlayer inventory = event.entityPlayer.inventory;
+			InventoryPlayer inventory = player.inventory;
 
 			for (int i = 0; i < inventory.getSizeInventory(); i++)
 			{
@@ -87,13 +97,13 @@ public class MIMEventHooks
 							MIMUtils.mergeItemStack(item, pouch);
 						}
 
-						if (Config.isFullAutoCollectPouch)
+						if (Config.isFullAutoCollectPouch.contains(player.getUniqueID().toString()))
 						{
 							pouch.collectAllItemStack(inventory, false);
 						}
 					}
 
-					if (Config.isCollectTorch && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder)
+					if (Config.isCollectTorch.contains(player.getUniqueID().toString()) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder)
 					{
 						int damage = itemstack.getItemDamage();
 						int count = item.stackSize;
