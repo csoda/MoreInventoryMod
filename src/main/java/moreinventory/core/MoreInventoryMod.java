@@ -33,6 +33,7 @@ import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
+import moreinventory.util.StorageBoxOwnerList;
 import moreinventory.util.Version;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -74,6 +75,7 @@ public class MoreInventoryMod
 	public static final SimpleNetworkWrapper network = new SimpleNetworkWrapper(MODID);
 
 	public static MIMWorldSaveHelper saveHelper;
+	public static StorageBoxOwnerList StorageBoxOwnerList;
 
 	public static Block catchall;
 	public static Block storageBox;

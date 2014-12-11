@@ -14,10 +14,7 @@ import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
-import moreinventory.util.MIMItemBoxList;
-import moreinventory.util.MIMItemInvList;
-import moreinventory.util.MIMUtils;
-import moreinventory.util.Version;
+import moreinventory.util.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.event.ClickEvent;
@@ -154,7 +151,9 @@ public class MIMEventHooks
 				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
 				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");
 				TileEntityTeleporter.teleporterList = new MIMItemBoxList("Teleporter");
-				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList));
+				MoreInventoryMod.StorageBoxOwnerList = new StorageBoxOwnerList();
+				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData",
+														Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.StorageBoxOwnerList));
 			}
 		}
 	}

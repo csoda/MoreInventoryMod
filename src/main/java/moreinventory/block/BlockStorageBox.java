@@ -62,7 +62,6 @@ public class BlockStorageBox extends BlockContainer
 
 			return true;
 		}
-
 		return tile.rightClickEvent(world, player, x, y, z);
 	}
 
