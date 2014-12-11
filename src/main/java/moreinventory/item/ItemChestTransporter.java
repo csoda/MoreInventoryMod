@@ -9,6 +9,7 @@ import moreinventory.inventory.InventoryPouch;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -16,6 +17,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -59,7 +61,9 @@ public class ItemChestTransporter extends Item
 	{
 		if (world.isRemote)
 		{
-			return false;
+			((EntityClientPlayerMP)player).sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(x, y, z, side, player.inventory.getCurrentItem(), hitX, hitY, hitZ));
+
+			return true;
 		}
 
 		if (itemstack.getItemDamage() == 0)
