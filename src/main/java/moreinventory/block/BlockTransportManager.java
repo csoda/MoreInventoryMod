@@ -32,9 +32,18 @@ public class BlockTransportManager extends BlockContainer
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
 	{
-		if (!world.isRemote && !player.isSneaking())
+		if (!world.isRemote)
 		{
-			player.openGui(MoreInventoryMod.instance, 2, world, x, y, z);
+			if (!player.isSneaking())
+			{
+				player.openGui(MoreInventoryMod.instance, 2, world, x, y, z);
+			}
+			else if(player.getCurrentEquippedItem() == null)
+			{
+				TileEntityTransportManager tile = (TileEntityTransportManager) world.getTileEntity(x, y, z);
+				tile.rotateBlock();
+
+			}
 		}
 
 		return true;
