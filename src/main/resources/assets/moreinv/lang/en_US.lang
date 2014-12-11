@@ -1,5 +1,7 @@
 # Localization file : en_US
 
+moreinv.version.message=A new %s version is available
+
 tile.catchall.name=Catchall
 transportmanager.name=Importer&Exporter
 transportmanager:importer.name=Importer
@@ -64,15 +66,17 @@ painting:Emerald.name=Emerald Paint
 painting:Steel.name=Steel Paint
 
 moreinv.config.title=MoreInventoryMod Configuration
+moreinv.config.general.versionNotify=Version Notify
+moreinv.config.general.versionNotify.tooltip=Whether or not to notify when a new MoreInventoryMod version is available.
+moreinv.config.general.transportableChests=Transportable Chests
+moreinv.config.general.transportableChests.tooltip=Specify the transportable chests on the Chest Transporter.
+moreinv.config.general.transportableChests.select=Select the transportable chest
 moreinv.config.general.isCollectTorch=Collect Torch
 moreinv.config.general.isCollectTorch.tooltip=Whether or not to collect to Torch Holder when pick up a Torch.
 moreinv.config.general.isFullAutoCollectPouch=Full Auto Collect Pouch
 moreinv.config.general.isFullAutoCollectPouch.tooltip=Whether or not to collect to Pouch on the player inventory when you pick up the drop items.
 moreinv.config.general.leftClickCatchall=Left Click Catchall Inventory
 moreinv.config.general.leftClickCatchall.tooltip=Whether or not to open the inventory when you left-click the Catchall.
-moreinv.config.general.transportableChests=Transportable Chests
-moreinv.config.general.transportableChests.tooltip=Specify the transportable chests on the Chest Transporter.
-moreinv.config.general.transportableChests.select=Select the transportable chest
 moreinv.config.general.containerBoxSideTexture=Container Box Side Texture
 moreinv.config.general.containerBoxSideTexture.tooltip=Whether or not to use the side-texture of Container Box.
 moreinv.config.general.clearGlassBox=Clear Glass Box

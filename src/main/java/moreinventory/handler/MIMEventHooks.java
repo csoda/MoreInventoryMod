@@ -1,6 +1,7 @@
 package moreinventory.handler;
 
 import com.google.common.collect.Lists;
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.event.ConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
@@ -16,11 +17,17 @@ import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
 import moreinventory.util.MIMItemBoxList;
 import moreinventory.util.MIMItemInvList;
 import moreinventory.util.MIMUtils;
+import moreinventory.util.Version;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.event.ClickEvent;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
+import net.minecraftforge.common.ForgeVersion.Status;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -43,6 +50,19 @@ public class MIMEventHooks
 	@SubscribeEvent
 	public void onClientConnected(FMLNetworkEvent.ClientConnectedToServerEvent event)
 	{
+		if (Version.getStatus() == Status.PENDING || Version.getStatus() == Status.FAILED)
+		{
+			Version.versionCheck();
+		}
+		else if (Version.isDev() || Config.versionNotify && Version.isOutdated())
+		{
+			IChatComponent component = new ChatComponentTranslation("moreinv.version.message", EnumChatFormatting.GREEN + "MoreInventoryMod" + EnumChatFormatting.RESET);
+			component.appendText(" : " + EnumChatFormatting.YELLOW + Version.getLatest());
+			component.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, MoreInventoryMod.metadata.url));
+
+			FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage(component);
+		}
+
 		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
 	}
 

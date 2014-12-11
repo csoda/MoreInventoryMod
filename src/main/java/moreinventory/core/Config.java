@@ -3,10 +3,10 @@ package moreinventory.core;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
 import moreinventory.item.ItemChestTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
+import moreinventory.util.MIMLog;
 import moreinventory.util.MIMUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.StatCollector;
@@ -22,6 +22,7 @@ public class Config
 {
 	public static Configuration config;
 
+	public static boolean versionNotify;
 	public static String[] transportableChestsDefault;
 	public static String[] transportableChests;
 
@@ -55,13 +56,20 @@ public class Config
 
 				file.renameTo(dest);
 
-				FMLLog.log(Level.ERROR, e, "A critical error occured reading the " + file.getName() + " file, defaults will be used - the invalid file is backed up at " + dest.getName());
+				MIMLog.log(Level.ERROR, e, "A critical error occured reading the " + file.getName() + " file, defaults will be used - the invalid file is backed up at " + dest.getName());
 			}
 		}
 
 		String category = Configuration.CATEGORY_GENERAL;
 		Property prop;
 		List<String> propOrder = Lists.newArrayList();
+
+		prop = config.get(category, "versionNotify", true);
+		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+		prop.comment += " [default: " + prop.getDefault() + "]";
+		propOrder.add(prop.getName());
+		versionNotify = prop.getBoolean(versionNotify);
 
 		if (transportableChestsDefault == null)
 		{

@@ -5,9 +5,13 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod.Metadata;
+import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -29,6 +33,7 @@ import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
+import moreinventory.util.Version;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -37,6 +42,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -58,6 +64,9 @@ public class MoreInventoryMod
 
 	@Instance(MODID)
 	public static MoreInventoryMod instance;
+
+	@Metadata(MODID)
+	public static ModMetadata metadata;
 
 	@SidedProxy(modId = MODID, clientSide = "moreinventory.client.ClientProxy", serverSide = "moreinventory.core.CommonProxy")
 	public static CommonProxy proxy;
@@ -85,6 +94,12 @@ public class MoreInventoryMod
 	public static final String defaultOwner = "***Unknown***";
 
 	public static final CreativeTabs tabMoreInventoryMod = new CreativeTabMoreInventoryMod();
+
+	@EventHandler
+	public void construct(FMLConstructionEvent event)
+	{
+		Version.versionCheck();
+	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
@@ -331,5 +346,14 @@ public class MoreInventoryMod
 		}
 
 		proxy.registerRenderers();
+	}
+
+	@EventHandler
+	public void serverStarting(FMLServerStartingEvent event)
+	{
+		if (event.getSide().isServer() && (Version.isDev() || Config.versionNotify && Version.isOutdated()))
+		{
+			event.getServer().logInfo(StatCollector.translateToLocalFormatted("moreinv.version.message", "MoreInventoryMod") + ": " + Version.getLatest());
+		}
 	}
 }
