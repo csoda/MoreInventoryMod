@@ -34,13 +34,13 @@ public class GuiTransportManager extends GuiContainer
 	{
 		super.initGui();
 
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 45, guiLeft + 43, 20, 20, "B", transportManager.sneak == 0));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 5, guiLeft + 43, 20, 20, "T", transportManager.sneak == 1));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 25, guiLeft + 43, 20, 20, "N", transportManager.sneak == 2));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 25, guiLeft + 63, 20, 20, "S", transportManager.sneak == 3));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 5, guiLeft + 63, 20, 20, "W", transportManager.sneak == 4));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 45, guiLeft + 63, 20, 20, "E", transportManager.sneak == 5));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiTop + xSize + 5, guiLeft + 23, 60, 20, "Default", transportManager.sneak == 6));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 45, guiTop + 43, 20, 20, "B", transportManager.sneak == 0));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 5, guiTop + 43, 20, 20, "T", transportManager.sneak == 1));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 25, guiTop + 43, 20, 20, "N", transportManager.sneak == 2));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 25, guiTop + 63, 20, 20, "S", transportManager.sneak == 3));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 5, guiTop + 63, 20, 20, "W", transportManager.sneak == 4));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 45, guiTop + 63, 20, 20, "E", transportManager.sneak == 5));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 5, guiTop + 23, 60, 20, "Default", transportManager.sneak == 6));
 
 		if (transportManager instanceof TileEntityImporter)
 		{
