@@ -1,56 +1,50 @@
 package moreinventory.handler;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.FMLInjectionData;
 import moreinventory.util.IWorldDataSave;
+import moreinventory.util.MIMLog;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.Level;
 
 import java.io.*;
 import java.util.List;
 
 public class MIMWorldSaveHelper
 {
+	private static final File saveDir = new File((File)FMLInjectionData.data()[6] /* The minecraft dir */, "saves");
+
 	public final World world;
-	private final String saveFileName;
+
+	private final File saveFile;
 	private final List<IWorldDataSave> saveList;
 
-	public MIMWorldSaveHelper(World world, String name, List<IWorldDataSave> save)
+	public MIMWorldSaveHelper(World world, String name, List<IWorldDataSave> list)
 	{
 		this.world = world;
-		this.saveFileName = name;
-		this.saveList = save;
+		this.saveFile = new File(saveDir, name + ".dat");
+		this.saveList = list;
 		this.loadData();
 	}
 
 	public void saveData()
 	{
-		MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-
-		if (server == null)
-		{
-			return;
-		}
-
-		NBTTagCompound nbt = new NBTTagCompound();
-
-		for (IWorldDataSave save : saveList)
-		{
-			save.writeToNBT(nbt);
-		}
-
-		File saveDir = getSaveDir(server);
-
-		if (!saveDir.exists())
-		{
-			saveDir.mkdirs();
-		}
-
-		File saveFile = getSaveFile(server);
-
 		try
 		{
+			NBTTagCompound nbt = new NBTTagCompound();
+
+			for (IWorldDataSave save : saveList)
+			{
+				save.writeToNBT(nbt);
+			}
+
+			if (!saveFile.getParentFile().exists())
+			{
+				saveFile.getParentFile().mkdirs();
+			}
+
 			if (!saveFile.exists())
 			{
 				saveFile.createNewFile();
@@ -60,7 +54,7 @@ public class MIMWorldSaveHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			MIMLog.log(Level.ERROR, e, "An error occurred trying to save the " + FilenameUtils.getBaseName(saveFile.getName()));
 		}
 	}
 
@@ -68,23 +62,10 @@ public class MIMWorldSaveHelper
 	{
 		try
 		{
-			MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-
-			if (server == null)
+			if (!saveFile.getParentFile().exists())
 			{
-				return;
+				saveFile.getParentFile().mkdirs();
 			}
-
-			File saveDir = getSaveDir(server);
-
-			if (!saveDir.exists())
-			{
-				saveDir.mkdirs();
-
-				return;
-			}
-
-			File saveFile = getSaveFile(server);
 
 			if (saveFile.exists())
 			{
@@ -98,17 +79,7 @@ public class MIMWorldSaveHelper
 		}
 		catch (IOException e)
 		{
-			e.printStackTrace();
+			MIMLog.log(Level.ERROR, e, "An error occurred trying to load the " + FilenameUtils.getBaseName(saveFile.getName()));
 		}
-	}
-
-	public File getSaveDir(MinecraftServer server)
-	{
-		return server.isSinglePlayer() ? new File(server.getFile("saves"), world.getSaveHandler().getWorldDirectoryName()) : new File(server.getFolderName());
-	}
-
-	public File getSaveFile(MinecraftServer server)
-	{
-		return new File(getSaveDir(server).toString(), saveFileName + ".dat");
 	}
 }
