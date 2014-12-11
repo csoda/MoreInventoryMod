@@ -298,6 +298,16 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return false;
 	}
 
+	private void clearRegister()
+	{
+		if (contentsCount == 0)
+		{
+			contents = null;
+			sendContents();
+		}
+	}
+
+
 	public boolean isSameAsContents(ItemStack itemstack)
 	{
 		boolean result = itemstack != null && (getContents() == null || MIMUtils.compareStacksWithDamage(itemstack, getContents()));
@@ -458,11 +468,18 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				clickTime = 16;
 
 				ItemStack itemstack = player.getCurrentEquippedItem();
-				registerItems(itemstack);
+				if(itemstack !=null)
+				{
+					registerItems(itemstack);
 
-				canInsert = false;
-				tryPutIn(itemstack);
-				canInsert = prevInsert;
+					canInsert = false;
+					tryPutIn(itemstack);
+					canInsert = prevInsert;
+				}
+				else if(player.isSneaking())
+				{
+					clearRegister();
+				}
 				break;
 			case 2:
 				canInsert = false;
