@@ -52,11 +52,6 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int idk, float hitX, float hitY, float hitZ)
 	{
-		if (world.isRemote)
-		{
-			return true;
-		}
-
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 		ItemStack itemstack = player.getCurrentEquippedItem();
 
@@ -119,8 +114,6 @@ public class BlockStorageBox extends BlockContainer
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 
-		tile.onPlaced(entity);
-
 		switch (MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3)
 		{
 			case 0:
@@ -135,7 +128,12 @@ public class BlockStorageBox extends BlockContainer
 			case 3:
 				tile.face = 4;
 				break;
+			default:
+				tile.face = 2;
+				break;
 		}
+
+		tile.onPlaced(entity);
 	}
 
 	@Override

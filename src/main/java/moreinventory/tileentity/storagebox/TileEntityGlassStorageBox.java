@@ -36,22 +36,27 @@ public class TileEntityGlassStorageBox extends TileEntityStorageBox
 	@Override
 	public boolean rightClickEvent(World world, EntityPlayer player, int x, int y, int z)
 	{
-		if (clickTime == 0)
+		switch (++clickCount)
 		{
-			clickTime = 10;
+			case 1:
+				clickTime = 16;
+
+				return false;
+			case 2:
+				return false;
+			case 3:
+				clickCount = 0;
+
+				getStorageBoxNetworkManager().linkedCollect(player.inventory);
+				updatePlayerInventory(player);
+				player.onUpdate();
+				break;
+			default:
+				clickCount = 0;
+				break;
 		}
 
-		if (++clickCount == 3)
-		{
-			getStorageBoxNetworkManager().linkedCollect(player.inventory);
-			player.onUpdate();
-			clickTime = 0;
-			clickCount = 0;
-
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 	@Override
