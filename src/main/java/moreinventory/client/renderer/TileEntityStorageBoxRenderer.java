@@ -1,7 +1,9 @@
 package moreinventory.client.renderer;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import moreinventory.core.Config;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -9,6 +11,8 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
@@ -63,6 +67,16 @@ public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 
 		if (itemstack != null)
 		{
+			if (Config.pointedContainerBoxInfo)
+			{
+				MovingObjectPosition moving = FMLClientHandler.instance().getClient().objectMouseOver;
+
+				if (moving == null || moving.typeOfHit != MovingObjectType.BLOCK || moving.blockX != tile.xCoord || moving.blockY != tile.yCoord || moving.blockZ != tile.zCoord)
+				{
+					return;
+				}
+			}
+
 			EntityItem entity = new EntityItem(tile.getWorldObj(), 0.0D, 0.0D, 0.0D, itemstack);
 			entity.getEntityItem().stackSize = 1;
 			entity.hoverStart = 0.0F;

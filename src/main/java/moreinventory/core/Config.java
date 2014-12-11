@@ -32,6 +32,7 @@ public class Config
 
 	// Client-side only
 	public static boolean containerBoxSideTexture;
+	public static boolean pointedContainerBoxInfo;
 	public static boolean clearGlassBox;
 
 	public static void syncConfig()
@@ -143,6 +144,12 @@ public class Config
 			prop.comment += " [default: " + prop.getDefault() + "]";
 			propOrder.add(prop.getName());
 			containerBoxSideTexture = prop.getBoolean(containerBoxSideTexture);
+			prop = config.get(category, "pointedContainerBoxInfo", false);
+			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+			prop.comment += " [default: " + prop.getDefault() + "]";
+			propOrder.add(prop.getName());
+			pointedContainerBoxInfo = prop.getBoolean(pointedContainerBoxInfo);
 			prop = config.get(category, "clearGlassBox", true);
 			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
 			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
