@@ -29,6 +29,7 @@ item.spanner.name=Spanner
 item.torchholder:Iron.name=Iron Torch Holder
 item.torchholder:Gold.name=Gold Torch Holder
 item.torchholder:Diamond.name=Diamond Torch Holder
+item.torchholder.rest=Rest of torches
 
 itemnofunction.name=Unknown
 itemnofunction0.name=Leather Pack

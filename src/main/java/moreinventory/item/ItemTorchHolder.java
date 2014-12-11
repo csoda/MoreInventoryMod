@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -34,7 +35,7 @@ public class ItemTorchHolder extends Item
 	{
 		boolean result = false;
 
-		if (itemstack.getItemDamage() < maxDamage[grade] - 2)
+		if (itemstack.getItemDamage() < itemstack.getMaxDamage() - 2)
 		{
 			if (Item.getItemFromBlock(Blocks.torch).onItemUse(new ItemStack(Blocks.torch, 1), player, world, x, y, z, side, hitX, hitY, hitZ))
 			{
@@ -132,6 +133,6 @@ public class ItemTorchHolder extends Item
 	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
 	{
-		list.add(itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 + " uses");
+		list.add(I18n.format("item.torchholder.rest") + ": " + (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2));
 	}
 }

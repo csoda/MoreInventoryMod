@@ -29,6 +29,7 @@ item.spanner.name=スパナ
 item.torchholder:Iron.name=鉄のトーチホルダー
 item.torchholder:Gold.name=金のトーチホルダー
 item.torchholder:Diamond.name=ダイヤのトーチホルダー
+item.torchholder.rest=松明の残り
 
 itemnofunction.name=Unknown
 itemnofunction0.name=革の詰め物

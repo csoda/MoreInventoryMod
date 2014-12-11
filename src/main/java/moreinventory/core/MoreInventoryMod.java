@@ -75,6 +75,13 @@ public class MoreInventoryMod
 
 	public static final SimpleNetworkWrapper network = new SimpleNetworkWrapper(MODID);
 
+	public static final CreativeTabs tabMoreInventoryMod = new CreativeTabMoreInventoryMod();
+
+	public static final String[] MATERIALNAME = {"Leather Pack", "Brush", "Dimension Core", "Clipboard"};
+	public static final String[] COLORNAME = {"White", "Orange", "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray", "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red", "Black"};
+
+	public static final String defaultOwner = "***Unknown***";
+
 	public static MIMWorldSaveHelper saveHelper;
 
 	public static Block catchall;
@@ -90,17 +97,13 @@ public class MoreInventoryMod
 	public static Item plating;
 	public static Item pouch;
 
-	public static final String[] MATERIALNAME = {"Leather Pack", "Brush", "Dimension Core", "Clipboard"};
-	public static final String[] COLORNAME = {"White", "Orange", "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray", "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red", "Black"};
-
-	public static final String defaultOwner = "***Unknown***";
-
-	public static final CreativeTabs tabMoreInventoryMod = new CreativeTabMoreInventoryMod();
-
 	@EventHandler
 	public void construct(FMLConstructionEvent event)
 	{
 		Version.versionCheck();
+
+		RecipeSorter.register(MODID + ":torchholder", RecipeTorchHolder.class, Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register(MODID + ":pouch", RecipePouch.class, Category.SHAPELESS, "after:minecraft:shapeless");
 	}
 
 	@EventHandler
@@ -124,8 +127,8 @@ public class MoreInventoryMod
 		GameRegistry.registerBlock(transportManager, ItemBlockTransportManager.class, "transportmanager");
 		GameRegistry.registerBlock(storageBoxAddon, ItemBlockSBAddon.class, "StorageBoxAddon");
 
-		final String[] gradeName = { "Iron", "Gold", "Diamond" };
-		for (int i = 0; i < 3; i++)
+		final String[] gradeName = {"Iron", "Gold", "Diamond"};
+		for (int i = 0; i < gradeName.length; i++)
 		{
 			torchHolder[i] = new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
 
@@ -346,9 +349,6 @@ public class MoreInventoryMod
 				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), ingot, ingot, lava, brush));
 			}
 		}
-
-		RecipeSorter.register(MODID + ":torchholder", RecipeTorchHolder.class, Category.SHAPELESS, "after:minecraft:shapeless");
-		RecipeSorter.register(MODID + ":pouch", RecipePouch.class, Category.SHAPELESS, "after:minecraft:shapeless");
 
 		proxy.registerRenderers();
 	}
