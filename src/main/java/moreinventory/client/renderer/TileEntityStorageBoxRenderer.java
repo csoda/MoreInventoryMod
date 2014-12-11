@@ -18,6 +18,8 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 {
+	private final EntityItem entityItem = new EntityItem(null, 0.0D, 0.0D, 0.0D);
+
 	public void renderModelAt(TileEntityStorageBox tile, double posX, double posY, double posZ, float ticks)
 	{
 		int rotation = 1;
@@ -77,12 +79,12 @@ public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 				}
 			}
 
-			EntityItem entity = new EntityItem(tile.getWorldObj(), 0.0D, 0.0D, 0.0D, itemstack);
-			entity.getEntityItem().stackSize = 1;
-			entity.hoverStart = 0.0F;
+			entityItem.setEntityItemStack(itemstack);
+			entityItem.getEntityItem().stackSize = 1;
+			entityItem.hoverStart = 0.0F;
 
 			RenderItem.renderInFrame = true;
-			RenderManager.instance.renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+			RenderManager.instance.renderEntityWithPosYaw(entityItem, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
 			RenderItem.renderInFrame = false;
 
 			StringBuilder builder = new StringBuilder(10);
