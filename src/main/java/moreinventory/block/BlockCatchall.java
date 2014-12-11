@@ -47,7 +47,7 @@ public class BlockCatchall extends BlockContainer
 			{
 				((TileEntityCatchall)world.getTileEntity(x, y, z)).transferTo(player);
 			}
-			else if (!Config.leftClickCatchall)
+			else if (!Config.leftClickCatchall.contains(player.getUniqueID().toString()))
 			{
 				player.openGui(MoreInventoryMod.instance, 0, world, x, y, z);
 			}
@@ -59,7 +59,7 @@ public class BlockCatchall extends BlockContainer
 	@Override
 	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
 	{
-		if (!world.isRemote && Config.leftClickCatchall && !player.isSneaking())
+		if (!world.isRemote && Config.leftClickCatchall.contains(player.getUniqueID().toString()) && !player.isSneaking())
 		{
 			player.openGui(MoreInventoryMod.instance, 0, world, x, y, z);
 		}

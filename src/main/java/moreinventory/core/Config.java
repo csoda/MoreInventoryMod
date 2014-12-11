@@ -1,6 +1,7 @@
 package moreinventory.core;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Loader;
@@ -15,15 +16,18 @@ import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 public class Config
 {
 	public static Configuration config;
 
-	public static boolean isCollectTorch;
-	public static boolean isFullAutoCollectPouch;
-	public static boolean leftClickCatchall;
+	public static String[] transportableChestsDefault;
 	public static String[] transportableChests;
+
+	public static final Set<String> isCollectTorch = Sets.newHashSet();
+	public static final Set<String> isFullAutoCollectPouch = Sets.newHashSet();
+	public static final Set<String> leftClickCatchall = Sets.newHashSet();
 
 	// Client-side only
 	public static boolean containerBoxSideTexture;
@@ -59,26 +63,7 @@ public class Config
 		Property prop;
 		List<String> propOrder = Lists.newArrayList();
 
-		prop = config.get(category, "isCollectTorch", true);
-		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
-		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
-		prop.comment += " [default: " + prop.getDefault() + "]";
-		propOrder.add(prop.getName());
-		isCollectTorch = prop.getBoolean(isCollectTorch);
-		prop = config.get(category, "isFullAutoCollectPouch", false);
-		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
-		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
-		prop.comment += " [default: " + prop.getDefault() + "]";
-		propOrder.add(prop.getName());
-		isFullAutoCollectPouch = prop.getBoolean(isFullAutoCollectPouch);
-		prop = config.get(category, "leftClickCatchall", false);
-		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
-		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
-		prop.comment += " [default: " + prop.getDefault() + "]";
-		propOrder.add(prop.getName());
-		leftClickCatchall = prop.getBoolean(leftClickCatchall);
-
-		if (transportableChests == null)
+		if (transportableChestsDefault == null)
 		{
 			List<String> chests = Lists.newArrayList();
 
@@ -94,10 +79,10 @@ public class Config
 			chests.add("BambooMod:jpChest@-1@10");
 			chests.add("MultiPageChest:multipagechest@-1@11");
 
-			transportableChests = chests.toArray(new String[chests.size()]);
+			transportableChestsDefault = chests.toArray(new String[chests.size()]);
 		}
 
-		prop = config.get(category, "transportableChests", transportableChests);
+		prop = config.get(category, "transportableChests", transportableChestsDefault);
 		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
 		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
 		prop.comment += Configuration.NEW_LINE + Configuration.NEW_LINE;
@@ -111,6 +96,39 @@ public class Config
 
 		if (FMLCommonHandler.instance().getSide().isClient())
 		{
+			prop = config.get(category, "isCollectTorch", true);
+			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+			prop.comment += " [default: " + prop.getDefault() + "]";
+			propOrder.add(prop.getName());
+
+			if (prop.getBoolean(isCollectTorch.remove("client")))
+			{
+				isCollectTorch.add("client");
+			}
+
+			prop = config.get(category, "isFullAutoCollectPouch", false);
+			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+			prop.comment += " [default: " + prop.getDefault() + "]";
+			propOrder.add(prop.getName());
+
+			if (prop.getBoolean(isFullAutoCollectPouch.remove("client")))
+			{
+				isFullAutoCollectPouch.add("client");
+			}
+
+			prop = config.get(category, "leftClickCatchall", false);
+			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+			prop.comment += " [default: " + prop.getDefault() + "]";
+			propOrder.add(prop.getName());
+
+			if (prop.getBoolean(leftClickCatchall.remove("client")))
+			{
+				leftClickCatchall.add("client");
+			}
+
 			prop = config.get(category, "containerBoxSideTexture", true);
 			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
 			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");

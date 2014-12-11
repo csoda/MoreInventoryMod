@@ -32,4 +32,10 @@ public class BlockMeta
 
 		return false;
 	}
+
+	@Override
+	public String toString()
+	{
+		return MIMUtils.getUniqueName(block) + "@" + meta;
+	}
 }

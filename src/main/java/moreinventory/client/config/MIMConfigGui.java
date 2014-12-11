@@ -30,7 +30,6 @@ public class MIMConfigGui extends GuiConfig
 		List<IConfigElement> list = Lists.newArrayList();
 
 		list.addAll(new ConfigElement(Config.config.getCategory(Configuration.CATEGORY_GENERAL)).getChildElements());
-		list.addAll(new ConfigElement(Config.config.getCategory("client")).getChildElements());
 		list.add(new DummyCategoryElement(MoreInventoryMod.MODID, MoreInventoryMod.CONFIG_LANG + "color", ColorEntry.class));
 
 		return list;

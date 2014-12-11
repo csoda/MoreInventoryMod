@@ -89,18 +89,18 @@ public class MoreInventoryMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-        catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
-        storageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
-        transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
-        storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
+		catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
+		storageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
+		transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
+		storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
 
-        torchHolder = new Item[3];
-        transporter = new ItemChestTransporter().setUnlocalizedName("transporter");
-        noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
-        potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
-        spanner = new ItemSpanner().setUnlocalizedName("spanner");
-        plating = new ItemPlating().setUnlocalizedName("painting");
-        pouch = new ItemPouch().setUnlocalizedName("pouch");
+		torchHolder = new Item[3];
+		transporter = new ItemChestTransporter().setUnlocalizedName("transporter");
+		noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
+		potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
+		spanner = new ItemSpanner().setUnlocalizedName("spanner");
+		plating = new ItemPlating().setUnlocalizedName("painting");
+		pouch = new ItemPouch().setUnlocalizedName("pouch");
 
 		GameRegistry.registerBlock(catchall, ItemBlock.class, "catchall");
 		GameRegistry.registerBlock(storageBox, ItemBlockStorageBox.class, "containerbox");
@@ -140,6 +140,7 @@ public class MoreInventoryMod
 		Config.syncConfig();
 
 		int i = 0;
+		network.registerMessage(ConfigSyncMessage.class, ConfigSyncMessage.class, i++, Side.SERVER);
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
 		network.registerMessage(TransportManagerMessage.Client.class, TransportManagerMessage.class, i++, Side.CLIENT);
