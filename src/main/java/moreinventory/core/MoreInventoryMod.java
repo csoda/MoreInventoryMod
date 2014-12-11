@@ -45,6 +45,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.RecipeSorter.Category;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
@@ -344,6 +346,9 @@ public class MoreInventoryMod
 				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), ingot, ingot, lava, brush));
 			}
 		}
+
+		RecipeSorter.register(MODID + ":torchholder", RecipeTorchHolder.class, Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register(MODID + ":pouch", RecipePouch.class, Category.SHAPELESS, "after:minecraft:shapeless");
 
 		proxy.registerRenderers();
 	}
