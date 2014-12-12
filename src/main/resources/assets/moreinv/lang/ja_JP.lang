@@ -29,6 +29,7 @@ item.spanner.name=スパナ
 item.torchholder:Iron.name=鉄のトーチホルダー
 item.torchholder:Gold.name=金のトーチホルダー
 item.torchholder:Diamond.name=ダイヤのトーチホルダー
+item.torchholder.rest=松明の残り
 
 itemnofunction.name=Unknown
 itemnofunction0.name=革の詰め物
@@ -79,6 +80,8 @@ moreinv.config.general.leftClickCatchall=ガラクタ入れを左クリック
 moreinv.config.general.leftClickCatchall.tooltip=ガラクタ入れを左クリックした際にガラクタ入れのインベントリを開きます。
 moreinv.config.general.containerBoxSideTexture=コンテナの側面テクスチャ
 moreinv.config.general.containerBoxSideTexture.tooltip=コンテナの側面テクスチャを使用します。
+moreinv.config.general.pointedContainerBoxInfo=ポイント時のコンテナ情報
+moreinv.config.general.pointedContainerBoxInfo.tooltip=ポイントした時だけコンテナの内容量情報を表示します。
 moreinv.config.general.clearGlassBox=透き通ったガラスコンテナ
 moreinv.config.general.clearGlassBox.tooltip=ガラスコンテナの連結テクスチャを使用します。
 moreinv.config.color=コンテナの色の設定
