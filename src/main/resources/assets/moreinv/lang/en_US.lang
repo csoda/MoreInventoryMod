@@ -35,9 +35,13 @@ item.transporter.name=Transporter
 item.potionholder.name=Potion Holder
 item.spanner.name=Spanner
 item.torchholder:Iron.name=Iron Torch Holder
-item.torchholder:Gold.name=Gold Torch Holder
+item.torchholder:Gold.name=Golden Torch Holder
 item.torchholder:Diamond.name=Diamond Torch Holder
 item.torchholder.rest=Rest of torches
+item.arrowholder:Iron.name=Iron Arrow Holder
+item.arrowholder:Gold.name=Golden Arrow Holder
+item.arrowholder:Diamond.name=Diamond Arrow Holder
+item.arrowholder.rest=Rest of arrows
 
 itemnofunction.name=Unknown
 itemnofunction0.name=Leather Pack

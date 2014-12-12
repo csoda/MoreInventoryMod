@@ -38,6 +38,10 @@ item.torchholder:Iron.name=鉄のトーチホルダー
 item.torchholder:Gold.name=金のトーチホルダー
 item.torchholder:Diamond.name=ダイヤのトーチホルダー
 item.torchholder.rest=松明の残り
+item.arrowholder:Iron.name=鉄のアローホルダー
+item.arrowholder:Gold.name=金のアローホルダー
+item.arrowholder:Diamond.name=ダイヤのアローホルダー
+item.arrowholder.rest=矢の残り
 
 itemnofunction.name=Unknown
 itemnofunction0.name=革の詰め物
