@@ -10,28 +10,44 @@ import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
+import moreinventory.item.ItemArrowHolder;
 import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
-import moreinventory.util.*;
+import moreinventory.util.MIMItemBoxList;
+import moreinventory.util.MIMItemInvList;
+import moreinventory.util.MIMUtils;
+import moreinventory.util.Version;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeVersion.Status;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.player.ArrowLooseEvent;
+import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.world.WorldEvent;
+
+import java.util.Random;
 
 public class MIMEventHooks
 {
 	public static final MIMEventHooks instance = new MIMEventHooks();
+
+	protected static final Random eventRand = new Random();
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
@@ -60,7 +76,7 @@ public class MIMEventHooks
 			FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage(component);
 		}
 
-		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
+		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isCollectArrow.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
 	}
 
 	@SubscribeEvent
@@ -105,6 +121,8 @@ public class MIMEventHooks
 
 				if (itemstack != null)
 				{
+					String uuid = player.getUniqueID().toString();
+
 					if (itemstack.getItem() == MoreInventoryMod.pouch)
 					{
 						InventoryPouch pouch = new InventoryPouch(itemstack);
@@ -114,13 +132,14 @@ public class MIMEventHooks
 							MIMUtils.mergeItemStack(item, pouch);
 						}
 
-						if (Config.isFullAutoCollectPouch.contains(player.getUniqueID().toString()))
+						if (Config.isFullAutoCollectPouch.contains(uuid))
 						{
 							pouch.collectAllItemStack(inventory, false);
 						}
 					}
 
-					if (Config.isCollectTorch.contains(player.getUniqueID().toString()) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder)
+					if (Config.isCollectTorch.contains(uuid) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder ||
+						Config.isCollectArrow.contains(uuid) && item.getItem() == Items.arrow && itemstack.getItem() instanceof ItemArrowHolder)
 					{
 						int damage = itemstack.getItemDamage();
 						int count = item.stackSize;
@@ -142,6 +161,97 @@ public class MIMEventHooks
 	}
 
 	@SubscribeEvent
+	public void onArrowLoose(ArrowLooseEvent event)
+	{
+		if (event.bow != null && event.bow.getItem() == Items.bow)
+		{
+			EntityPlayer player = event.entityPlayer;
+			World world = player.worldObj;
+			ItemStack bow = event.bow;
+
+			for (Item holder : MoreInventoryMod.arrowHolder)
+			{
+				if (player.inventory.hasItem(holder))
+				{
+					float f = (float)event.charge / 20.0F;
+					f = (f * f + f * 2.0F) / 3.0F;
+
+					if ((double)f < 0.1D)
+					{
+						return;
+					}
+
+					if (f > 1.0F)
+					{
+						f = 1.0F;
+					}
+
+					EntityArrow entity = new EntityArrow(world, player, f * 2.0F);
+
+					if (f == 1.0F)
+					{
+						entity.setIsCritical(true);
+					}
+
+					int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, bow);
+
+					if (k > 0)
+					{
+						entity.setDamage(entity.getDamage() + (double)k * 0.5D + 0.5D);
+					}
+
+					int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, bow);
+
+					if (l > 0)
+					{
+						entity.setKnockbackStrength(l);
+					}
+
+					if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, bow) > 0)
+					{
+						entity.setFire(100);
+					}
+
+					bow.damageItem(1, player);
+					world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (eventRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+
+					if (!player.capabilities.isCreativeMode)
+					{
+						player.inventory.mainInventory[MIMUtils.getFirstSlot(player.inventory.mainInventory, holder)].damageItem(1, player);
+					}
+
+					if (!world.isRemote)
+					{
+						world.spawnEntityInWorld(entity);
+					}
+
+					event.setCanceled(true);
+					break;
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
+	public void onArrowNock(ArrowNockEvent event)
+	{
+		if (event.result != null && event.result.getItem() == Items.bow)
+		{
+			EntityPlayer player = event.entityPlayer;
+
+			for (Item holder : MoreInventoryMod.arrowHolder)
+			{
+				if (player.capabilities.isCreativeMode || player.inventory.hasItem(holder))
+				{
+					player.setItemInUse(event.result, event.result.getMaxItemUseDuration());
+
+					break;
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event)
 	{
 		if (!event.world.isRemote)
@@ -151,9 +261,7 @@ public class MIMEventHooks
 				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
 				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");
 				TileEntityTeleporter.teleporterList = new MIMItemBoxList("Teleporter");
-				MoreInventoryMod.StorageBoxOwnerList = new StorageBoxOwnerList();
-				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData",
-														Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.StorageBoxOwnerList));
+				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList));
 			}
 		}
 	}

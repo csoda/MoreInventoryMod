@@ -25,7 +25,7 @@ public class GuiPotionHolder extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		fontRendererObj.drawString("Potion Holder", 8, 6, 4210752);
+		fontRendererObj.drawString(I18n.format("item.potionholder.name"), 8, 6, 4210752);
 		fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 120 + 2, 4210752);
 	}
 

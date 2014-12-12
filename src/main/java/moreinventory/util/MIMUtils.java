@@ -250,8 +250,20 @@ public final class MIMUtils
 
 	public static boolean canInsertFromSide(IInventory inventory, ItemStack itemstack, int slot, int side)
 	{
-		return inventory.isItemValidForSlot(slot, itemstack) && (!(inventory instanceof ISidedInventory) || ((ISidedInventory)inventory).canInsertItem(
-				slot, itemstack, side));
+		return inventory.isItemValidForSlot(slot, itemstack) && (!(inventory instanceof ISidedInventory) || ((ISidedInventory)inventory).canInsertItem(slot, itemstack, side));
+	}
+
+	public static int getFirstSlot(ItemStack[] items, Item item)
+	{
+		for (int i = 0; i < items.length; ++i)
+		{
+			if (items[i] != null && items[i].getItem() == item)
+			{
+				return i;
+			}
+		}
+
+		return -1;
 	}
 
 	public static int compareWithNull(Object o1, Object o2)

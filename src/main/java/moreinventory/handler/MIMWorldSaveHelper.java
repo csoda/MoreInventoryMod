@@ -1,6 +1,7 @@
 package moreinventory.handler;
 
 import cpw.mods.fml.relauncher.FMLInjectionData;
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import moreinventory.util.IWorldDataSave;
 import moreinventory.util.MIMLog;
 import net.minecraft.nbt.CompressedStreamTools;
@@ -14,7 +15,9 @@ import java.util.List;
 
 public class MIMWorldSaveHelper
 {
-	private static final File saveDir = new File((File)FMLInjectionData.data()[6] /* The minecraft dir */, "saves");
+	private static final File
+	rootDir = (File)FMLInjectionData.data()[6], /* The minecraft dir */
+	savesDir = new File(rootDir, "saves");
 
 	public final World world;
 
@@ -24,7 +27,7 @@ public class MIMWorldSaveHelper
 	public MIMWorldSaveHelper(World world, String name, List<IWorldDataSave> list)
 	{
 		this.world = world;
-		this.saveFile = new File(saveDir, name + ".dat");
+		this.saveFile = new File(FMLLaunchHandler.side().isClient() ? savesDir : rootDir, name + ".dat");
 		this.saveList = list;
 		this.loadData();
 	}

@@ -6,6 +6,9 @@ tile.catchall.name=ガラクタ入れ
 transportmanager.name=Importer&Exporter
 transportmanager:importer.name=インポーター
 transportmanager:exporter.name=エクスポーター
+transportmanager.gui.sneaking=搬出方向
+transportmanager.gui.include=搬入する
+transportmanager.gui.exclude=搬入しない
 Teleporter.name=テレポーター
 
 containerbox.name=コンテナ
@@ -22,6 +25,11 @@ containerbox:CobbleStone.name=丸石のコンテナ
 containerbox:Emerald.name=エメラルドのコンテナ
 containerbox:Ender.name=エンダーコンテナ
 containerbox:Steel.name=鋼鉄のコンテナ
+containerbox.gui.details=詳細
+containerbox.gui.private=個人
+containerbox.gui.insert=インサート
+containerbox.gui.connection=接続
+containerbox.gui.tier=ランク
 
 item.transporter.name=トランスポーター
 item.potionholder.name=ポーションホルダー
@@ -30,6 +38,10 @@ item.torchholder:Iron.name=鉄のトーチホルダー
 item.torchholder:Gold.name=金のトーチホルダー
 item.torchholder:Diamond.name=ダイヤのトーチホルダー
 item.torchholder.rest=松明の残り
+item.arrowholder:Iron.name=鉄のアローホルダー
+item.arrowholder:Gold.name=金のアローホルダー
+item.arrowholder:Diamond.name=ダイヤのアローホルダー
+item.arrowholder.rest=矢の残り
 
 itemnofunction.name=Unknown
 itemnofunction0.name=革の詰め物
@@ -66,6 +78,12 @@ painting:Silver.name=銀メッキ
 painting:Emerald.name=エメラルドメッキ
 painting:Steel.name=鋼鉄メッキ
 
+moreinv.gui.default=デフォルト
+moreinv.gui.menu=メニュー
+moreinv.gui.config=コンフィグ
+moreinv.gui.register=登録
+moreinv.gui.owner=所有者
+
 moreinv.config.title=MoreInventoryModの設定
 moreinv.config.general.versionNotify=バージョン通知
 moreinv.config.general.versionNotify.tooltip=MoreInventoryModの新しいバージョンが利用可能な場合、チャットログで通知します。
@@ -74,6 +92,8 @@ moreinv.config.general.transportableChests.tooltip=トランスポーターで�
 moreinv.config.general.transportableChests.select=移動可能なチェストを選択してください
 moreinv.config.general.isCollectTorch=松明の格納
 moreinv.config.general.isCollectTorch.tooltip=松明を拾った際にトーチホルダーに格納します。
+moreinv.config.general.isCollectArrow=矢の格納
+moreinv.config.general.isCollectArrow.tooltip=矢を拾った際にアローホルダーに格納します。
 moreinv.config.general.isFullAutoCollectPouch=フルオートポーチ
 moreinv.config.general.isFullAutoCollectPouch.tooltip=ドロップアイテムを拾った際にプレイヤーのインベントリにあるポーチに自動で格納します。
 moreinv.config.general.leftClickCatchall=ガラクタ入れを左クリック
