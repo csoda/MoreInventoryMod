@@ -13,13 +13,13 @@ import net.minecraftforge.common.DimensionManager;
 
 public class StorageBoxNetworkManager
 {
-	private final String ownerName;
+	private final String ownerID;
 	private final MIMItemBoxList storageBoxList = new MIMItemBoxList();
 	private final MIMBoxList addonList = new MIMBoxList();
 
-	public StorageBoxNetworkManager(World world, int x, int y, int z, String name)
+	public StorageBoxNetworkManager(World world, int x, int y, int z, String UUID)
 	{
-		this.ownerName = name;
+		this.ownerID = UUID;
 		this.createNetwork(new MIMBoxList(), world, x, y, z);
 	}
 
@@ -52,7 +52,7 @@ public class StorageBoxNetworkManager
 
 			if (list.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId))
 			{
-				if (!storage.isPrivate() || storage.getOwnerName().equals(MoreInventoryMod.defaultOwner) || storage.getOwnerName().equals(ownerName))
+				if (!storage.isPrivate() || storage.getOwner().equals(MoreInventoryMod.defaultOwnerID) || storage.getOwner().equals(ownerID))
 				{
 					if (tile instanceof TileEntityStorageBox)
 					{
@@ -99,7 +99,7 @@ public class StorageBoxNetworkManager
 			else
 			{
 				int[] pos = list.getBoxPos(0);
-				StorageBoxNetworkManager manager = new StorageBoxNetworkManager(DimensionManager.getWorld(list.getDimensionID(0)), pos[0], pos[1], pos[2], ownerName);
+				StorageBoxNetworkManager manager = new StorageBoxNetworkManager(DimensionManager.getWorld(list.getDimensionID(0)), pos[0], pos[1], pos[2], ownerID);
 				list = list.getDifference(manager.getKnownList());
 			}
 

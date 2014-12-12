@@ -93,7 +93,7 @@ public class MoreInventoryMod
 	public static final String[] MATERIALNAME = {"Leather Pack", "Brush", "Dimension Core", "Clipboard"};
 	public static final String[] COLORNAME = {"White", "Orange", "Magenta", "LightBlue", "Yellow", "Lime", "Pink", "Gray", "LightGray", "Cyan", "Purple", "Blue", "Brown", "Green", "Red", "Black"};
 
-	public static final String defaultOwner = "***Unknown***";
+	public static final String defaultOwnerID = "No UUID";
 
 	public static MIMWorldSaveHelper saveHelper;
 	public static StorageBoxOwnerList StorageBoxOwnerList;

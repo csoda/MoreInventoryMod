@@ -11,12 +11,17 @@ import java.util.Set;
 
 public class StorageBoxOwnerList implements IWorldDataSave
 {
-	private final HashMap<String,String> ownerList = new HashMap<String, String>(); //<UUID ,displayedName>
+	private final HashMap<String,String> ownerList; //<UUID ,displayedName>
+
+	public StorageBoxOwnerList()
+	{
+		ownerList = new HashMap<String, String>();
+	}
 
 	public void updateOwner(EntityPlayer player)
 	{
 		String id = player.getUniqueID().toString();
-		ownerList.put(id,player.getDisplayName());
+		ownerList.put(id, player.getDisplayName());
 	}
 
 	public String getOwnerName(String UUID)
@@ -31,6 +36,7 @@ public class StorageBoxOwnerList implements IWorldDataSave
 		return result;
 	}
 
+	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		NBTTagList list = nbt.getTagList("OwnerList", 10);
@@ -42,25 +48,11 @@ public class StorageBoxOwnerList implements IWorldDataSave
 		}
 	}
 
+	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
-/*
-		NBTTagList list = new NBTTagList();
-		Map.Entry<String, String>[] UUIDs = (Map.Entry<String, String>[]) ownerList.entrySet().toArray();
-
-		for (int i = 0; i < UUIDs.length; i++)
-		{
-			NBTTagCompound data = new NBTTagCompound();
-			data.setString("id", UUIDs[i].getKey());
-			data.setString("name", UUIDs[i].getValue());
-			list.appendTag(data);
-		}
-
-		nbt.setTag("OwnerList", list);
-*/
 		NBTTagList list = new NBTTagList();
 		Set UUIDs = ownerList.entrySet();
-
 
 		for (Iterator i = UUIDs.iterator(); i.hasNext();)
 		{

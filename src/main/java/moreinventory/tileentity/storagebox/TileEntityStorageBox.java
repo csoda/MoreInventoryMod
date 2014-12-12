@@ -33,7 +33,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public boolean canInsert = true;
 	public boolean checkNBT = true;
 
-	private String ownerName = MoreInventoryMod.defaultOwner;
+	private String ownerID = MoreInventoryMod.defaultOwnerID;
 	private StorageBoxType type;
 	private StorageBoxNetworkManager storageBoxManager;
 
@@ -46,6 +46,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public int displayedStackCount;
 	@SideOnly(Side.CLIENT)
 	public int connectCount;
+	@SideOnly(Side.CLIENT)
+	public String displayedOwnerName;
 
 	public TileEntityStorageBox()
 	{
@@ -82,9 +84,14 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	}
 
 	@Override
+	public String getOwner()
+	{
+		return this.ownerID;
+	}
+
 	public String getOwnerName()
 	{
-		return ownerName;
+		return MoreInventoryMod.StorageBoxOwnerList.getOwnerName(getOwner());
 	}
 
 	@Override
@@ -461,7 +468,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public boolean rightClickEvent(World world, EntityPlayer player, int x, int y, int z)
 	{
 		boolean prevInsert = canInsert;
-
+		System.out.println(ownerID);
 		switch (++clickCount)
 		{
 			case 1:
@@ -554,14 +561,14 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void makeNewBoxList()
 	{
-		storageBoxManager = new StorageBoxNetworkManager(worldObj, xCoord, yCoord, zCoord, ownerName);
+		storageBoxManager = new StorageBoxNetworkManager(worldObj, xCoord, yCoord, zCoord, ownerID);
 	}
 
 	public void onPlaced(EntityLivingBase entity)
 	{
 		if (entity instanceof EntityPlayer)
 		{
-			ownerName = ((EntityPlayer)entity).getDisplayName();
+			ownerID = ((EntityPlayer)entity).getUniqueID().toString();
 		}
 
 		for (int i = 0; i < 6; i++)
@@ -601,7 +608,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		tile.contents = contents;
 		tile.contentsCount = contentsCount;
 		tile.isPrivate = isPrivate;
-		tile.ownerName = ownerName;
+		tile.ownerID = ownerID;
 
 		return tile;
 	}
@@ -625,7 +632,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		canInsert = nbt.getBoolean("canInsert");
 		checkNBT = nbt.getBoolean("checkNBT");
 		isPrivate = nbt.getBoolean("isPrivate");
-		ownerName = nbt.getString("owner");
+		ownerID = nbt.getString("owner");
 	}
 
 	@Override
@@ -661,7 +668,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		nbt.setBoolean("isPrivate", isPrivate);
 		nbt.setBoolean("canInsert", canInsert);
 		nbt.setBoolean("checkNBT", checkNBT);
-		nbt.setString("owner", ownerName);
+		nbt.setString("owner", ownerID);
 	}
 
 	public TileEntityStorageBox updateFromMetadata(int meta)
@@ -717,18 +724,19 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		contents = itemstack;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public void handlePacketConfig(boolean config1, boolean config2, boolean config3, int config4, String owner)
 	{
 		isPrivate = config1;
 		checkNBT = config2;
 		canInsert = config3;
 		connectCount = config4;
-		ownerName = owner;
+		displayedOwnerName = owner;
 	}
 
 	public void handlePacketButton(byte channel, String owner)
 	{
-		if (!isPrivate() || ownerName.equals(owner) || ownerName.equals(MoreInventoryMod.defaultOwner))
+		if (!isPrivate() || ownerID.equals(owner) || ownerID.equals(MoreInventoryMod.defaultOwnerID))
 		{
 			switch (channel)
 			{
@@ -759,7 +767,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void sendGUIPacketToClient()
 	{
-		MoreInventoryMod.network.sendToDimension(new StorageBoxConfigMessage(xCoord, yCoord, zCoord, isPrivate, checkNBT, canInsert, getStorageBoxNetworkManager().getKnownList().getListSize(), ownerName), worldObj.provider.dimensionId);
+		MoreInventoryMod.network.sendToDimension(new StorageBoxConfigMessage(xCoord, yCoord, zCoord, isPrivate, checkNBT, canInsert, getStorageBoxNetworkManager().getKnownList().getListSize(), getOwnerName()), worldObj.provider.dimensionId);
 	}
 
 	public void sendGUIPacketToServer(byte channel)

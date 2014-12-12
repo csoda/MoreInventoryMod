@@ -82,7 +82,7 @@ public class GuiStorageBox extends GuiContainer
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		fontRendererObj.drawString("[" + I18n.format("containerbox.gui.details") + "]", 25, 77, 4210752);
-		fontRendererObj.drawString(I18n.format("moreinv.gui.owner") + ": " + storageBox.getOwnerName(), 30, 87, 4210752);
+		fontRendererObj.drawString(I18n.format("moreinv.gui.owner") + ": " + storageBox.displayedOwnerName, 30, 87, 4210752);
 		fontRendererObj.drawString(I18n.format("containerbox.gui.connection") + ": " + storageBox.connectCount, 30, 98, 4210752);
 		fontRendererObj.drawString(I18n.format("containerbox.gui.tier") + ": " + storageBox.getStorageBoxType().tier, 30, 108, 4210752);
 

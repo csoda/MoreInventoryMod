@@ -15,10 +15,7 @@ import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
-import moreinventory.util.MIMItemBoxList;
-import moreinventory.util.MIMItemInvList;
-import moreinventory.util.MIMUtils;
-import moreinventory.util.Version;
+import moreinventory.util.*;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -39,6 +36,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.Random;
@@ -252,6 +250,11 @@ public class MIMEventHooks
 	}
 
 	@SubscribeEvent
+	public void onLoadPlayer(PlayerEvent.LoadFromFile event){
+		MoreInventoryMod.StorageBoxOwnerList.updateOwner(event.entityPlayer);
+	}
+
+	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event)
 	{
 		if (!event.world.isRemote)
@@ -261,7 +264,8 @@ public class MIMEventHooks
 				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
 				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");
 				TileEntityTeleporter.teleporterList = new MIMItemBoxList("Teleporter");
-				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList));
+				MoreInventoryMod.StorageBoxOwnerList = new StorageBoxOwnerList();
+				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.StorageBoxOwnerList));
 			}
 		}
 	}
