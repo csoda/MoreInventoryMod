@@ -27,6 +27,7 @@ public class Config
 	public static String[] transportableChests;
 
 	public static final Set<String> isCollectTorch = Sets.newHashSet();
+	public static final Set<String> isCollectArrow = Sets.newHashSet();
 	public static final Set<String> isFullAutoCollectPouch = Sets.newHashSet();
 	public static final Set<String> leftClickCatchall = Sets.newHashSet();
 
@@ -114,6 +115,17 @@ public class Config
 			if (prop.getBoolean(isCollectTorch.remove("client")))
 			{
 				isCollectTorch.add("client");
+			}
+
+			prop = config.get(category, "isCollectArrow", true);
+			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
+			prop.comment += " [default: " + prop.getDefault() + "]";
+			propOrder.add(prop.getName());
+
+			if (prop.getBoolean(isCollectArrow.remove("client")))
+			{
+				isCollectArrow.add("client");
 			}
 
 			prop = config.get(category, "isFullAutoCollectPouch", false);

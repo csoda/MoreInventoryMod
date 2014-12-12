@@ -7,10 +7,10 @@ import moreinventory.container.ContainerPouch;
 import moreinventory.inventory.InventoryPouch;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
@@ -64,8 +64,8 @@ public class GuiPouch extends GuiContainer
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		fontRendererObj.drawString(pouch.customName, 8, 6, 4210752);
-		fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 96 + 2, 4210752);
-		fontRendererObj.drawString("Config", xSize + 18, 10, 4210752);
+		fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 96 + 2, 4210752);
+		fontRendererObj.drawString(I18n.format("moreinv.gui.config"), xSize + 18, 10, 4210752);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -40,9 +41,9 @@ public class GuiStorageBox extends GuiContainer
 	{
 		super.initGui();
 
-		buttonList.add(new GuiButtonStorageBox(0, guiLeft + 23, guiTop + 35, 50, 20, "[Private]", storageBox.isPrivate));
+		buttonList.add(new GuiButtonStorageBox(0, guiLeft + 23, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.private") + "]", storageBox.isPrivate));
 		buttonList.add(new GuiButtonStorageBox(1, guiLeft + 75, guiTop + 35, 30, 20, "[NBT]", storageBox.checkNBT));
-		buttonList.add(new GuiButtonStorageBox(2, guiLeft + 107, guiTop + 35, 50, 20, "[Insert]", storageBox.canInsert));
+		buttonList.add(new GuiButtonStorageBox(2, guiLeft + 107, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.insert") + "]", storageBox.canInsert));
 
 		if (!usingPlayer.getDisplayName().equals(storageBox.getOwnerName()))
 		{
@@ -80,10 +81,10 @@ public class GuiStorageBox extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		fontRendererObj.drawString("[Details]", 25, 77, 4210752);
-		fontRendererObj.drawString("Owner: " + storageBox.getOwnerName(), 30, 87, 4210752);
-		fontRendererObj.drawString("Connection: " + storageBox.connectCount, 30, 98, 4210752);
-		fontRendererObj.drawString("Tier: " + storageBox.getStorageBoxType().tier, 30, 108, 4210752);
+		fontRendererObj.drawString("[" + I18n.format("containerbox.gui.details") + "]", 25, 77, 4210752);
+		fontRendererObj.drawString(I18n.format("moreinv.gui.owner") + ": " + storageBox.getOwnerName(), 30, 87, 4210752);
+		fontRendererObj.drawString(I18n.format("containerbox.gui.connection") + ": " + storageBox.connectCount, 30, 98, 4210752);
+		fontRendererObj.drawString(I18n.format("containerbox.gui.tier") + ": " + storageBox.getStorageBoxType().tier, 30, 108, 4210752);
 
 		if (contents != null)
 		{

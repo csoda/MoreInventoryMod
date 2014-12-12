@@ -40,12 +40,12 @@ public class GuiTransportManager extends GuiContainer
 		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 25, guiTop + 63, 20, 20, "S", transportManager.sneak == 3));
 		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 5, guiTop + 63, 20, 20, "W", transportManager.sneak == 4));
 		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 45, guiTop + 63, 20, 20, "E", transportManager.sneak == 5));
-		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 5, guiTop + 23, 60, 20, "Default", transportManager.sneak == 6));
+		buttonList.add(new GuiButtonConfigString(buttonList.size(), guiLeft + xSize + 5, guiTop + 23, 60, 20, I18n.format("moreinv.gui.default"), transportManager.sneak == 6));
 
 		if (transportManager instanceof TileEntityImporter)
 		{
-			buttonList.add(new GuiButtonConfigString(7, (width - xSize) / 2 + 5, (height - ySize) / 2 + 35, 53, 20, "Register", ((TileEntityImporter)transportManager).register));
-			buttonList.add(new GuiButton(8, (width - xSize) / 2 + xSize - 58, (height - ySize) / 2 + 35, 53, 20, ((TileEntityImporter)transportManager).include ? "Include" : "Exclude"));
+			buttonList.add(new GuiButtonConfigString(7, (width - xSize) / 2 + 5, (height - ySize) / 2 + 35, 53, 20, I18n.format("moreinv.gui.register"), ((TileEntityImporter)transportManager).register));
+			buttonList.add(new GuiButton(8, (width - xSize) / 2 + xSize - 58, (height - ySize) / 2 + 35, 53, 20, ((TileEntityImporter)transportManager).include ? I18n.format("transportmanager.gui.include") : I18n.format("transportmanager.gui.exclude")));
 		}
 	}
 
@@ -74,7 +74,7 @@ public class GuiTransportManager extends GuiContainer
 					break;
 				case 8:
 					((TileEntityImporter)transportManager).include = !((TileEntityImporter)transportManager).include;
-					((GuiButton)buttonList.get(8)).displayString = ((TileEntityImporter)transportManager).include ? "Include" : "Exclude";
+					((GuiButton)buttonList.get(8)).displayString = ((TileEntityImporter)transportManager).include ? I18n.format("transportmanager.gui.include") : I18n.format("transportmanager.gui.exclude");
 					break;
 			}
 
@@ -85,9 +85,9 @@ public class GuiTransportManager extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		fontRendererObj.drawString(transportManager instanceof TileEntityImporter ? "Importer" : "Exporter", 8, 6, 4210752);
+		fontRendererObj.drawString(transportManager instanceof TileEntityImporter ? I18n.format("transportmanager:importer.name") : I18n.format("transportmanager:exporter.name"), 8, 6, 4210752);
 		fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 120 + 2, 4210752);
-		fontRendererObj.drawString("Sneaking", xSize + 18, 10, 4210752);
+		fontRendererObj.drawString(I18n.format("transportmanager.gui.sneaking"), xSize + 18, 10, 4210752);
 	}
 
 	@Override

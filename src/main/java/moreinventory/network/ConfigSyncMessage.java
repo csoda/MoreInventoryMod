@@ -9,13 +9,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 public class ConfigSyncMessage implements IMessage, IMessageHandler<ConfigSyncMessage, IMessage>
 {
-	private boolean isCollectTorch, isFullAutoCollectPouch, leftClickCatchall;
+	private boolean isCollectTorch, isCollectArrow, isFullAutoCollectPouch, leftClickCatchall;
 
 	public ConfigSyncMessage() {}
 
-	public ConfigSyncMessage(boolean isCollectTorch, boolean isFullAutoCollectPouch, boolean leftClickCatchall)
+	public ConfigSyncMessage(boolean isCollectTorch, boolean isCollectArrow, boolean isFullAutoCollectPouch, boolean leftClickCatchall)
 	{
 		this.isCollectTorch = isCollectTorch;
+		this.isCollectArrow = isCollectArrow;
 		this.isFullAutoCollectPouch = isFullAutoCollectPouch;
 		this.leftClickCatchall = leftClickCatchall;
 	}
@@ -24,6 +25,7 @@ public class ConfigSyncMessage implements IMessage, IMessageHandler<ConfigSyncMe
 	public void fromBytes(ByteBuf buf)
 	{
 		isCollectTorch = buf.readBoolean();
+		isCollectArrow = buf.readBoolean();
 		isFullAutoCollectPouch = buf.readBoolean();
 		leftClickCatchall = buf.readBoolean();
 	}
@@ -32,6 +34,7 @@ public class ConfigSyncMessage implements IMessage, IMessageHandler<ConfigSyncMe
 	public void toBytes(ByteBuf buf)
 	{
 		buf.writeBoolean(isCollectTorch);
+		buf.writeBoolean(isCollectArrow);
 		buf.writeBoolean(isFullAutoCollectPouch);
 		buf.writeBoolean(leftClickCatchall);
 	}
@@ -49,6 +52,15 @@ public class ConfigSyncMessage implements IMessage, IMessageHandler<ConfigSyncMe
 		else
 		{
 			Config.isCollectTorch.remove(uuid);
+		}
+
+		if (message.isCollectArrow)
+		{
+			Config.isCollectArrow.add(uuid);
+		}
+		else
+		{
+			Config.isCollectArrow.remove(uuid);
 		}
 
 		if (message.isFullAutoCollectPouch)
