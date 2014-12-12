@@ -6,6 +6,9 @@ tile.catchall.name=Catchall
 transportmanager.name=Importer&Exporter
 transportmanager:importer.name=Importer
 transportmanager:exporter.name=Exporter
+transportmanager.gui.sneaking=Sneaking
+transportmanager.gui.include=Include
+transportmanager.gui.exclude=Exclude
 Teleporter.name=Teleporter
 
 containerbox.name=Container Box
@@ -22,6 +25,11 @@ containerbox:CobbleStone.name=Cobblestone Container Box
 containerbox:Emerald.name=Emerald Container Box
 containerbox:Ender.name=Ender Container Box
 containerbox:Steel.name=Steel Container Box
+containerbox.gui.details=Details
+containerbox.gui.private=Private
+containerbox.gui.insert=Insert
+containerbox.gui.connection=Connection
+containerbox.gui.tier=Tier
 
 item.transporter.name=Transporter
 item.potionholder.name=Potion Holder
@@ -65,6 +73,12 @@ painting:Bronze.name=Bronze Paint
 painting:Silver.name=Silver Paint
 painting:Emerald.name=Emerald Paint
 painting:Steel.name=Steel Paint
+
+moreinv.gui.default=Default
+moreinv.gui.menu=Menu
+moreinv.gui.config=Config
+moreinv.gui.register=Register
+moreinv.gui.owner=Owner
 
 moreinv.config.title=MoreInventoryMod Configuration
 moreinv.config.general.versionNotify=Version Notify

@@ -6,6 +6,9 @@ tile.catchall.name=ガラクタ入れ
 transportmanager.name=Importer&Exporter
 transportmanager:importer.name=インポーター
 transportmanager:exporter.name=エクスポーター
+transportmanager.gui.sneaking=搬出方向
+transportmanager.gui.include=搬入する
+transportmanager.gui.exclude=搬入しない
 Teleporter.name=テレポーター
 
 containerbox.name=コンテナ
@@ -22,6 +25,11 @@ containerbox:CobbleStone.name=丸石のコンテナ
 containerbox:Emerald.name=エメラルドのコンテナ
 containerbox:Ender.name=エンダーコンテナ
 containerbox:Steel.name=鋼鉄のコンテナ
+containerbox.gui.details=詳細
+containerbox.gui.private=個人
+containerbox.gui.insert=インサート
+containerbox.gui.connection=接続
+containerbox.gui.tier=ランク
 
 item.transporter.name=トランスポーター
 item.potionholder.name=ポーションホルダー
@@ -65,6 +73,12 @@ painting:Bronze.name=青銅メッキ
 painting:Silver.name=銀メッキ
 painting:Emerald.name=エメラルドメッキ
 painting:Steel.name=鋼鉄メッキ
+
+moreinv.gui.default=デフォルト
+moreinv.gui.menu=メニュー
+moreinv.gui.config=コンフィグ
+moreinv.gui.register=登録
+moreinv.gui.owner=所有者
 
 moreinv.config.title=MoreInventoryModの設定
 moreinv.config.general.versionNotify=バージョン通知
