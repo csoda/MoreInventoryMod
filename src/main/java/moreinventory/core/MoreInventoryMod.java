@@ -37,15 +37,26 @@ import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
 import moreinventory.util.StorageBoxOwnerList;
 import moreinventory.util.Version;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.dispenser.BehaviorProjectileDispense;
+import net.minecraft.dispenser.IBlockSource;
+import net.minecraft.dispenser.IPosition;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
@@ -146,6 +157,31 @@ public class MoreInventoryMod
 			arrowHolder[i] = new ItemArrowHolder(i).setUnlocalizedName("arrowholder:" + gradeName[i]);
 
 			GameRegistry.registerItem(arrowHolder[i], "arrowholder" + gradeName[i]);
+
+			BlockDispenser.dispenseBehaviorRegistry.putObject(arrowHolder[i], new BehaviorProjectileDispense()
+			{
+				@Override
+				public ItemStack dispenseStack(IBlockSource blockSource, ItemStack itemstack)
+				{
+					World world = blockSource.getWorld();
+					EnumFacing facing = BlockDispenser.func_149937_b(blockSource.getBlockMetadata());
+					IProjectile projectile = getProjectileEntity(world, BlockDispenser.func_149939_a(blockSource));
+					projectile.setThrowableHeading((double)facing.getFrontOffsetX(), (double)((float)facing.getFrontOffsetY() + 0.1F), (double)facing.getFrontOffsetZ(), func_82500_b(), func_82498_a());
+					world.spawnEntityInWorld((Entity)projectile);
+					itemstack.damageItem(1, FakePlayerFactory.getMinecraft((WorldServer)world));
+
+					return itemstack;
+				}
+
+				@Override
+				protected IProjectile getProjectileEntity(World world, IPosition pos)
+				{
+					EntityArrow entity = new EntityArrow(world, pos.getX(), pos.getY(), pos.getZ());
+					entity.canBePickedUp = 1;
+
+					return entity;
+				}
+			});
 		}
 
 		GameRegistry.registerItem(transporter, "transporter");
