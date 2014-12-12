@@ -121,6 +121,17 @@ public class CommandMoreInventoryMod implements ICommand
 						}
 
 						break;
+					case "isCollectArrow":
+						if (value)
+						{
+							Config.isCollectArrow.add(uuid);
+						}
+						else
+						{
+							Config.isCollectArrow.remove(uuid);
+						}
+
+						break;
 					case "isFullAutoCollectPouch":
 						if (value)
 						{
@@ -171,7 +182,7 @@ public class CommandMoreInventoryMod implements ICommand
 			case 2:
 				if (args[0].equalsIgnoreCase("config") || args[0].equalsIgnoreCase("cfg"))
 				{
-					return CommandBase.getListOfStringsMatchingLastWord(args, "isCollectTorch", "isFullAutoCollectPouch", "leftClickCatchall");
+					return CommandBase.getListOfStringsMatchingLastWord(args, "isCollectTorch", "isCollectArrow", "isFullAutoCollectPouch", "leftClickCatchall");
 				}
 			case 3:
 				if (args[0].equalsIgnoreCase("config") || args[0].equalsIgnoreCase("cfg"))

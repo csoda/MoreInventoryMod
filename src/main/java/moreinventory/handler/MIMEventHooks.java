@@ -10,6 +10,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
+import moreinventory.item.ItemArrowHolder;
 import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
@@ -75,7 +76,7 @@ public class MIMEventHooks
 			FMLClientHandler.instance().getClient().ingameGUI.getChatGUI().printChatMessage(component);
 		}
 
-		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
+		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isCollectArrow.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
 	}
 
 	@SubscribeEvent
@@ -120,6 +121,8 @@ public class MIMEventHooks
 
 				if (itemstack != null)
 				{
+					String uuid = player.getUniqueID().toString();
+
 					if (itemstack.getItem() == MoreInventoryMod.pouch)
 					{
 						InventoryPouch pouch = new InventoryPouch(itemstack);
@@ -129,13 +132,14 @@ public class MIMEventHooks
 							MIMUtils.mergeItemStack(item, pouch);
 						}
 
-						if (Config.isFullAutoCollectPouch.contains(player.getUniqueID().toString()))
+						if (Config.isFullAutoCollectPouch.contains(uuid))
 						{
 							pouch.collectAllItemStack(inventory, false);
 						}
 					}
 
-					if (Config.isCollectTorch.contains(player.getUniqueID().toString()) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder)
+					if (Config.isCollectTorch.contains(uuid) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder ||
+						Config.isCollectArrow.contains(uuid) && item.getItem() == Items.arrow && itemstack.getItem() instanceof ItemArrowHolder)
 					{
 						int damage = itemstack.getItemDamage();
 						int count = item.stackSize;
@@ -164,11 +168,10 @@ public class MIMEventHooks
 			EntityPlayer player = event.entityPlayer;
 			World world = player.worldObj;
 			ItemStack bow = event.bow;
-			boolean flag = player.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, bow) > 0;
 
 			for (Item holder : MoreInventoryMod.arrowHolder)
 			{
-				if (flag || player.inventory.hasItem(holder))
+				if (player.inventory.hasItem(holder))
 				{
 					float f = (float)event.charge / 20.0F;
 					f = (f * f + f * 2.0F) / 3.0F;
@@ -212,11 +215,7 @@ public class MIMEventHooks
 					bow.damageItem(1, player);
 					world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (eventRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 
-					if (flag)
-					{
-						entity.canBePickedUp = 2;
-					}
-					else
+					if (!player.capabilities.isCreativeMode)
 					{
 						player.inventory.mainInventory[MIMUtils.getFirstSlot(player.inventory.mainInventory, holder)].damageItem(1, player);
 					}
