@@ -161,6 +161,7 @@ public class MoreInventoryMod
 
 		int i = 0;
 		network.registerMessage(ConfigSyncMessage.class, ConfigSyncMessage.class, i++, Side.SERVER);
+		network.registerMessage(OpenUrlMessage.class, OpenUrlMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
 		network.registerMessage(TransportManagerMessage.Client.class, TransportManagerMessage.class, i++, Side.CLIENT);
@@ -356,6 +357,8 @@ public class MoreInventoryMod
 	@EventHandler
 	public void serverStarting(FMLServerStartingEvent event)
 	{
+		event.registerServerCommand(new CommandMoreInventoryMod());
+
 		if (event.getSide().isServer() && (Version.isDev() || Config.versionNotify && Version.isOutdated()))
 		{
 			event.getServer().logInfo(StatCollector.translateToLocalFormatted("moreinv.version.message", "MoreInventoryMod") + ": " + Version.getLatest());
