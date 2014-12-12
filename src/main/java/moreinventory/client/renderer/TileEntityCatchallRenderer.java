@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 {
 	private final ModelCatchall model = new ModelCatchall();
+	private final EntityItem entityItem = new EntityItem(null, 0.0D, 0.0D, 0.0D);
 
 	public void renderModelAt(TileEntityCatchall tile, double posX, double posY, double posZ, float ticks)
 	{
@@ -70,9 +71,9 @@ public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 
 			if (itemstack != null)
 			{
-				EntityItem entity = new EntityItem(tile.getWorldObj(), 0.0D, 0.0D, 0.0D, itemstack);
-				entity.getEntityItem().stackSize = 1;
-				entity.hoverStart = 0.0F;
+				entityItem.setEntityItemStack(itemstack);
+				entityItem.getEntityItem().stackSize = 1;
+				entityItem.hoverStart = 0.0F;
 
 				byte x = (byte) (i % 3);
 				byte y = (byte) ((i - i % 3) / 3 % 3);
@@ -83,13 +84,13 @@ public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 
 				if (RenderManager.instance.options.fancyGraphics)
 				{
-					RenderManager.instance.renderEntityWithPosYaw(entity, renderX, renderY, renderZ, 0.0F, 0.0F);
+					RenderManager.instance.renderEntityWithPosYaw(entityItem, renderX, renderY, renderZ, 0.0F, 0.0F);
 				}
 				else
 				{
 					renderX += (x + z) % 3 * 0.01F - 0.01F;
 					renderZ += -(x + z) % 3 * 0.01F + 0.01F;
-					RenderManager.instance.renderEntityWithPosYaw(entity, renderX, -renderZ, renderY, 0.0F, 0.0F);
+					RenderManager.instance.renderEntityWithPosYaw(entityItem, renderX, -renderZ, renderY, 0.0F, 0.0F);
 				}
 			}
 		}
