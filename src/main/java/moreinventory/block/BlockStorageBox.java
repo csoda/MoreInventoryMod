@@ -62,6 +62,7 @@ public class BlockStorageBox extends BlockContainer
 
 			return true;
 		}
+
 		return tile.rightClickEvent(world, player, x, y, z);
 	}
 
@@ -77,7 +78,7 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block)
 	{
-		if (block == this)
+		if (block instanceof BlockStorageBox)
 		{
 			((TileEntityStorageBox)world.getTileEntity(x, y, z)).onNeighborRemoved();
 		}
@@ -86,7 +87,10 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block block, int metadata)
 	{
-		dropItems(world, x, y, z);
+		if (!world.isRemote)
+		{
+			dropItems(world, x, y, z);
+		}
 
 		super.breakBlock(world, x, y, z, block, metadata);
 	}
@@ -100,7 +104,7 @@ public class BlockStorageBox extends BlockContainer
 			return;
 		}
 
-		IInventory inventory = (IInventory) tile;
+		IInventory inventory = (IInventory)tile;
 
 		for (int i = 0; i < inventory.getSizeInventory(); i++)
 		{
@@ -109,7 +113,7 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack par6ItemStack)
+	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemstack)
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 

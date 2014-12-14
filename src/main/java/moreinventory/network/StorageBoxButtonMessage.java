@@ -51,7 +51,7 @@ public class StorageBoxButtonMessage implements IMessage, IMessageHandler<Storag
 
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
-			((TileEntityStorageBox)tile).handlePacketButton(message.channel, player.getDisplayName());
+			((TileEntityStorageBox)tile).handlePacketButton(message.channel, player.getUniqueID().toString());
 		}
 
 		return null;

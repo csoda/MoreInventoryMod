@@ -17,17 +17,17 @@ public class SBAddonBaseConfigMessage implements IMessage
 {
 	private int x, y, z;
 	private byte channel;
-	private boolean flag;
+	private boolean isOwner;
 
 	public SBAddonBaseConfigMessage() {}
 
-	public SBAddonBaseConfigMessage(int x, int y, int z, byte channel, boolean flag)
+	public SBAddonBaseConfigMessage(int x, int y, int z, byte channel, boolean isOwner)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.channel = channel;
-		this.flag = flag;
+		this.isOwner = isOwner;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class SBAddonBaseConfigMessage implements IMessage
 		y = buf.readInt();
 		z = buf.readInt();
 		channel = buf.readByte();
-		flag = buf.readBoolean();
+		isOwner = buf.readBoolean();
 	}
 
 	@Override
@@ -47,7 +47,7 @@ public class SBAddonBaseConfigMessage implements IMessage
 		buf.writeInt(y);
 		buf.writeInt(z);
 		buf.writeByte(channel);
-		buf.writeBoolean(flag);
+		buf.writeBoolean(isOwner);
 	}
 
 	public static class Client implements IMessageHandler<SBAddonBaseConfigMessage, IMessage>
@@ -61,7 +61,7 @@ public class SBAddonBaseConfigMessage implements IMessage
 
 			if (tile != null && tile instanceof TileEntitySBAddonBase)
 			{
-				((TileEntitySBAddonBase)tile).handleConfigPacketClient(message.channel, message.flag);
+				((TileEntitySBAddonBase)tile).handleConfigPacketClient(message.channel, message.isOwner);
 			}
 
 			return null;
@@ -79,7 +79,7 @@ public class SBAddonBaseConfigMessage implements IMessage
 
 			if (tile != null && tile instanceof TileEntitySBAddonBase)
 			{
-				((TileEntitySBAddonBase)tile).handleConfigPacketServer(message.channel, message.flag, player.getDisplayName());
+				((TileEntitySBAddonBase)tile).handleConfigPacketServer(message.channel, player.getUniqueID().toString());
 			}
 
 			return null;

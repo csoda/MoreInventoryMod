@@ -140,13 +140,16 @@ public class MIMItemBoxList extends MIMBoxList
 
 		itemList.clear();
 
-		NBTTagList list = nbt.getTagList(tagName + "Item", 10);
+		NBTTagList list = (NBTTagList)nbt.getTag(tagName + "Item");
 
-		for (int i = 0; i < list.tagCount(); i++)
+		if (list != null)
 		{
-			NBTTagCompound data = list.getCompoundTagAt(i);
+			for (int i = 0; i < list.tagCount(); i++)
+			{
+				NBTTagCompound data = list.getCompoundTagAt(i);
 
-			itemList.add(data.getInteger("Index"), ItemStack.loadItemStackFromNBT(data));
+				itemList.add(data.getInteger("Index"), ItemStack.loadItemStackFromNBT(data));
+			}
 		}
 	}
 }

@@ -1,10 +1,10 @@
 package moreinventory.handler;
 
-import com.google.common.collect.Lists;
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
@@ -13,9 +13,13 @@ import moreinventory.inventory.InventoryPouch;
 import moreinventory.item.ItemArrowHolder;
 import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
+import moreinventory.network.PlayerNameCacheMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
-import moreinventory.util.*;
+import moreinventory.util.MIMItemBoxList;
+import moreinventory.util.MIMItemInvList;
+import moreinventory.util.MIMUtils;
+import moreinventory.util.Version;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,6 +31,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
@@ -49,7 +54,7 @@ public class MIMEventHooks
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
-	public void onConfigChanged(ConfigChangedEvent event)
+	public void onConfigChanged(OnConfigChangedEvent event)
 	{
 		if (event.modID.equals(MoreInventoryMod.MODID))
 		{
@@ -59,7 +64,7 @@ public class MIMEventHooks
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
-	public void onClientConnected(FMLNetworkEvent.ClientConnectedToServerEvent event)
+	public void onClientConnected(ClientConnectedToServerEvent event)
 	{
 		if (Version.getStatus() == Status.PENDING || Version.getStatus() == Status.FAILED)
 		{
@@ -75,6 +80,14 @@ public class MIMEventHooks
 		}
 
 		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new ConfigSyncMessage(Config.isCollectTorch.contains("client"), Config.isCollectArrow.contains("client"), Config.isFullAutoCollectPouch.contains("client"), Config.leftClickCatchall.contains("client"))));
+	}
+
+	@SubscribeEvent
+	public void onServerConnect(ServerConnectionFromClientEvent event)
+	{
+		NBTTagCompound data = new NBTTagCompound();
+		MoreInventoryMod.playerNameCache.writeToNBT(data);
+		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new PlayerNameCacheMessage(data)));
 	}
 
 	@SubscribeEvent
@@ -250,8 +263,9 @@ public class MIMEventHooks
 	}
 
 	@SubscribeEvent
-	public void onLoadPlayer(PlayerEvent.LoadFromFile event){
-		MoreInventoryMod.StorageBoxOwnerList.updateOwner(event.entityPlayer);
+	public void onPlayerLoad(PlayerEvent.LoadFromFile event)
+	{
+		MoreInventoryMod.playerNameCache.refreshOwner(event.entityPlayer);
 	}
 
 	@SubscribeEvent
@@ -264,8 +278,7 @@ public class MIMEventHooks
 				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
 				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");
 				TileEntityTeleporter.teleporterList = new MIMItemBoxList("Teleporter");
-				MoreInventoryMod.StorageBoxOwnerList = new StorageBoxOwnerList();
-				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", Lists.newArrayList(TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.StorageBoxOwnerList));
+				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.playerNameCache);
 			}
 		}
 	}

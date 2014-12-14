@@ -199,17 +199,20 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		NBTTagList list = nbt.getTagList("Items", 10);
+		NBTTagList list = (NBTTagList)nbt.getTag("Items");
 		containerItems = new ItemStack[getSizeInventory()];
 
-		for (int i = 0; i < list.tagCount(); ++i)
+		if (list != null)
 		{
-			NBTTagCompound data = list.getCompoundTagAt(i);
-			int slot = data.getByte("Slot") & 255;
-
-			if (slot >= 0 && slot < containerItems.length)
+			for (int i = 0; i < list.tagCount(); ++i)
 			{
-				containerItems[slot] = ItemStack.loadItemStackFromNBT(data);
+				NBTTagCompound data = list.getCompoundTagAt(i);
+				int slot = data.getByte("Slot") & 255;
+
+				if (slot >= 0 && slot < containerItems.length)
+				{
+					containerItems[slot] = ItemStack.loadItemStackFromNBT(data);
+				}
 			}
 		}
 	}

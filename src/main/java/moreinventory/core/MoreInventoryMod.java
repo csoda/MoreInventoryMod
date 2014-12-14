@@ -34,7 +34,7 @@ import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
-import moreinventory.util.StorageBoxOwnerList;
+import moreinventory.util.PlayerNameCache;
 import moreinventory.util.Version;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
@@ -96,7 +96,8 @@ public class MoreInventoryMod
 	public static final String defaultOwnerID = "No UUID";
 
 	public static MIMWorldSaveHelper saveHelper;
-	public static StorageBoxOwnerList StorageBoxOwnerList;
+
+	public static final PlayerNameCache playerNameCache = new PlayerNameCache();
 
 	public static Block catchall;
 	public static Block storageBox;
@@ -211,6 +212,7 @@ public class MoreInventoryMod
 		int i = 0;
 		network.registerMessage(ConfigSyncMessage.class, ConfigSyncMessage.class, i++, Side.SERVER);
 		network.registerMessage(OpenUrlMessage.class, OpenUrlMessage.class, i++, Side.CLIENT);
+		network.registerMessage(PlayerNameCacheMessage.class, PlayerNameCacheMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Client.class, PouchMessage.class, i++, Side.CLIENT);
 		network.registerMessage(PouchMessage.Server.class, PouchMessage.class, i++, Side.SERVER);
 		network.registerMessage(TransportManagerMessage.Client.class, TransportManagerMessage.class, i++, Side.CLIENT);

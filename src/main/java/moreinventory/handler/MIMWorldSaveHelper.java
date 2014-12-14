@@ -1,5 +1,6 @@
 package moreinventory.handler;
 
+import com.google.common.collect.Lists;
 import cpw.mods.fml.relauncher.FMLInjectionData;
 import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import moreinventory.util.IWorldDataSave;
@@ -30,6 +31,11 @@ public class MIMWorldSaveHelper
 		this.saveFile = new File(FMLLaunchHandler.side().isClient() ? savesDir : rootDir, name + ".dat");
 		this.saveList = list;
 		this.loadData();
+	}
+
+	public MIMWorldSaveHelper(World world, String name, IWorldDataSave... data)
+	{
+		this(world, name, Lists.newArrayList(data));
 	}
 
 	public void saveData()
