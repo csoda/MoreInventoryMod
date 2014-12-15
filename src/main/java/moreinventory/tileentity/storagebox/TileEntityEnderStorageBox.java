@@ -22,7 +22,7 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return slot == 0 && MIMUtils.compareStacksWithDamage(itemstack, getContents()) && !itemstack.hasTagCompound();
+		return slot == 0 && isSameAsContents(itemstack) && !itemstack.hasTagCompound();
 	}
 
 	@Override
@@ -55,9 +55,9 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 
 	public void updateDisplayedSize()
 	{
-		for (int i = 0; i < enderBoxList.getListSize(); i++)
+		for (int i = 0; i < enderBoxList.getListSize(); ++i)
 		{
-			if (MIMUtils.compareStacksWithDamage(enderBoxList.getItem(i), getContents()))
+			if (isSameAsContents(enderBoxList.getItem(i)))
 			{
 				World world = DimensionManager.getWorld(enderBoxList.getDimensionID(i));
 
@@ -86,9 +86,9 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 		{
 			enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, itemstack);
 			itemList.registerItem(itemstack);
+			markDirty();
+			storageItems = itemList.getInventory(getContents());
 		}
-
-		markDirty();
 
 		return false;
 	}

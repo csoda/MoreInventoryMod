@@ -12,7 +12,6 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -124,36 +123,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public ItemStack getContents()
 	{
 		return contents;
-	}
-
-	public Item getContentsItem()
-	{
-		ItemStack itemstack = getContents();
-
-		if (itemstack != null)
-		{
-			return itemstack.getItem();
-		}
-
-		return null;
-	}
-
-	public void setContents(ItemStack itemstack)
-	{
-		if (itemstack != null)
-		{
-			contents = itemstack;
-		}
-	}
-
-	public int getContentsDamage()
-	{
-		if (contents != null)
-		{
-			return contents.getItemDamage();
-		}
-
-		return 0;
 	}
 
 	@Override

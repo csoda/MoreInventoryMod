@@ -10,7 +10,7 @@ import java.util.List;
 
 public class MIMItemBoxList extends MIMBoxList
 {
-	private List<ItemStack> itemList = Lists.newArrayList();
+	private final List<ItemStack> itemList = Lists.newArrayList();
 
 	public MIMItemBoxList() {}
 
@@ -34,10 +34,8 @@ public class MIMItemBoxList extends MIMBoxList
 
 			return true;
 		}
-		else
-		{
-			registerItem(x, y, z, d, itemstack);
-		}
+
+		registerItem(x, y, z, d, itemstack);
 
 		return false;
 	}
@@ -66,12 +64,6 @@ public class MIMItemBoxList extends MIMBoxList
 	@Override
 	public void addAllBox(MIMBoxList csList) {}
 
-	public void addAllBoxList(MIMItemBoxList csList)
-	{
-		super.addAllBox(csList);
-		itemList.addAll(csList.itemList);
-	}
-
 	public ItemStack getItem(int i)
 	{
 		return i >= 0 && i < itemList.size() ? itemList.get(i) : null;
@@ -95,7 +87,7 @@ public class MIMItemBoxList extends MIMBoxList
 
 			if (x == pos[0] && y == pos[1] && z == pos[2] && dim == d)
 			{
-				itemList.add(itemstack);
+				itemList.add(i, itemstack);
 				flag = true;
 			}
 		}
@@ -139,9 +131,9 @@ public class MIMItemBoxList extends MIMBoxList
 
 		if (list != null)
 		{
-			itemList = Lists.newArrayListWithCapacity(list.tagCount());
+			itemList.clear();
 
-			for (int i = 0; i < itemList.size(); i++)
+			for (int i = 0; i < list.tagCount(); i++)
 			{
 				NBTTagCompound data = list.getCompoundTagAt(i);
 				itemList.add(data.getInteger("Index"), ItemStack.loadItemStackFromNBT(data));

@@ -55,6 +55,12 @@ public class BlockStorageBox extends BlockContainer
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int idk, float hitX, float hitY, float hitZ)
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
+
+		if (world.isRemote && tile.getStorageBoxType() != StorageBoxType.Glass)
+		{
+			return true;
+		}
+
 		ItemStack itemstack = player.getCurrentEquippedItem();
 
 		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.noFunctionItems && itemstack.getItemDamage() == 3 && tile.getStorageBoxType() != StorageBoxType.Glass)
