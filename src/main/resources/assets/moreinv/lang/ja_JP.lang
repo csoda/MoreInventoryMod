@@ -26,8 +26,12 @@ containerbox:Emerald.name=エメラルドのコンテナ
 containerbox:Ender.name=エンダーコンテナ
 containerbox:Steel.name=鋼鉄のコンテナ
 containerbox.gui.details=詳細
-containerbox.gui.private=個人
-containerbox.gui.insert=インサート
+containerbox.gui.private=孤立
+containerbox.gui.private.tooltip=有効にすると、他のコンテナとの連結を行いません。
+containerbox.gui.nbt=NBT
+containerbox.gui.nbt.tooltip=無効にすると、アイテムのNBTのチェックを行いません。アイテム未登録時にのみ変更することができます。
+containerbox.gui.insert=搬入
+containerbox.gui.insert.tooltip=無効にすると、アイテムの搬入を行いません。
 containerbox.gui.connection=接続
 containerbox.gui.tier=ランク
 

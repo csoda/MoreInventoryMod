@@ -95,7 +95,7 @@ public class MoreInventoryMod
 
 	public static final String defaultOwnerID = "No UUID";
 
-	public static MIMWorldSaveHelper saveHelper;
+	public static MIMWorldSaveHelper saveHandler;
 
 	public static final PlayerNameCache playerNameCache = new PlayerNameCache();
 

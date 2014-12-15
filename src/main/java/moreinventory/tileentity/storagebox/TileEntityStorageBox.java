@@ -12,7 +12,6 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -124,37 +123,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public ItemStack getContents()
 	{
 		return contents;
-	}
-
-	public Item getContentsItem()
-	{
-		Item item = null;
-		ItemStack itemstack = getContents();
-
-		if (itemstack != null)
-		{
-			item = itemstack.getItem();
-		}
-
-		return item;
-	}
-
-	public void setContents(ItemStack itemstack)
-	{
-		if (itemstack != null)
-		{
-			contents = itemstack;
-		}
-	}
-
-	public int getContentsDamage()
-	{
-		if (contents != null)
-		{
-			return contents.getItemDamage();
-		}
-
-		return 0;
 	}
 
 	@Override
@@ -271,7 +239,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (!worldObj.isRemote)
 		{
-			getContentItemCount();
 			getStorageBoxNetworkManager().updateOnInvChanged(worldObj, xCoord, yCoord, zCoord, getContents());
 			sendPacket();
 		}
@@ -572,7 +539,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			ownerID = entity.getUniqueID().toString();
 		}
 
-		for (int i = 0; i < 6; i++)
+		markDirty();
+
+		for (int i = 0; i < 6; ++i)
 		{
 			int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, Facing.oppositeSide[i]);
 			TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);

@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
+import java.util.Locale;
 import java.util.Map;
 
 public enum EnumSBAddon
@@ -58,12 +59,15 @@ public enum EnumSBAddon
 	public static Map<String, IIcon> registerIcon(IIconRegister iconRegister)
 	{
 		Map<String, IIcon> iconMap = Maps.newHashMap();
+		EnumSBAddon[] addons = values();
 
-		for (int i = 0; i < values().length; i++)
+		for (EnumSBAddon addon : addons)
 		{
-			for (int j = 0; j < values()[i].icons.length; j++)
+			for (String icon : addon.icons)
 			{
-				iconMap.put(values()[i].name() + "_" + values()[i].icons[j], iconRegister.registerIcon("moreinv:" + values()[i].name() + "_" + values()[i].icons[j]));
+				String name = addon.name().toLowerCase(Locale.ENGLISH) + "_" + icon;
+
+				iconMap.put(name, iconRegister.registerIcon("moreinv:" + name));
 			}
 		}
 
@@ -80,17 +84,18 @@ public enum EnumSBAddon
 	public static IIcon getIcon(Map<String, IIcon> map, int side, int meta)
 	{
 		EnumSBAddon addon = values()[meta];
+		String name = addon.name().toLowerCase(Locale.ENGLISH);
 
 		if (meta == 0)
 		{
 			switch (side)
 			{
 				case 0:
-					return map.get(addon.name() + "_" + addon.icons[2]);
+					return map.get(name + "_" + addon.icons[2]);
 				case 1:
-					return map.get(addon.name() + "_" + addon.icons[1]);
+					return map.get(name + "_" + addon.icons[1]);
 				default:
-					return map.get(addon.name() + "_" + addon.icons[0]);
+					return map.get(name + "_" + addon.icons[0]);
 			}
 		}
 

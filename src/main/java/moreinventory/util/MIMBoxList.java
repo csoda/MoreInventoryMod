@@ -1,5 +1,6 @@
 package moreinventory.util;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -8,7 +9,7 @@ import net.minecraftforge.common.DimensionManager;
 
 import java.util.List;
 
-public class MIMBoxList implements IWorldDataSave
+public class MIMBoxList implements INBTSaveData
 {
 	private final List<Integer> listX = Lists.newArrayList();
 	private final List<Integer> listY = Lists.newArrayList();
@@ -140,7 +141,7 @@ public class MIMBoxList implements IWorldDataSave
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
-		if (tagName != null)
+		if (!Strings.isNullOrEmpty(tagName))
 		{
 			NBTTagList list = new NBTTagList();
 

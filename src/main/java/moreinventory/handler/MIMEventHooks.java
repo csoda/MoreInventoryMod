@@ -16,8 +16,6 @@ import moreinventory.network.ConfigSyncMessage;
 import moreinventory.network.PlayerNameCacheMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
-import moreinventory.util.MIMItemBoxList;
-import moreinventory.util.MIMItemInvList;
 import moreinventory.util.MIMUtils;
 import moreinventory.util.Version;
 import net.minecraft.enchantment.Enchantment;
@@ -271,14 +269,13 @@ public class MIMEventHooks
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load event)
 	{
-		if (!event.world.isRemote)
+		World world = event.world;
+
+		if (!world.isRemote)
 		{
-			if (MoreInventoryMod.saveHelper == null || !MoreInventoryMod.saveHelper.world.getSaveHandler().getWorldDirectoryName().equals(event.world.getSaveHandler().getWorldDirectoryName()))
+			if (MoreInventoryMod.saveHandler == null || !MoreInventoryMod.saveHandler.world.getSaveHandler().getWorldDirectoryName().equals(world.getSaveHandler().getWorldDirectoryName()))
 			{
-				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
-				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");
-				TileEntityTeleporter.teleporterList = new MIMItemBoxList("Teleporter");
-				MoreInventoryMod.saveHelper = new MIMWorldSaveHelper(event.world, "MoreInvData", TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.playerNameCache);
+				MoreInventoryMod.saveHandler = new MIMWorldSaveHelper(world, "MoreInvData", TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.playerNameCache);
 			}
 		}
 	}
@@ -286,11 +283,13 @@ public class MIMEventHooks
 	@SubscribeEvent
 	public void onWorldUnload(WorldEvent.Unload event)
 	{
-		if (!event.world.isRemote && event.world.provider.dimensionId == 0)
+		World world = event.world;
+
+		if (!world.isRemote && world.provider.dimensionId == 0)
 		{
-			if (MoreInventoryMod.saveHelper != null)
+			if (MoreInventoryMod.saveHandler != null)
 			{
-				MoreInventoryMod.saveHelper.saveData();
+				MoreInventoryMod.saveHandler.saveData();
 			}
 		}
 	}

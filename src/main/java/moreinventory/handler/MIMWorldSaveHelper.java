@@ -1,13 +1,12 @@
 package moreinventory.handler;
 
 import com.google.common.collect.Lists;
-import cpw.mods.fml.relauncher.FMLInjectionData;
-import cpw.mods.fml.relauncher.FMLLaunchHandler;
-import moreinventory.util.IWorldDataSave;
+import moreinventory.util.INBTSaveData;
 import moreinventory.util.MIMLog;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.Level;
 
@@ -16,24 +15,20 @@ import java.util.List;
 
 public class MIMWorldSaveHelper
 {
-	private static final File
-	rootDir = (File)FMLInjectionData.data()[6], /* The minecraft dir */
-	savesDir = new File(rootDir, "saves");
-
 	public final World world;
 
 	private final File saveFile;
-	private final List<IWorldDataSave> saveList;
+	private final List<INBTSaveData> saveList;
 
-	public MIMWorldSaveHelper(World world, String name, List<IWorldDataSave> list)
+	public MIMWorldSaveHelper(World world, String name, List<INBTSaveData> list)
 	{
 		this.world = world;
-		this.saveFile = new File(FMLLaunchHandler.side().isClient() ? savesDir : rootDir, name + ".dat");
+		this.saveFile = new File(DimensionManager.getCurrentSaveRootDirectory(), name + ".dat");
 		this.saveList = list;
 		this.loadData();
 	}
 
-	public MIMWorldSaveHelper(World world, String name, IWorldDataSave... data)
+	public MIMWorldSaveHelper(World world, String name, INBTSaveData... data)
 	{
 		this(world, name, Lists.newArrayList(data));
 	}
@@ -44,7 +39,7 @@ public class MIMWorldSaveHelper
 		{
 			NBTTagCompound nbt = new NBTTagCompound();
 
-			for (IWorldDataSave save : saveList)
+			for (INBTSaveData save : saveList)
 			{
 				save.writeToNBT(nbt);
 			}
@@ -80,7 +75,7 @@ public class MIMWorldSaveHelper
 			{
 				NBTTagCompound nbt = CompressedStreamTools.readCompressed(new BufferedInputStream(new FileInputStream(saveFile)));
 
-				for (IWorldDataSave save : saveList)
+				for (INBTSaveData save : saveList)
 				{
 					save.readFromNBT(nbt);
 				}

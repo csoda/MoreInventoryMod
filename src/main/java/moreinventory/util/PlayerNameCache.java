@@ -8,7 +8,7 @@ import net.minecraft.nbt.NBTTagList;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class PlayerNameCache implements IWorldDataSave
+public class PlayerNameCache implements INBTSaveData
 {
 	private final Map<String, String> nameCache = Maps.newHashMap(); // <UUID,Name>
 
