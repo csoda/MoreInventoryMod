@@ -1,5 +1,6 @@
 package moreinventory.util;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -7,9 +8,10 @@ import net.minecraft.nbt.NBTTagList;
 
 import java.util.List;
 
-public class MIMItemInvList extends MIMItemList implements IWorldDataSave
+public class MIMItemInvList extends MIMItemList implements INBTSaveData
 {
-	private final List<ItemStack[]> inv = Lists.newArrayList();
+	private final List<ItemStack[]> inventories = Lists.newArrayList();
+
 	private String tagName;
 
 	public MIMItemInvList() {}
@@ -19,11 +21,11 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 		this.tagName = tag;
 	}
 
-	public ItemStack[] getInv(ItemStack itemstack)
+	public ItemStack[] getInventory(ItemStack itemstack)
 	{
 		int i = getItemIndex(itemstack);
 
-		return i != -1 ? inv.get(i) : new ItemStack[2];
+		return i != -1 ? inventories.get(i) : new ItemStack[2];
 	}
 
 	@Override
@@ -56,7 +58,7 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 		{
 			list.add(itemstack);
 			count.add(0);
-			inv.add(new ItemStack[2]);
+			inventories.add(new ItemStack[2]);
 		}
 	}
 
@@ -64,7 +66,7 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 	{
 		if (index != -1)
 		{
-			ItemStack[] items = inv.get(index);
+			ItemStack[] items = inventories.get(index);
 
 			if (items[0] != null)
 			{
@@ -123,22 +125,22 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
-		if (tagName != null)
+		if (!Strings.isNullOrEmpty(tagName))
 		{
 			NBTTagList nbttaglist = new NBTTagList();
 
 			for (int i = 0; i < list.size(); i++)
 			{
+				ItemStack itemstack = list.get(i);
 				NBTTagCompound data1 = new NBTTagCompound();
 				NBTTagCompound data2 = new NBTTagCompound();
-				ItemStack contents = list.get(i);
 
-				if (contents != null)
+				if (itemstack != null)
 				{
-					contents.writeToNBT(data2);
+					itemstack.writeToNBT(data2);
 				}
 
-				ItemStack itemstack = inv.get(i)[1];
+				itemstack = inventories.get(i)[1];
 
 				data1.setTag("Item", data2);
 				data1.setInteger("Count", count.get(i) + (itemstack != null ? itemstack.stackSize : 0));
@@ -161,7 +163,7 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 				NBTTagCompound data = nbttaglist.getCompoundTagAt(i);
 				list.add(ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")));
 				count.add(data.getInteger("Count"));
-				inv.add(new ItemStack[2]);
+				inventories.add(new ItemStack[2]);
 				updateState(i);
 			}
 		}

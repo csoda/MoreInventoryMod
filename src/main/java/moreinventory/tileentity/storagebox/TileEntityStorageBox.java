@@ -128,15 +128,14 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public Item getContentsItem()
 	{
-		Item item = null;
 		ItemStack itemstack = getContents();
 
 		if (itemstack != null)
 		{
-			item = itemstack.getItem();
+			return itemstack.getItem();
 		}
 
-		return item;
+		return null;
 	}
 
 	public void setContents(ItemStack itemstack)
@@ -271,7 +270,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (!worldObj.isRemote)
 		{
-			getContentItemCount();
 			getStorageBoxNetworkManager().updateOnInvChanged(worldObj, xCoord, yCoord, zCoord, getContents());
 			sendPacket();
 		}
@@ -572,7 +570,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			ownerID = entity.getUniqueID().toString();
 		}
 
-		for (int i = 0; i < 6; i++)
+		markDirty();
+
+		for (int i = 0; i < 6; ++i)
 		{
 			int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, Facing.oppositeSide[i]);
 			TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);

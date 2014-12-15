@@ -1,5 +1,6 @@
 package moreinventory.util;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class MIMItemBoxList extends MIMBoxList
 {
-	private final List<ItemStack> itemList = Lists.newArrayList();
+	private List<ItemStack> itemList = Lists.newArrayList();
 
 	public MIMItemBoxList() {}
 
@@ -33,8 +34,10 @@ public class MIMItemBoxList extends MIMBoxList
 
 			return true;
 		}
-
-		registerItem(x, y, z, d, itemstack);
+		else
+		{
+			registerItem(x, y, z, d, itemstack);
+		}
 
 		return false;
 	}
@@ -71,17 +74,12 @@ public class MIMItemBoxList extends MIMBoxList
 
 	public ItemStack getItem(int i)
 	{
-		return i < itemList.size() ? itemList.get(i) : null;
+		return i >= 0 && i < itemList.size() ? itemList.get(i) : null;
 	}
 
 	public int getItemDamage(int i)
 	{
-		ItemStack item = null;
-
-		if (i < itemList.size())
-		{
-			item = itemList.get(i);
-		}
+		ItemStack item = getItem(i);
 
 		return item != null ? item.getItemDamage() : 0;
 	}
@@ -90,14 +88,14 @@ public class MIMItemBoxList extends MIMBoxList
 	{
 		boolean flag = false;
 
-		for (int i = 0; i < itemList.size(); i++)
+		for (int i = 0; i < getListSize(); i++)
 		{
 			int[] pos = getBoxPos(i);
 			int dim = getDimensionID(i);
 
 			if (x == pos[0] && y == pos[1] && z == pos[2] && dim == d)
 			{
-				itemList.set(i, itemstack);
+				itemList.add(itemstack);
 				flag = true;
 			}
 		}
@@ -111,12 +109,12 @@ public class MIMItemBoxList extends MIMBoxList
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
-		if (tagName != null)
+		if (!Strings.isNullOrEmpty(tagName))
 		{
 			super.writeToNBT(nbt);
 			NBTTagList list = new NBTTagList();
 
-			for (int i = 0; i < itemList.size(); i++)
+			for (int i = 0; i < itemList.size(); ++i)
 			{
 				ItemStack itemstack = getItem(i);
 
@@ -137,17 +135,15 @@ public class MIMItemBoxList extends MIMBoxList
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-
-		itemList.clear();
-
 		NBTTagList list = (NBTTagList)nbt.getTag(tagName + "Item");
 
 		if (list != null)
 		{
-			for (int i = 0; i < list.tagCount(); i++)
+			itemList = Lists.newArrayListWithCapacity(list.tagCount());
+
+			for (int i = 0; i < itemList.size(); i++)
 			{
 				NBTTagCompound data = list.getCompoundTagAt(i);
-
 				itemList.add(data.getInteger("Index"), ItemStack.loadItemStackFromNBT(data));
 			}
 		}

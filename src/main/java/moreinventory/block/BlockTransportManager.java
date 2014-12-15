@@ -38,11 +38,9 @@ public class BlockTransportManager extends BlockContainer
 			{
 				player.openGui(MoreInventoryMod.instance, 2, world, x, y, z);
 			}
-			else if(player.getCurrentEquippedItem() == null)
+			else if (player.getCurrentEquippedItem() == null)
 			{
-				TileEntityTransportManager tile = (TileEntityTransportManager) world.getTileEntity(x, y, z);
-				tile.rotateBlock();
-
+				((TileEntityTransportManager) world.getTileEntity(x, y, z)).rotateBlock();
 			}
 		}
 

@@ -11,41 +11,29 @@ import net.minecraftforge.common.DimensionManager;
 
 public class TileEntityEnderStorageBox extends TileEntityStorageBox
 {
-	public static MIMItemInvList itemList;
-	public static MIMItemBoxList enderBoxList;
+	public static final MIMItemInvList itemList = new MIMItemInvList("EnderStorageBoxInv");
+	public static final MIMItemBoxList enderBoxList = new MIMItemBoxList("EnderStorageBox");
 
 	public TileEntityEnderStorageBox()
 	{
 		super(StorageBoxType.Ender);
 	}
 
-	public ItemStack[] getInv()
-	{
-		if (itemList != null)
-		{
-			return itemList.getInv(getContents());
-		}
-
-		return new ItemStack[2];
-	}
-
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return slot == 0 && itemstack != null && itemstack.getItem() == getContentsItem() && itemstack.getItemDamage() == getContentsDamage() && !itemstack.hasTagCompound();
+		return slot == 0 && MIMUtils.compareStacksWithDamage(itemstack, getContents()) && !itemstack.hasTagCompound();
 	}
 
 	@Override
 	public int getContentItemCount()
 	{
-		int count = itemList.getItemCount(getContents());
+		contentsCount = itemList.getItemCount(getContents());
 
 		if (storageItems[1] != null)
 		{
-			count += storageItems[1].stackSize;
+			contentsCount += storageItems[1].stackSize;
 		}
-
-		contentsCount = count;
 
 		return contentsCount;
 	}
@@ -71,16 +59,15 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 		{
 			if (MIMUtils.compareStacksWithDamage(enderBoxList.getItem(i), getContents()))
 			{
-				int[] pos = enderBoxList.getBoxPos(i);
 				World world = DimensionManager.getWorld(enderBoxList.getDimensionID(i));
 
 				if (world != null)
 				{
+					int[] pos = enderBoxList.getBoxPos(i);
 					TileEntity tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 
 					if (tile != null && tile instanceof TileEntityEnderStorageBox)
 					{
-						((TileEntityStorageBox)tile).getContentItemCount();
 						((TileEntityStorageBox)tile).sendPacket();
 					}
 					else
@@ -95,14 +82,15 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	@Override
 	public boolean registerItems(ItemStack itemstack)
 	{
-		boolean result = super.registerItems(itemstack);
+		if (super.registerItems(itemstack))
+		{
+			enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, itemstack);
+			itemList.registerItem(itemstack);
+		}
 
-		enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
-		itemList.registerItem(getContents());
+		markDirty();
 
-		storageItems = itemList.getInv(getContents());
-
-		return result;
+		return false;
 	}
 
 	@Override
@@ -110,6 +98,6 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	{
 		super.readFromNBT(nbt);
 
-		storageItems = getInv();
+		storageItems = itemList.getInventory(getContents());
 	}
 }

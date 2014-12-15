@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class SlotConfig extends Slot
 {
@@ -15,7 +16,7 @@ public class SlotConfig extends Slot
 	@Override
 	public int getSlotStackLimit()
 	{
-		return 0;
+		return 1;
 	}
 
 	@Override
@@ -35,9 +36,14 @@ public class SlotConfig extends Slot
 	{
 		if (itemstack != null)
 		{
-			ItemStack itemstack1 = itemstack.copy();
-			itemstack1.stackSize = 0;
-			inventory.setInventorySlotContents(getSlotIndex(), itemstack1);
+			ItemStack item = new ItemStack(itemstack.getItem(), 1, itemstack.getItemDamage());
+
+			if (itemstack.getTagCompound() != null)
+			{
+				item.setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
+			}
+
+			inventory.setInventorySlotContents(getSlotIndex(), item);
 		}
 
 		onSlotChanged();

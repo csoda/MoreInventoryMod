@@ -19,10 +19,10 @@ public class TileEntityTransportManagerRenderer extends TileEntitySpecialRendere
 	static
 	{
 		transportManagerTextures[0] = new ResourceLocation("textures/blocks/anvil_base.png");
-		transportManagerTextures[1] = new ResourceLocation("moreinv:textures/blocks/Importer.png");
-		transportManagerTextures[2] = new ResourceLocation("moreinv:textures/blocks/Importer_black.png");
-		transportManagerTextures[3] = new ResourceLocation("moreinv:textures/blocks/Exporter.png");
-		transportManagerTextures[4] = new ResourceLocation("moreinv:textures/blocks/Exporter_black.png");
+		transportManagerTextures[1] = new ResourceLocation("moreinv:textures/blocks/importer.png");
+		transportManagerTextures[2] = new ResourceLocation("moreinv:textures/blocks/importer_black.png");
+		transportManagerTextures[3] = new ResourceLocation("moreinv:textures/blocks/exporter.png");
+		transportManagerTextures[4] = new ResourceLocation("moreinv:textures/blocks/exporter_black.png");
 	}
 
 	private final ModelImporter model = new ModelImporter();

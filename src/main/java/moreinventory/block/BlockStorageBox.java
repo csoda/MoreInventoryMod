@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.List;
+import java.util.Locale;
 
 public class BlockStorageBox extends BlockContainer
 {
@@ -38,13 +39,14 @@ public class BlockStorageBox extends BlockContainer
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons_glass;
 	@SideOnly(Side.CLIENT)
-	private IIcon icon_glass_air;
+	private IIcon icon_air;
 	@SideOnly(Side.CLIENT)
 	private byte[][] glassIndex;
 
 	public BlockStorageBox(Material material)
 	{
 		super(material);
+		this.setBlockTextureName("moreinv:storagebox");
 		this.setHardness(2.0F);
         this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
@@ -199,18 +201,21 @@ public class BlockStorageBox extends BlockContainer
 		icons_top = new IIcon[StorageBoxType.values().length];
 		icons_face = new IIcon[StorageBoxType.values().length];
 		icons_glass = new IIcon[16];
+		icon_air = iconRegister.registerIcon("moreinv:air");
 
 		for (int i = 0; i < StorageBoxType.values().length; i++)
 		{
+			String name = StorageBoxType.values()[i].name().toLowerCase(Locale.ENGLISH);
+
 			if (i != 8)
 			{
-				icons[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_side");
-				icons_top[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_top");
-				icons_face[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "_face");
+				icons[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_side");
+				icons_top[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_top");
+				icons_face[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_face");
 			}
 			else
 			{
-				icons[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[i].name() + "0");
+				icons[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_0");
 				icons_top[i] = icons[i];
 				icons_face[i] = icons[i];
 			}
@@ -218,10 +223,8 @@ public class BlockStorageBox extends BlockContainer
 
 		for (int i = 0; i < 16; i++)
 		{
-			icons_glass[i] = iconRegister.registerIcon("moreinv:Box_" + StorageBoxType.values()[8].name() + i);
+			icons_glass[i] = iconRegister.registerIcon(getTextureName() + "_" + StorageBoxType.Glass.name().toLowerCase(Locale.ENGLISH) + "_" + i);
 		}
-
-		icon_glass_air = iconRegister.registerIcon("moreinv:Box_Glass_Air");
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -235,16 +238,15 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
 	{
-		int metadata = world.getBlockMetadata(x, y, z);
-		int face = ((TileEntityStorageBox)world.getTileEntity(x, y, z)).face;
+		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 
-		if (metadata == 8)
+		if (tile.getStorageBoxType() == StorageBoxType.Glass)
 		{
 			int pos[] = MIMUtils.getSidePos(x, y, z, side);
 
 			if (world.getBlock(pos[0], pos[1], pos[2]) == this || world.getBlock(pos[0], pos[1], pos[2]).isNormalCube())
 			{
-				return icon_glass_air;
+				return icon_air;
 			}
 			else if (Config.clearGlassBox)
 			{
@@ -252,12 +254,14 @@ public class BlockStorageBox extends BlockContainer
 			}
 		}
 
+		int meta = tile.getBlockMetadata();
+
 		if (Config.containerBoxSideTexture)
 		{
-			return side == 0 || side == 1 ? icons_top[metadata] : side == face ? icons_face[metadata] : icons[metadata];
+			return side == 0 || side == 1 ? icons_top[meta] : side == tile.face ? icons_face[meta] : icons[meta];
 		}
 
-		return getIcon(side, metadata);
+		return getIcon(side, meta);
 	}
 
 	@SideOnly(Side.CLIENT)
