@@ -27,7 +27,11 @@ containerbox:Ender.name=Ender Container Box
 containerbox:Steel.name=Steel Container Box
 containerbox.gui.details=Details
 containerbox.gui.private=Private
+containerbox.gui.private.tooltip=When you enable, this container box refuse the connection between the other container boxes.
+containerbox.gui.nbt=NBT
+containerbox.gui.nbt.tooltip=When you disable, this container box does not check NBT. You can change only when item does not registered.
 containerbox.gui.insert=Insert
+containerbox.gui.insert.tooltip=When you disable, this container box refuse the insert.
 containerbox.gui.connection=Connection
 containerbox.gui.tier=Tier
 

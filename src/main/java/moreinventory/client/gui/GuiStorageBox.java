@@ -1,5 +1,6 @@
 package moreinventory.client.gui;
 
+import cpw.mods.fml.client.config.HoverChecker;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.gui.button.GuiButtonStorageBox;
@@ -25,6 +26,8 @@ public class GuiStorageBox extends GuiContainer
 	private final ItemStack contents;
 	private final int maxStack;
 
+	protected HoverChecker privateHover, nbtHover, insertHover;
+
 	public GuiStorageBox(InventoryPlayer inventory, TileEntityStorageBox tile)
 	{
 		super(new ContainerStorageBox(inventory, tile));
@@ -42,7 +45,7 @@ public class GuiStorageBox extends GuiContainer
 		super.initGui();
 
 		buttonList.add(new GuiButtonStorageBox(0, guiLeft + 23, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.private") + "]", storageBox.isPrivate));
-		buttonList.add(new GuiButtonStorageBox(1, guiLeft + 75, guiTop + 35, 30, 20, "[NBT]", storageBox.checkNBT));
+		buttonList.add(new GuiButtonStorageBox(1, guiLeft + 75, guiTop + 35, 30, 20, "[" + I18n.format("containerbox.gui.nbt") + "]", storageBox.checkNBT));
 		buttonList.add(new GuiButtonStorageBox(2, guiLeft + 107, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.insert") + "]", storageBox.canInsert));
 
 		if (!usingPlayer.getUniqueID().toString().equals(storageBox.getOwner()))
@@ -60,6 +63,10 @@ public class GuiStorageBox extends GuiContainer
 		{
 			((GuiButton)buttonList.get(1)).enabled = false;
 		}
+
+		privateHover = new HoverChecker((GuiButton)buttonList.get(0), 800);
+		nbtHover = new HoverChecker((GuiButton)buttonList.get(1), 800);
+		insertHover = new HoverChecker((GuiButton)buttonList.get(2), 800);
 	}
 
 	@Override
@@ -76,6 +83,25 @@ public class GuiStorageBox extends GuiContainer
 		((GuiButtonStorageBox)buttonList.get(0)).isPushed = storageBox.isPrivate();
 		((GuiButtonStorageBox)buttonList.get(1)).isPushed = storageBox.checkNBT;
 		((GuiButtonStorageBox)buttonList.get(2)).isPushed = storageBox.canInsert;
+	}
+
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float ticks)
+	{
+		super.drawScreen(mouseX, mouseY, ticks);
+
+		if (privateHover.checkHover(mouseX, mouseY))
+		{
+			func_146283_a(fontRendererObj.listFormattedStringToWidth(I18n.format("containerbox.gui.private.tooltip"), width / 2), mouseX, mouseY);
+		}
+		else if (nbtHover.checkHover(mouseX, mouseY))
+		{
+			func_146283_a(fontRendererObj.listFormattedStringToWidth(I18n.format("containerbox.gui.nbt.tooltip"), width / 2), mouseX, mouseY);
+		}
+		else if (insertHover.checkHover(mouseX, mouseY))
+		{
+			func_146283_a(fontRendererObj.listFormattedStringToWidth(I18n.format("containerbox.gui.insert.tooltip"), width / 2), mouseX, mouseY);
+		}
 	}
 
 	@Override
