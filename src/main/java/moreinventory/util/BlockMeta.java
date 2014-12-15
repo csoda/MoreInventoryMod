@@ -2,6 +2,7 @@ package moreinventory.util;
 
 import com.google.common.base.Objects;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 
 public class BlockMeta
 {
@@ -10,8 +11,13 @@ public class BlockMeta
 
 	public BlockMeta(Block block, int metadata)
 	{
-		this.block = block;
+		this.block = block == null ? Blocks.air : block;
 		this.meta = metadata;
+	}
+
+	public BlockMeta(String name, int metadata)
+	{
+		this(Block.getBlockFromName(name), metadata);
 	}
 
 	@Override

@@ -152,15 +152,18 @@ public class MIMItemInvList extends MIMItemList implements IWorldDataSave
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
-		NBTTagList nbttaglist = nbt.getTagList(tagName, 10);
+		NBTTagList nbttaglist = (NBTTagList)nbt.getTag(tagName);
 
-		for (int i = 0; i < nbttaglist.tagCount(); i++)
+		if (nbttaglist != null)
 		{
-			NBTTagCompound data = nbttaglist.getCompoundTagAt(i);
-			list.add(ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")));
-			count.add(data.getInteger("Count"));
-			inv.add(new ItemStack[2]);
-			updateState(i);
+			for (int i = 0; i < nbttaglist.tagCount(); i++)
+			{
+				NBTTagCompound data = nbttaglist.getCompoundTagAt(i);
+				list.add(ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")));
+				count.add(data.getInteger("Count"));
+				inv.add(new ItemStack[2]);
+				updateState(i);
+			}
 		}
 	}
 }

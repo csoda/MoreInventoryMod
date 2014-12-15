@@ -162,15 +162,18 @@ public class MIMBoxList implements IWorldDataSave
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
-		NBTTagList list = nbt.getTagList(tagName, 10);
+		NBTTagList list = (NBTTagList)nbt.getTag(tagName);
 
-		for (int i = 0; i < list.tagCount(); i++)
+		if (list != null)
 		{
-			NBTTagCompound data = list.getCompoundTagAt(i);
-			listX.add(data.getInteger("X"));
-			listY.add(data.getInteger("Y"));
-			listZ.add(data.getInteger("Z"));
-			dimension.add(data.getInteger("D"));
+			for (int i = 0; i < list.tagCount(); i++)
+			{
+				NBTTagCompound data = list.getCompoundTagAt(i);
+				listX.add(data.getInteger("X"));
+				listY.add(data.getInteger("Y"));
+				listZ.add(data.getInteger("Z"));
+				dimension.add(data.getInteger("D"));
+			}
 		}
 	}
 }

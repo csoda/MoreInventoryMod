@@ -209,17 +209,20 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		NBTTagList list = nbt.getTagList("items", 10);
+		NBTTagList list = (NBTTagList)nbt.getTag("items");
 		inventoryItems = new ItemStack[getSizeInventory()];
 
-		for (int i = 0; i < list.tagCount(); ++i)
+		if (list != null)
 		{
-			NBTTagCompound data = list.getCompoundTagAt(i);
-			int slot = data.getByte("Slot") & 255;
-
-			if (slot >= 0 && slot < inventoryItems.length)
+			for (int i = 0; i < list.tagCount(); ++i)
 			{
-				inventoryItems[slot] = ItemStack.loadItemStackFromNBT(data);
+				NBTTagCompound data = list.getCompoundTagAt(i);
+				int slot = data.getByte("Slot") & 255;
+
+				if (slot >= 0 && slot < inventoryItems.length)
+				{
+					inventoryItems[slot] = ItemStack.loadItemStackFromNBT(data);
+				}
 			}
 		}
 

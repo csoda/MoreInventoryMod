@@ -49,7 +49,6 @@ public class TileEntityGlassStorageBox extends TileEntityStorageBox
 
 				getStorageBoxNetworkManager().linkedCollect(player.inventory);
 				updatePlayerInventory(player);
-				player.onUpdate();
 				break;
 			default:
 				clickCount = 0;

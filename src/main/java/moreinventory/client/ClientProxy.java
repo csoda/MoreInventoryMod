@@ -12,7 +12,7 @@ import moreinventory.core.MoreInventoryMod;
 import moreinventory.tileentity.TileEntityCatchall;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
-import moreinventory.util.MIMUtils;
+import net.minecraft.item.Item;
 import net.minecraftforge.client.MinecraftForgeClient;
 
 @SideOnly(Side.CLIENT)
@@ -25,6 +25,6 @@ public class ClientProxy extends CommonProxy
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCatchall.class, new TileEntityCatchallRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTransportManager.class, new TileEntityTransportManagerRenderer());
 
-		MinecraftForgeClient.registerItemRenderer(MIMUtils.getItemBlock(MoreInventoryMod.catchall), new ItemCatchallRenderer());
+		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(MoreInventoryMod.catchall), new ItemCatchallRenderer());
 	}
 }

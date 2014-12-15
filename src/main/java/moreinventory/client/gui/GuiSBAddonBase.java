@@ -93,7 +93,7 @@ public abstract class GuiSBAddonBase extends GuiContainer
 
 		if (xSize < x && x < xSize + 20 && 0 < y && y < 20)
 		{
-			drawCreativeTabHoveringText(I18n.format("moreinv.gui.owner") + ": " + addonBase.displayedOwnerName, x - 30, y);
+			drawCreativeTabHoveringText(I18n.format("moreinv.gui.owner") + ": " + addonBase.getOwnerName(), x - 30, y);
 		}
 	}
 

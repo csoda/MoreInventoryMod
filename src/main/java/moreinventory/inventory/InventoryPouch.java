@@ -268,16 +268,19 @@ public class InventoryPouch implements IInventory
 				return;
 			}
 
-			NBTTagList list = nbt.getTagList("Items", 10);
+			NBTTagList list = (NBTTagList)nbt.getTag("Items");
 
-			for (int i = 0; i < list.tagCount(); i++)
+			if (list != null)
 			{
-				NBTTagCompound data = list.getCompoundTagAt(i);
-				int slot = data.getByte("Slot") & 0xFF;
-
-				if (slot >= 0 && slot < pouchItems.length)
+				for (int i = 0; i < list.tagCount(); i++)
 				{
-					pouchItems[slot] = ItemStack.loadItemStackFromNBT(data);
+					NBTTagCompound data = list.getCompoundTagAt(i);
+					int slot = data.getByte("Slot") & 0xFF;
+
+					if (slot >= 0 && slot < pouchItems.length)
+					{
+						pouchItems[slot] = ItemStack.loadItemStackFromNBT(data);
+					}
 				}
 			}
 

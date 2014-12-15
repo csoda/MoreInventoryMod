@@ -25,6 +25,10 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 {
 	protected ItemStack[] storageItems;
 
+	private String ownerID = MoreInventoryMod.defaultOwnerID;
+	private StorageBoxType type;
+	private StorageBoxNetworkManager storageBoxManager;
+
 	private ItemStack contents;
 
 	public int contentsCount;
@@ -32,10 +36,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public boolean isPrivate = false;
 	public boolean canInsert = true;
 	public boolean checkNBT = true;
-
-	private String ownerID = MoreInventoryMod.defaultOwnerID;
-	private StorageBoxType type;
-	private StorageBoxNetworkManager storageBoxManager;
 
 	protected byte clickTime = 0;
 	protected byte clickCount = 0;
@@ -46,8 +46,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public int displayedStackCount;
 	@SideOnly(Side.CLIENT)
 	public int connectCount;
-	@SideOnly(Side.CLIENT)
-	public String displayedOwnerName;
 
 	public TileEntityStorageBox()
 	{
@@ -86,12 +84,12 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	@Override
 	public String getOwner()
 	{
-		return this.ownerID;
+		return ownerID;
 	}
 
 	public String getOwnerName()
 	{
-		return MoreInventoryMod.StorageBoxOwnerList.getOwnerName(getOwner());
+		return MoreInventoryMod.playerNameCache.getName(getOwner());
 	}
 
 	@Override
@@ -168,7 +166,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return slot != type.inventorySize ? storageItems[slot] : null;
+		return slot >= 0 && slot < storageItems.length ? storageItems[slot] : null;
 	}
 
 	@Override
@@ -197,12 +195,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				itemstack.stackSize = getInventoryStackLimit();
 			}
 		}
-		else
+		else if (slot < type.inventorySize)
 		{
-			if (slot < type.inventorySize)
-			{
-				storageItems[slot] = null;
-			}
+			storageItems[slot] = null;
 		}
 
 		markDirty();
@@ -314,7 +309,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		}
 	}
 
-
 	public boolean isSameAsContents(ItemStack itemstack)
 	{
 		boolean result = itemstack != null && (getContents() == null || MIMUtils.compareStacksWithDamage(itemstack, getContents()));
@@ -366,7 +360,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (getContents() != null)
 		{
-			for (int i = 0; i < inventory.getSizeInventory(); i++)
+			for (int i = 0; i < inventory.getSizeInventory(); ++i)
 			{
 				ItemStack itemstack = inventory.getStackInSlot(i);
 
@@ -418,7 +412,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return false;
 	}
 
-	public ItemStack loadItemStack(int flag)
+	public ItemStack loadItemStack(int max)
 	{
 		int maxCount = 0;
 		ItemStack result = null;
@@ -433,7 +427,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				{
 					result = itemstack.copy();
 					result.stackSize = 0;
-					maxCount = flag == 0 ? itemstack.getMaxStackSize() : flag;
+					maxCount = max == 0 ? itemstack.getMaxStackSize() : max;
 
 					if (maxCount > itemstack.getMaxStackSize())
 					{
@@ -468,14 +462,14 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public boolean rightClickEvent(World world, EntityPlayer player, int x, int y, int z)
 	{
 		boolean prevInsert = canInsert;
-		System.out.println(ownerID);
+
 		switch (++clickCount)
 		{
 			case 1:
 				clickTime = 16;
-
 				ItemStack itemstack = player.getCurrentEquippedItem();
-				if(itemstack !=null)
+
+				if (itemstack != null)
 				{
 					registerItems(itemstack);
 
@@ -483,18 +477,17 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 					tryPutIn(itemstack);
 					canInsert = prevInsert;
 				}
-				else if(player.isSneaking())
+				else if (player.isSneaking())
 				{
 					clearRegister();
 				}
+
 				break;
 			case 2:
 				canInsert = false;
 				collectAllItemStack(player.inventory);
 				canInsert = prevInsert;
-
 				updatePlayerInventory(player);
-				player.onUpdate();
 				break;
 			case 3:
 				clickCount = 0;
@@ -502,7 +495,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				getStorageBoxNetworkManager().linkedCollect(player.inventory);
 				storageBoxManager.updateOnTripleClicked(worldObj, xCoord, yCoord, zCoord, getContents());
 				updatePlayerInventory(player);
-				player.onUpdate();
 				break;
 			default:
 				clickCount = 0;
@@ -514,9 +506,16 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void leftClickEvent(EntityPlayer player)
 	{
-		if (getContents() != null && player.inventory.getFirstEmptyStack() != -1)
+		if (getContents() != null)
 		{
-			player.inventory.addItemStackToInventory(loadItemStack(!player.isSneaking() ? 0 : 1));
+			if (player.isSneaking())
+			{
+				player.inventory.addItemStackToInventory(loadItemStack(1));
+			}
+			else if (player.inventory.getFirstEmptyStack() != -1)
+			{
+				player.inventory.addItemStackToInventory(loadItemStack(0));
+			}
 		}
 	}
 
@@ -533,6 +532,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				player.inventory.setInventorySlotContents(i, null);
 			}
 		}
+
+		player.onUpdate();
 	}
 
 	@Override
@@ -568,7 +569,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (entity instanceof EntityPlayer)
 		{
-			ownerID = ((EntityPlayer)entity).getUniqueID().toString();
+			ownerID = entity.getUniqueID().toString();
 		}
 
 		for (int i = 0; i < 6; i++)
@@ -618,12 +619,15 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		super.readFromNBT(nbt);
 
-		NBTTagList list = nbt.getTagList("Items", 10);
+		NBTTagList list = (NBTTagList)nbt.getTag("Items");
 
-		for (int i = 0; i < list.tagCount(); ++i)
+		if (list != null)
 		{
-			NBTTagCompound data = list.getCompoundTagAt(i);
-			storageItems[data.getShort("Slot2")] = ItemStack.loadItemStackFromNBT(data);
+			for (int i = 0; i < list.tagCount(); ++i)
+			{
+				NBTTagCompound data = list.getCompoundTagAt(i);
+				storageItems[data.getShort("Slot2")] = ItemStack.loadItemStackFromNBT(data);
+			}
 		}
 
 		contents = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Contents"));
@@ -695,6 +699,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return null;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public void handlePacket(int config1, byte config2)
 	{
 		contentsCount = config1;
@@ -705,20 +710,10 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			int size = getContents().getMaxStackSize();
 			displayedStackSize = (byte)(contentsCount % size);
 			displayedStackCount = (contentsCount - displayedStackSize) / size;
-
-			if (displayedStackSize > 9999)
-			{
-				displayedStackCount = 1;
-
-				while (displayedStackSize > 99999)
-				{
-					displayedStackSize /= 10;
-					displayedStackCount++;
-				}
-			}
 		}
 	}
 
+	@SideOnly(Side.CLIENT)
 	public void handlePacketContents(ItemStack itemstack)
 	{
 		contents = itemstack;
@@ -731,7 +726,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		checkNBT = config2;
 		canInsert = config3;
 		connectCount = config4;
-		displayedOwnerName = owner;
+		ownerID = owner;
 	}
 
 	public void handlePacketButton(byte channel, String owner)
@@ -767,7 +762,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void sendGUIPacketToClient()
 	{
-		MoreInventoryMod.network.sendToDimension(new StorageBoxConfigMessage(xCoord, yCoord, zCoord, isPrivate, checkNBT, canInsert, getStorageBoxNetworkManager().getKnownList().getListSize(), getOwnerName()), worldObj.provider.dimensionId);
+		MoreInventoryMod.network.sendToDimension(new StorageBoxConfigMessage(xCoord, yCoord, zCoord, isPrivate, checkNBT, canInsert, getStorageBoxNetworkManager().getKnownList().getListSize(), ownerID), worldObj.provider.dimensionId);
 	}
 
 	public void sendGUIPacketToServer(byte channel)

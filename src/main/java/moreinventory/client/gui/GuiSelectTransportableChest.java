@@ -7,7 +7,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import cpw.mods.fml.client.config.GuiButtonExt;
 import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
@@ -37,6 +36,8 @@ import java.util.concurrent.RecursiveAction;
 public class GuiSelectTransportableChest extends GuiScreen
 {
 	private final GuiScreen parent;
+	private GuiTextField blockField;
+	private GuiTextField blockMetaField;
 
 	private ChestList chestList;
 	private GuiButton doneButton;
@@ -45,6 +46,13 @@ public class GuiSelectTransportableChest extends GuiScreen
 	public GuiSelectTransportableChest(GuiScreen parent)
 	{
 		this.parent = parent;
+	}
+
+	public GuiSelectTransportableChest(GuiScreen parent, GuiTextField blockField, GuiTextField blockMetaField)
+	{
+		this(parent);
+		this.blockField = blockField;
+		this.blockMetaField = blockMetaField;
 	}
 
 	@Override
@@ -88,6 +96,21 @@ public class GuiSelectTransportableChest extends GuiScreen
 			switch (button.id)
 			{
 				case 0:
+					if (!chestList.selected.isEmpty())
+					{
+						BlockMeta entry = chestList.selected.iterator().next();
+
+						if (blockField != null)
+						{
+							blockField.setText(MIMUtils.getUniqueName(entry.block));
+						}
+
+						if (blockMetaField != null)
+						{
+							blockMetaField.setText(Integer.toString(entry.meta));
+						}
+					}
+
 					mc.displayGuiScreen(parent);
 
 					if (parent == null)
@@ -339,7 +362,7 @@ public class GuiSelectTransportableChest extends GuiScreen
 					switch (nameType)
 					{
 						case 1:
-							name = GameRegistry.findUniqueIdentifierFor(entry.block).toString();
+							name = MIMUtils.getUniqueName(entry.block);
 							break;
 						case 2:
 							name = entry.block.getUnlocalizedName();
@@ -355,7 +378,7 @@ public class GuiSelectTransportableChest extends GuiScreen
 					switch (nameType)
 					{
 						case 1:
-							name = GameRegistry.findUniqueIdentifierFor(entry.block).toString() + ", " + itemstack.getItemDamage();
+							name = MIMUtils.getUniqueName(entry.block) + ", " + itemstack.getItemDamage();
 							break;
 						case 2:
 							name = itemstack.getUnlocalizedName();
@@ -367,7 +390,7 @@ public class GuiSelectTransportableChest extends GuiScreen
 					}
 				}
 			}
-			catch (Throwable e) {}
+			catch (Throwable ignored) {}
 
 			if (!Strings.isNullOrEmpty(name))
 			{

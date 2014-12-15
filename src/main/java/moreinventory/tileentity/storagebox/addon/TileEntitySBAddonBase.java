@@ -1,7 +1,5 @@
 package moreinventory.tileentity.storagebox.addon;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.SBAddonBaseConfigMessage;
 import moreinventory.network.SBAddonBaseMessage;
@@ -25,9 +23,6 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	private String ownerID = MoreInventoryMod.defaultOwnerID;
 	private boolean isPrivate = false;
 
-	@SideOnly(Side.CLIENT)
-	public String displayedOwnerName;
-
 	@Override
 	public StorageBoxNetworkManager getStorageBoxNetworkManager()
 	{
@@ -48,38 +43,18 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	@Override
 	public String getOwner()
 	{
-		return this.ownerID;
+		return ownerID;
 	}
 
 	public String getOwnerName()
 	{
-		return MoreInventoryMod.StorageBoxOwnerList.getOwnerName(getOwner());
-	}
-
-	public boolean isOwner(String name)
-	{
-		return ownerID.equals(name) || ownerID.equals(MoreInventoryMod.defaultOwnerID);
+		return MoreInventoryMod.playerNameCache.getName(ownerID);
 	}
 
 	@Override
 	public boolean isPrivate()
 	{
 		return isPrivate;
-	}
-
-	public void setPrivate(boolean flag)
-	{
-		isPrivate = flag;
-	}
-
-	public void togglePrivate(String name)
-	{
-		if (ownerID.equals(name) || ownerID.equals(MoreInventoryMod.defaultOwnerID))
-		{
-			isPrivate = !isPrivate;
-
-			sendCommonPacket();
-		}
 	}
 
 	@Override
@@ -97,7 +72,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
-		return storageItems[slot];
+		return slot >= 0 && slot < storageItems.length ? storageItems[slot] : null;
 	}
 
 	@Override
@@ -179,7 +154,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	{
 		if (entity instanceof EntityPlayer)
 		{
-			ownerID= ((EntityPlayer)entity).getUniqueID().toString();
+			ownerID = entity.getUniqueID().toString();
 		}
 
 		getStorageBoxNetworkManager().recreateNetwork();
@@ -200,12 +175,15 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 
 		if (storageItems != null)
 		{
-			NBTTagList list = nbt.getTagList("Items", 10);
+			NBTTagList list = (NBTTagList)nbt.getTag("Items");
 
-			for (int i = 0; i < list.tagCount(); ++i)
+			if (list != null)
 			{
-				NBTTagCompound data = list.getCompoundTagAt(i);
-				storageItems[data.getShort("Slot")] = ItemStack.loadItemStackFromNBT(data);
+				for (int i = 0; i < list.tagCount(); ++i)
+				{
+					NBTTagCompound data = list.getCompoundTagAt(i);
+					storageItems[data.getShort("Slot")] = ItemStack.loadItemStackFromNBT(data);
+				}
 			}
 		}
 
@@ -216,7 +194,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 
 		if (nbt.hasKey("owner"))
 		{
-			ownerID= nbt.getString("owner");
+			ownerID = nbt.getString("owner");
 		}
 	}
 
@@ -257,7 +235,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 
 	public void sendCommonPacket()
 	{
-		MoreInventoryMod.network.sendToDimension(new SBAddonBaseMessage(xCoord, yCoord, zCoord, isPrivate, getOwnerName()), worldObj.provider.dimensionId);
+		MoreInventoryMod.network.sendToDimension(new SBAddonBaseMessage(xCoord, yCoord, zCoord, isPrivate, ownerID), worldObj.provider.dimensionId);
 	}
 
 	public void sendCommonGuiPacketToClient(byte channel, boolean flag)
@@ -273,7 +251,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 	public void handlePacket(boolean flag, String owner)
 	{
 		isPrivate = flag;
-		displayedOwnerName= owner;
+		ownerID = owner;
 	}
 
 	public void handleConfigPacketClient(byte channel, boolean flag)
@@ -284,7 +262,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 		}
 	}
 
-	public void handleConfigPacketServer(byte channel, boolean flag, String owner)
+	public void handleConfigPacketServer(byte channel, String owner)
 	{
 		if (!isPrivate() || ownerID.equals(owner) || ownerID.equals(MoreInventoryMod.defaultOwnerID))
 		{
@@ -292,7 +270,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 			{
 				isPrivate = !isPrivate;
 
-				sendCommonGuiPacketToClient((byte) 0, this.isPrivate);
+				sendCommonGuiPacketToClient((byte)0, isPrivate);
 			}
 		}
 	}

@@ -45,7 +45,7 @@ public class GuiStorageBox extends GuiContainer
 		buttonList.add(new GuiButtonStorageBox(1, guiLeft + 75, guiTop + 35, 30, 20, "[NBT]", storageBox.checkNBT));
 		buttonList.add(new GuiButtonStorageBox(2, guiLeft + 107, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.insert") + "]", storageBox.canInsert));
 
-		if (!usingPlayer.getDisplayName().equals(storageBox.getOwnerName()))
+		if (!usingPlayer.getUniqueID().toString().equals(storageBox.getOwner()))
 		{
 			((GuiButton)buttonList.get(0)).enabled = false;
 
@@ -82,7 +82,7 @@ public class GuiStorageBox extends GuiContainer
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		fontRendererObj.drawString("[" + I18n.format("containerbox.gui.details") + "]", 25, 77, 4210752);
-		fontRendererObj.drawString(I18n.format("moreinv.gui.owner") + ": " + storageBox.displayedOwnerName, 30, 87, 4210752);
+		fontRendererObj.drawString(I18n.format("moreinv.gui.owner") + ": " + storageBox.getOwnerName(), 30, 87, 4210752);
 		fontRendererObj.drawString(I18n.format("containerbox.gui.connection") + ": " + storageBox.connectCount, 30, 98, 4210752);
 		fontRendererObj.drawString(I18n.format("containerbox.gui.tier") + ": " + storageBox.getStorageBoxType().tier, 30, 108, 4210752);
 
@@ -117,7 +117,7 @@ public class GuiStorageBox extends GuiContainer
 				drawTexturedModalRect(guiLeft + 57, guiTop + 65, xSize + 8 + (int)storageBox.getWorldObj().getTotalWorldTime() % 6, 0, width, 5);
 
 				String power = Integer.toString(15 * width / 64);
-				fontRendererObj.drawStringWithShadow(power, guiLeft + 88 - fontRendererObj.getStringWidth(power) / 2, guiTop + 65, 0x4dff00);
+				fontRendererObj.drawStringWithShadow(power, guiLeft + 88 - fontRendererObj.getStringWidth(power) / 2, guiTop + 65, 0x4DFF00);
 				fontRendererObj.drawString("E", guiLeft + 50, guiTop + 64, 4210752);
 				fontRendererObj.drawString("F", guiLeft + 123, guiTop + 64, 4210752);
 			}

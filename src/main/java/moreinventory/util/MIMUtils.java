@@ -86,20 +86,7 @@ public final class MIMUtils
 
 	public static boolean compareStacksWithDamage(ItemStack item1, ItemStack item2)
 	{
-		if (item1 != null && item2 != null)
-		{
-			if (item1.getItem() == item2.getItem() && (item1.isItemDamaged() && item2.isItemDamaged() || item1.getItemDamage() == item2.getItemDamage()))
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	public static Item getItemBlock(Block block)
-	{
-		return new ItemStack(block).getItem();
+		return item1 != null && item2 != null && item1.getItem() == item2.getItem() && (item1.isItemDamaged() && item2.isItemDamaged() || item1.getItemDamage() == item2.getItemDamage());
 	}
 
 	public static void checkNull(IInventory inventory)
@@ -119,7 +106,7 @@ public final class MIMUtils
 	{
 		ItemStack item = inventory.getStackInSlot(slot);
 
-		if (item != null && item.stackSize == 0)
+		if (item != null && item.stackSize <= 0)
 		{
 			inventory.setInventorySlotContents(slot, null);
 		}
@@ -157,7 +144,7 @@ public final class MIMUtils
 
 	public static boolean mergeItemStack(ItemStack itemstack, IInventory inventory, int side)
 	{
-		boolean flag = false;
+		boolean success = false;
 		int size = inventory.getSizeInventory();
 
 		if (itemstack == null)
@@ -171,35 +158,30 @@ public final class MIMUtils
 			{
 				ItemStack item = inventory.getStackInSlot(i);
 
-				if (item != null && item.getItem() == itemstack.getItem() && (!itemstack.getHasSubtypes() || itemstack.getItemDamage() == item.getItemDamage())
-					&& ItemStack.areItemStackTagsEqual(itemstack, item))
+				if (item != null && item.getItem() == itemstack.getItem() && (!itemstack.getHasSubtypes() || itemstack.getItemDamage() == item.getItemDamage()) && ItemStack.areItemStackTagsEqual(itemstack, item))
 				{
 					if (canAccessFromSide(inventory, i, side) && canInsertFromSide(inventory, itemstack, i, side))
 					{
-						int l = item.stackSize + itemstack.stackSize;
+						int sum = item.stackSize + itemstack.stackSize;
 
-						if (l <= itemstack.getMaxStackSize())
+						if (sum <= itemstack.getMaxStackSize())
 						{
 							itemstack.stackSize = 0;
-							ItemStack itemstack1 = item.copy();
-							itemstack1.stackSize = l;
-							inventory.setInventorySlotContents(i, itemstack1);
-							flag = true;
+							item.stackSize = sum;
+							success = true;
 						}
 						else if (item.stackSize < itemstack.getMaxStackSize())
 						{
 							itemstack.stackSize -= itemstack.getMaxStackSize() - item.stackSize;
-							ItemStack itemstack1 = item.copy();
-							itemstack1.stackSize = itemstack.getMaxStackSize();
-							inventory.setInventorySlotContents(i, itemstack1);
-							flag = true;
+							item.stackSize = itemstack.getMaxStackSize();
+							success = true;
 						}
 					}
 				}
 
-				if (itemstack.stackSize == 0)
+				if (itemstack.stackSize <= 0)
 				{
-					return flag;
+					return success;
 				}
 			}
 		}
@@ -214,24 +196,22 @@ public final class MIMUtils
 				{
 					inventory.setInventorySlotContents(i, itemstack.copy());
 					itemstack.stackSize = 0;
-					flag = true;
+					success = true;
 					break;
 				}
 			}
 		}
 
-		return flag;
+		return success;
 	}
 
 	public static boolean canAccessFromSide(IInventory inventory, int slot, int side)
 	{
 		if (inventory instanceof ISidedInventory)
 		{
-			int[] slots = ((ISidedInventory)inventory).getAccessibleSlotsFromSide(side);
-
-			for (int slot1 : slots)
+			for (int i : ((ISidedInventory)inventory).getAccessibleSlotsFromSide(side))
 			{
-				if (slot1 == slot)
+				if (i == slot)
 				{
 					return true;
 				}
