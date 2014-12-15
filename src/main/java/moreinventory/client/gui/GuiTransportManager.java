@@ -1,5 +1,6 @@
 package moreinventory.client.gui;
 
+import cpw.mods.fml.client.config.HoverChecker;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.gui.button.GuiButtonConfigString;
@@ -21,12 +22,16 @@ public class GuiTransportManager extends GuiContainer
 
 	private final TileEntityTransportManager transportManager;
 
-	public GuiTransportManager(InventoryPlayer inventoryPlayer, TileEntityTransportManager tileEntity)
+	protected GuiButtonConfigString registerButton;
+	protected GuiButton cludeButton;
+	protected HoverChecker cludeHover;
+
+	public GuiTransportManager(InventoryPlayer inventoryPlayer, TileEntityTransportManager tile)
 	{
-		super(new ContainerTransportManager(inventoryPlayer, tileEntity));
+		super(new ContainerTransportManager(inventoryPlayer, tile));
 		this.xSize = 176;
 		this.ySize = 190;
-		this.transportManager = tileEntity;
+		this.transportManager = tile;
 	}
 
 	@Override
@@ -44,8 +49,26 @@ public class GuiTransportManager extends GuiContainer
 
 		if (transportManager instanceof TileEntityImporter)
 		{
-			buttonList.add(new GuiButtonConfigString(7, (width - xSize) / 2 + 5, (height - ySize) / 2 + 35, 53, 20, I18n.format("moreinv.gui.register"), ((TileEntityImporter)transportManager).register));
-			buttonList.add(new GuiButton(8, (width - xSize) / 2 + xSize - 58, (height - ySize) / 2 + 35, 53, 20, ((TileEntityImporter)transportManager).include ? I18n.format("transportmanager.gui.include") : I18n.format("transportmanager.gui.exclude")));
+			if (registerButton == null)
+			{
+				registerButton = new GuiButtonConfigString(7, 0, 0, 53, 20, I18n.format("moreinv.gui.register"), ((TileEntityImporter)transportManager).register);
+			}
+
+			registerButton.xPosition = guiLeft + 5;
+			registerButton.yPosition = guiTop + 35;
+
+			if (cludeButton == null)
+			{
+				cludeButton = new GuiButton(8, 0, 0, 53, 20, ((TileEntityImporter)transportManager).include ? I18n.format("transportmanager.gui.include") : I18n.format("transportmanager.gui.exclude"));
+			}
+
+			cludeButton.xPosition = guiLeft + xSize - 58;
+			cludeButton.yPosition = guiTop + 35;
+
+			buttonList.add(registerButton);
+			buttonList.add(cludeButton);
+
+			cludeHover = new HoverChecker(cludeButton, 800);
 		}
 	}
 
@@ -70,11 +93,11 @@ public class GuiTransportManager extends GuiContainer
 			{
 				case 7:
 					((TileEntityImporter)transportManager).register = !((TileEntityImporter)transportManager).register;
-					((GuiButtonConfigString)buttonList.get(7)).isPushed = ((TileEntityImporter)transportManager).register;
+					registerButton.isPushed = ((TileEntityImporter)transportManager).register;
 					break;
 				case 8:
 					((TileEntityImporter)transportManager).include = !((TileEntityImporter)transportManager).include;
-					((GuiButton)buttonList.get(8)).displayString = ((TileEntityImporter)transportManager).include ? I18n.format("transportmanager.gui.include") : I18n.format("transportmanager.gui.exclude");
+					cludeButton.displayString = ((TileEntityImporter)transportManager).include ? I18n.format("transportmanager.gui.include") : I18n.format("transportmanager.gui.exclude");
 					break;
 			}
 
@@ -83,11 +106,30 @@ public class GuiTransportManager extends GuiContainer
 	}
 
 	@Override
+	public void drawScreen(int mouseX, int mouseY, float ticks)
+	{
+		super.drawScreen(mouseX, mouseY, ticks);
+
+		if (cludeHover != null && cludeHover.checkHover(mouseX, mouseY) && transportManager instanceof TileEntityImporter)
+		{
+			if (((TileEntityImporter)transportManager).include)
+			{
+				func_146283_a(fontRendererObj.listFormattedStringToWidth(I18n.format("transportmanager.gui.include.tooltip"), width / 2), mouseX, mouseY);
+			}
+			else
+			{
+				func_146283_a(fontRendererObj.listFormattedStringToWidth(I18n.format("transportmanager.gui.exclude.tooltip"), width / 2), mouseX, mouseY);
+			}
+		}
+	}
+
+	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		fontRendererObj.drawString(transportManager instanceof TileEntityImporter ? I18n.format("transportmanager:importer.name") : I18n.format("transportmanager:exporter.name"), 8, 6, 4210752);
+		boolean flag = transportManager instanceof TileEntityImporter;
+		fontRendererObj.drawString(flag ? I18n.format("transportmanager:importer.name") : I18n.format("transportmanager:exporter.name"), 8, 6, 4210752);
 		fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 120 + 2, 4210752);
-		fontRendererObj.drawString(I18n.format("transportmanager.gui.sneaking"), xSize + 18, 10, 4210752);
+		fontRendererObj.drawString(flag ? I18n.format("transportmanager.gui.sneaking.importer") : I18n.format("transportmanager.gui.sneaking.exporter"), xSize + 18, 10, 4210752);
 	}
 
 	@Override

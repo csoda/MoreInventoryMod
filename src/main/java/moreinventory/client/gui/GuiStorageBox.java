@@ -26,6 +26,7 @@ public class GuiStorageBox extends GuiContainer
 	private final ItemStack contents;
 	private final int maxStack;
 
+	protected GuiButtonStorageBox privateButton, nbtButton, insertButton;
 	protected HoverChecker privateHover, nbtHover, insertHover;
 
 	public GuiStorageBox(InventoryPlayer inventory, TileEntityStorageBox tile)
@@ -43,30 +44,55 @@ public class GuiStorageBox extends GuiContainer
 	public void initGui()
 	{
 		super.initGui();
+		int id = buttonList.size();
 
-		buttonList.add(new GuiButtonStorageBox(0, guiLeft + 23, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.private") + "]", storageBox.isPrivate));
-		buttonList.add(new GuiButtonStorageBox(1, guiLeft + 75, guiTop + 35, 30, 20, "[" + I18n.format("containerbox.gui.nbt") + "]", storageBox.checkNBT));
-		buttonList.add(new GuiButtonStorageBox(2, guiLeft + 107, guiTop + 35, 50, 20, "[" + I18n.format("containerbox.gui.insert") + "]", storageBox.canInsert));
+		if (privateButton == null)
+		{
+			privateButton = new GuiButtonStorageBox(id++, 0, 0, 50, 20, "[" + I18n.format("containerbox.gui.private") + "]", storageBox.isPrivate);
+		}
+
+		privateButton.xPosition = guiLeft + 23;
+		privateButton.yPosition = guiTop + 35;
+
+		if (nbtButton == null)
+		{
+			nbtButton = new GuiButtonStorageBox(id++, 0, 0, 30, 20, "[" + I18n.format("containerbox.gui.nbt") + "]", storageBox.checkNBT);
+		}
+
+		nbtButton.xPosition = guiLeft + 75;
+		nbtButton.yPosition = guiTop + 35;
+
+		if (insertButton == null)
+		{
+			insertButton = new GuiButtonStorageBox(id, 0, 0, 50, 20, "[" + I18n.format("containerbox.gui.insert") + "]", storageBox.canInsert);
+		}
+
+		insertButton.xPosition = guiLeft + 107;
+		insertButton.yPosition = guiTop + 35;
+
+		buttonList.add(privateButton);
+		buttonList.add(nbtButton);
+		buttonList.add(insertButton);
 
 		if (!usingPlayer.getUniqueID().toString().equals(storageBox.getOwner()))
 		{
-			((GuiButton)buttonList.get(0)).enabled = false;
+			privateButton.enabled = false;
 
 			if (storageBox.isPrivate())
 			{
-				((GuiButton)buttonList.get(1)).enabled = false;
-				((GuiButton)buttonList.get(2)).enabled = false;
+				nbtButton.enabled = false;
+				insertButton.enabled = false;
 			}
 		}
 
 		if (contents != null)
 		{
-			((GuiButton)buttonList.get(1)).enabled = false;
+			nbtButton.enabled = false;
 		}
 
-		privateHover = new HoverChecker((GuiButton)buttonList.get(0), 800);
-		nbtHover = new HoverChecker((GuiButton)buttonList.get(1), 800);
-		insertHover = new HoverChecker((GuiButton)buttonList.get(2), 800);
+		privateHover = new HoverChecker(privateButton, 800);
+		nbtHover = new HoverChecker(nbtButton, 800);
+		insertHover = new HoverChecker(insertButton, 800);
 	}
 
 	@Override
@@ -80,9 +106,9 @@ public class GuiStorageBox extends GuiContainer
 	{
 		super.updateScreen();
 
-		((GuiButtonStorageBox)buttonList.get(0)).isPushed = storageBox.isPrivate();
-		((GuiButtonStorageBox)buttonList.get(1)).isPushed = storageBox.checkNBT;
-		((GuiButtonStorageBox)buttonList.get(2)).isPushed = storageBox.canInsert;
+		privateButton.isPushed = storageBox.isPrivate();
+		nbtButton.isPushed = storageBox.checkNBT;
+		insertButton.isPushed = storageBox.canInsert;
 	}
 
 	@Override

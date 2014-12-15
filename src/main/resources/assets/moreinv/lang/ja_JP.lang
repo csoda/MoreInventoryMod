@@ -3,14 +3,6 @@
 moreinv.version.message=%s の新しいバージョンが利用可能です
 
 tile.catchall.name=ガラクタ入れ
-transportmanager.name=Importer&Exporter
-transportmanager:importer.name=インポーター
-transportmanager:exporter.name=エクスポーター
-transportmanager.gui.sneaking=搬出方向
-transportmanager.gui.include=搬入する
-transportmanager.gui.exclude=搬入しない
-Teleporter.name=テレポーター
-
 containerbox.name=コンテナ
 containerbox:Wood.name=木のコンテナ
 containerbox:Iron.name=鉄のコンテナ 
@@ -34,6 +26,16 @@ containerbox.gui.insert=搬入
 containerbox.gui.insert.tooltip=無効にすると、アイテムの搬入を行いません。
 containerbox.gui.connection=接続
 containerbox.gui.tier=ランク
+transportmanager.name=インポーターとエクスポーター
+transportmanager:importer.name=インポーター
+transportmanager:exporter.name=エクスポーター
+transportmanager.gui.sneaking.importer=搬入方向
+transportmanager.gui.sneaking.exporter=搬出方向
+transportmanager.gui.include=搬入する
+transportmanager.gui.include.tooltip=スロットにあるアイテムを搬入します。
+transportmanager.gui.exclude=搬入しない
+transportmanager.gui.exclude.tooltip=スロットにあるアイテムを搬入しません。
+Teleporter.name=テレポーター
 
 item.transporter.name=トランスポーター
 item.potionholder.name=ポーションホルダー

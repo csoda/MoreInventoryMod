@@ -3,14 +3,6 @@
 moreinv.version.message=A new %s version is available
 
 tile.catchall.name=Catchall
-transportmanager.name=Importer&Exporter
-transportmanager:importer.name=Importer
-transportmanager:exporter.name=Exporter
-transportmanager.gui.sneaking=Sneaking
-transportmanager.gui.include=Include
-transportmanager.gui.exclude=Exclude
-Teleporter.name=Teleporter
-
 containerbox.name=Container Box
 containerbox:Wood.name=Wood Container Box
 containerbox:Iron.name=Iron Container Box 
@@ -34,6 +26,16 @@ containerbox.gui.insert=Insert
 containerbox.gui.insert.tooltip=When you disable, this container box refuse the insert.
 containerbox.gui.connection=Connection
 containerbox.gui.tier=Tier
+transportmanager.name=Importer&Exporter
+transportmanager:importer.name=Importer
+transportmanager:exporter.name=Exporter
+transportmanager.gui.sneaking.importer=Sneaking
+transportmanager.gui.sneaking.exporter=Sneaking
+transportmanager.gui.include=Include
+transportmanager.gui.include.tooltip=Includes the slot items.
+transportmanager.gui.exclude=Exclude
+transportmanager.gui.exclude.tooltip=Excludes the slot items.
+Teleporter.name=Teleporter
 
 item.transporter.name=Transporter
 item.potionholder.name=Potion Holder
