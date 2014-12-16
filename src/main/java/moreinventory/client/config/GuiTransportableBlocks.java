@@ -717,20 +717,28 @@ public class GuiTransportableBlocks extends GuiScreen
 			{
 				itemstack.setItemDamage(2);
 			}
+			else if (entry.blockMeta.block == Blocks.furnace)
+			{
+				itemstack.setItemDamage(3);
+			}
+			else if (entry.blockMeta.block == Blocks.lit_furnace)
+			{
+				itemstack.setItemDamage(4);
+			}
 			else if (entry.blockMeta.block == MoreInventoryMod.storageBox)
 			{
 				if (entry.blockMeta.meta == -1)
 				{
-					itemstack.setItemDamage(3);
+					itemstack.setItemDamage(5);
 				}
 				else
 				{
-					itemstack.setItemDamage(entry.blockMeta.meta + 3);
+					itemstack.setItemDamage(entry.blockMeta.meta + 5);
 				}
 			}
 			else
 			{
-				itemstack.setItemDamage(entry.iconIndex + 19);
+				itemstack.setItemDamage(entry.iconIndex + 21);
 			}
 
 			try

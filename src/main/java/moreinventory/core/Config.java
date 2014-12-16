@@ -82,6 +82,8 @@ public class Config
 
 			chests.add(MIMUtils.getUniqueName(Blocks.chest) + "@-1@0");
 			chests.add(MIMUtils.getUniqueName(Blocks.trapped_chest) + "@-1@0");
+			chests.add(MIMUtils.getUniqueName(Blocks.furnace) + "@-1@0");
+			chests.add(MIMUtils.getUniqueName(Blocks.lit_furnace) + "@-1@0");
 			chests.add(MIMUtils.getUniqueName(MoreInventoryMod.storageBox) + "@-1@0");
 
 			for (int i = 0; i < 7; i++)

@@ -99,11 +99,15 @@ public class GuiSelectTransportableBlock extends GuiScreen
 					if (parent != null && parent instanceof GuiTransportableBlocks)
 					{
 						GuiTransportableBlocks gui = (GuiTransportableBlocks)parent;
-						ChestEntry entry = gui.new ChestEntry(new BlockMeta(chestList.selected.block, chestList.selected.meta), 19);
 
-						gui.chestList.chests.addIfAbsent(entry);
-						gui.chestList.contents.addIfAbsent(entry);
-						gui.chestList.selected = entry;
+						if (!gui.editMode)
+						{
+							ChestEntry entry = gui.new ChestEntry(new BlockMeta(chestList.selected.block, chestList.selected.meta), 19);
+
+							gui.chestList.chests.addIfAbsent(entry);
+							gui.chestList.contents.addIfAbsent(entry);
+							gui.chestList.selected = entry;
+						}
 					}
 
 					if (chestList.selected != null)

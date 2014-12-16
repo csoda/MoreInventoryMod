@@ -7,28 +7,21 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
-public class ItemBlockTransportManager extends ItemBlock
+public class ItemBlockTransportManager extends ItemBlockWithMetadata
 {
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
 
 	public ItemBlockTransportManager(Block block)
 	{
-		super(block);
-		this.setHasSubtypes(true);
-	}
-
-	@Override
-	public int getMetadata(int damage)
-	{
-		return damage;
+		super(block, block);
 	}
 
 	@Override
