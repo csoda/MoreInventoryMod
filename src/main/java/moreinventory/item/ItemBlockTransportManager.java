@@ -68,14 +68,14 @@ public class ItemBlockTransportManager extends ItemBlock
 	public void registerIcons(IIconRegister iconRegister)
 	{
 		icons = new IIcon[2];
-		icons[0] = iconRegister.registerIcon("moreinv:Importer_Item");
-		icons[1] = iconRegister.registerIcon("moreinv:Exporter_Item");
+		icons[0] = iconRegister.registerIcon("moreinv:importer_item");
+		icons[1] = iconRegister.registerIcon("moreinv:exporter_item");
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public IIcon getIconFromDamage(int damage)
 	{
-		return icons[damage];
+		return icons[damage & (icons.length - 1)];
 	}
 }

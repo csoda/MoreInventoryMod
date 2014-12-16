@@ -24,6 +24,7 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
+import java.util.Locale;
 
 public class ItemTransporter extends Item
 {
@@ -137,29 +138,29 @@ public class ItemTransporter extends Item
 	public void registerIcons(IIconRegister iconRegister)
 	{
 		icons = new IIcon[49];
-		icons[0] = iconRegister.registerIcon("moreinv:ChestTransporter");
-		icons[1] = iconRegister.registerIcon("moreinv:ChestTransporter_Chest");
-		icons[2] = iconRegister.registerIcon("moreinv:ChestTransporter_TrapChest");
+		icons[0] = iconRegister.registerIcon("moreinv:transporter");
+		icons[1] = iconRegister.registerIcon("moreinv:transporter_chest");
+		icons[2] = iconRegister.registerIcon("moreinv:transporter_trapchest");
 
-		for (int i = 0; i < StorageBoxType.values().length; i++)
+		for (StorageBoxType type : StorageBoxType.values())
 		{
-			if (i != StorageBoxType.Glass.ordinal() && i != StorageBoxType.CobbleStone.ordinal() && i != StorageBoxType.Ender.ordinal())
+			if (type != StorageBoxType.Glass && type != StorageBoxType.CobbleStone && type != StorageBoxType.Ender)
 			{
-				icons[i + 3] = iconRegister.registerIcon("moreinv:ChestTransporter_" + StorageBoxType.values()[i].name() + "Box");
+				icons[type.ordinal() + 3] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + type.name().toLowerCase(Locale.ENGLISH));
 			}
 		}
 
-		for (int i = 0; i < 30; i++)
+		for (int i = 0; i < 30; ++i)
 		{
-			icons[i + 19] = iconRegister.registerIcon("moreinv:ChestTransporter_mod" + i);
+			icons[i + 19] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public IIcon getIconFromDamage(int par1)
+	public IIcon getIconFromDamage(int damage)
 	{
-		return icons[par1];
+		return icons[damage];
 	}
 
 	@SideOnly(Side.CLIENT)

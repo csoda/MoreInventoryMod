@@ -133,16 +133,16 @@ public class ItemTorchHolder extends Item
 		switch (grade)
 		{
 			case 0:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:Torchholder_iron");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:Emptyholder_iron");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_iron");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_iron");
 				break;
 			case 1:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:Torchholder_gold");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:Emptyholder_gold");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_gold");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_gold");
 				break;
 			case 2:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:Torchholder_diamond");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:Emptyholder_diamond");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_diamond");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_diamond");
 				break;
 		}
 
