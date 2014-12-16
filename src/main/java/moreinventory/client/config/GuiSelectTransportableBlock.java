@@ -96,22 +96,27 @@ public class GuiSelectTransportableBlock extends GuiScreen
 			switch (button.id)
 			{
 				case 0:
-					if (parent != null && parent instanceof GuiTransportableBlocks)
-					{
-						GuiTransportableBlocks gui = (GuiTransportableBlocks)parent;
-
-						if (!gui.editMode)
-						{
-							ChestEntry entry = gui.new ChestEntry(new BlockMeta(chestList.selected.block, chestList.selected.meta), 19);
-
-							gui.chestList.chests.addIfAbsent(entry);
-							gui.chestList.contents.addIfAbsent(entry);
-							gui.chestList.selected = entry;
-						}
-					}
-
 					if (chestList.selected != null)
 					{
+						if (parent != null && parent instanceof GuiTransportableBlocks)
+						{
+							GuiTransportableBlocks gui = (GuiTransportableBlocks)parent;
+
+							if (!gui.editMode)
+							{
+								ChestEntry entry = gui.new ChestEntry(new BlockMeta(chestList.selected.block, chestList.selected.meta), 19);
+
+								gui.chestList.chests.addIfAbsent(entry);
+								gui.chestList.contents.addIfAbsent(entry);
+								gui.chestList.selected = entry;
+								gui.editMode = true;
+								gui.initGui();
+
+								mc.displayGuiScreen(new GuiSelectTransportableIcon(gui, gui.iconField));
+								return;
+							}
+						}
+
 						if (blockField != null)
 						{
 							blockField.setText(MIMUtils.getUniqueName(chestList.selected.block));
@@ -277,6 +282,7 @@ public class GuiSelectTransportableBlock extends GuiScreen
 					chests.clear();
 					getContents().clear();
 					filterCache.clear();
+					selected = null;
 
 					List list = Lists.newArrayList();
 

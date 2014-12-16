@@ -104,6 +104,7 @@ moreinv.config.general.versionNotify.tooltip=MoreInventoryModの新しいバー�
 moreinv.config.general.transportableBlocks=移動可能なブロック
 moreinv.config.general.transportableBlocks.tooltip=トランスポーターで移動可能なインベントリを持つブロックとアイコンを指定します。
 moreinv.config.general.transportableBlocks.select=移動可能なブロックを選択してください
+moreinv.config.general.transportableBlocks.select.icon=トランスポーターのアイコンを選択してください
 moreinv.config.general.isCollectTorch=松明の格納
 moreinv.config.general.isCollectTorch.tooltip=松明を拾った際にトーチホルダーに格納します。
 moreinv.config.general.isCollectArrow=矢の格納
