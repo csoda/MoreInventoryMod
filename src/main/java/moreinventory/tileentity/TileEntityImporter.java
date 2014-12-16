@@ -46,7 +46,7 @@ public class TileEntityImporter extends TileEntityTransportManager
 				{
 					if (MIMUtils.canAccessFromSide(inventory, slot, getSneak(face)) && MIMUtils.canExtractFromSide(inventory, itemstack, slot, getSneak(face)))
 					{
-						if (((TileEntityStorageBox)tile).getStorageBoxNetworkManager().linkedPutIn(itemstack, null, register))
+						if (tile instanceof TileEntityStorageBox && ((TileEntityStorageBox)tile).getStorageBoxNetworkManager().linkedPutIn(itemstack, null, register))
 						{
 							MIMUtils.checkNullStack(inventory, slot);
 

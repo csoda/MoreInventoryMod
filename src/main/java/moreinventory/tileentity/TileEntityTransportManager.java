@@ -117,7 +117,7 @@ public abstract class TileEntityTransportManager extends TileEntity implements I
 	@Override
 	public int getSizeInventory()
 	{
-		return this.inventoryItems.length;
+		return inventoryItems.length;
 	}
 
 	@Override

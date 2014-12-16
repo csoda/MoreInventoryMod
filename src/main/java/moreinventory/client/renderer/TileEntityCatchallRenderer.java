@@ -75,9 +75,9 @@ public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 				entityItem.getEntityItem().stackSize = 1;
 				entityItem.hoverStart = 0.0F;
 
-				byte x = (byte) (i % 3);
-				byte y = (byte) ((i - i % 3) / 3 % 3);
-				byte z = (byte) ((i - i % 9) / 9 % 9);
+				byte x = (byte)(i % 3);
+				byte y = (byte)((i - i % 3) / 3 % 3);
+				byte z = (byte)((i - i % 9) / 9 % 9);
 				renderX = x * 0.3F - 0.3F;
 				renderY = y * 0.33F - 0.55F;
 				renderZ = z * -0.2F + (x + y) % 3 * 0.01F - 0.01F + 0.4F;

@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiSlot;
 import net.minecraft.client.renderer.Tessellator;
 
 import java.util.List;
-import java.util.Set;
 
 @SideOnly(Side.CLIENT)
 public abstract class GuiListSlot<E> extends GuiSlot
@@ -22,8 +21,6 @@ public abstract class GuiListSlot<E> extends GuiSlot
 	}
 
 	protected abstract List<E> getContents();
-
-	protected abstract Set<E> getSelected();
 
 	@Override
 	protected int getSize()
@@ -68,27 +65,6 @@ public abstract class GuiListSlot<E> extends GuiSlot
 	public void scrollToEnd()
 	{
 		scrollBy(getSlotHeight() * getSize());
-	}
-
-	public void scrollToSelected()
-	{
-		if (!getSelected().isEmpty())
-		{
-			int amount = 0;
-
-			for (E element : getSelected())
-			{
-				amount = getContents().indexOf(element) * getSlotHeight();
-
-				if (getAmountScrolled() != amount)
-				{
-					break;
-				}
-			}
-
-			scrollToTop();
-			scrollBy(amount);
-		}
 	}
 
 	public void scrollToPrev()
