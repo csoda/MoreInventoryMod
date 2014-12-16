@@ -22,6 +22,14 @@ public class ItemBlockStorageBox extends ItemBlock
 	@Override
 	public String getUnlocalizedName(ItemStack itemstack)
 	{
-		return "containerbox:" + StorageBoxType.values()[itemstack.getItemDamage()].name();
+		int damage = itemstack.getItemDamage();
+		StorageBoxType[] types = StorageBoxType.values();
+
+		if (damage < 0 || damage >= types.length)
+		{
+			return "containerbox";
+		}
+
+		return "containerbox:" + types[damage].name();
 	}
 }

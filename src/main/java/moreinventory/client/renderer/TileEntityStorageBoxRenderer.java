@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
@@ -63,11 +62,7 @@ public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 
 	private void renderContentsItem(TileEntityStorageBox tile)
 	{
-		int count = tile.displayedStackCount;
-		int size = tile.displayedStackSize;
-		ItemStack itemstack = tile.getContents();
-
-		if (itemstack != null)
+		if (tile.getContents() != null)
 		{
 			if (Config.pointedContainerBoxInfo)
 			{
@@ -79,7 +74,7 @@ public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 				}
 			}
 
-			entityItem.setEntityItemStack(itemstack);
+			entityItem.setEntityItemStack(tile.getContents());
 			entityItem.getEntityItem().stackSize = 1;
 			entityItem.hoverStart = 0.0F;
 
@@ -88,6 +83,8 @@ public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 			RenderItem.renderInFrame = false;
 
 			StringBuilder builder = new StringBuilder(10);
+			int count = tile.displayedStackCount;
+			int size = tile.displayedStackSize;
 
 			if (count > 0)
 			{

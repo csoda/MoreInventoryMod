@@ -120,16 +120,16 @@ public class ItemArrowHolder extends Item
 		switch (grade)
 		{
 			case 0:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:Arrowholder_iron");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:Emptyholder_iron");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:arrowholder_iron");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_iron");
 				break;
 			case 1:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:Arrowholder_gold");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:Emptyholder_gold");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:arrowholder_gold");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_gold");
 				break;
 			case 2:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:Arrowholder_diamond");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:Emptyholder_diamond");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:arrowholder_diamond");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_diamond");
 				break;
 		}
 

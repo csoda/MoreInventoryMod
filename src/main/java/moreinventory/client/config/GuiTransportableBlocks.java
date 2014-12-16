@@ -1,14 +1,14 @@
 package moreinventory.client.config;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import cpw.mods.fml.client.config.GuiButtonExt;
+import cpw.mods.fml.client.config.GuiConfigEntries.ArrayEntry;
 import moreinventory.client.gui.GuiListSlot;
-import moreinventory.client.gui.GuiSelectTransportableChest;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.util.ArrayListExtended;
 import moreinventory.util.BlockMeta;
@@ -16,38 +16,53 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.RecursiveAction;
 
-public class GuiTransportableChests extends GuiScreen
+public class GuiTransportableBlocks extends GuiScreen
 {
+	protected static RenderItem itemRender = new RenderItem();
+
 	private final GuiScreen parent;
+	protected ArrayEntry configElement;
 
-	private ChestList chestList;
-	private GuiButton doneButton, editButton, cancelButton, addButton, removeButton, clearButton;
-	private GuiTextField filterTextField;
+	protected ChestList chestList;
+	protected GuiButton doneButton, editButton, cancelButton, addButton, removeButton, clearButton;
+	protected GuiTextField filterTextField;
 
-	private boolean editMode;
-	private GuiTextField blockField, blockMetaField, iconField;
+	protected boolean editMode;
+	protected GuiTextField blockField, blockMetaField, iconField;
 
 	private int maxLabelWidth;
 
 	private final List<String> editLabelList = Lists.newArrayList();
 	private final List<GuiTextField> editFieldList = Lists.newArrayList();
 
-	public GuiTransportableChests(GuiScreen parent)
+	public GuiTransportableBlocks(GuiScreen parent)
 	{
 		this.parent = parent;
+	}
+
+	public GuiTransportableBlocks(GuiScreen parent, ArrayEntry entry)
+	{
+		this(parent);
+		this.configElement = entry;
 	}
 
 	@Override
@@ -60,7 +75,7 @@ public class GuiTransportableChests extends GuiScreen
 			chestList = new ChestList();
 		}
 
-		chestList.func_148122_a(width, height, 32, height - (editMode ? 100 : 28));
+		chestList.func_148122_a(width, height, 32, height - (editMode ? 74 : 28));
 
 		if (doneButton == null)
 		{
@@ -78,7 +93,7 @@ public class GuiTransportableChests extends GuiScreen
 
 		editButton.xPosition = doneButton.xPosition - doneButton.width - 3;
 		editButton.yPosition = doneButton.yPosition;
-		editButton.enabled = !chestList.selected.isEmpty();
+		editButton.enabled = chestList.selected != null;
 		editButton.visible = !editMode;
 
 		if (cancelButton == null)
@@ -206,36 +221,46 @@ public class GuiTransportableChests extends GuiScreen
 			case 0:
 				if (editMode)
 				{
-					for (final ChestEntry entry : chestList.selected)
+					if (chestList.selected != null)
+					{
+						if (!Strings.isNullOrEmpty(blockField.getText()))
+						{
+							chestList.selected.blockMeta = new BlockMeta(blockField.getText(), NumberUtils.toInt(blockMetaField.getText()));
+						}
+
+						if (!Strings.isNullOrEmpty(iconField.getText()))
+						{
+							chestList.selected.iconIndex = NumberUtils.toInt(iconField.getText(), 19);
+						}
+					}
+
+					actionPerformed(cancelButton);
+
+					chestList.scrollToTop();
+				}
+				else
+				{
+					if (configElement != null)
 					{
 						MIMUtils.getPool().execute(new RecursiveAction()
 						{
 							@Override
 							protected void compute()
 							{
-								if (!Strings.isNullOrEmpty(blockField.getText()))
+								List<String> values = Lists.newArrayList();
+
+								for (ChestEntry entry : chestList.chests)
 								{
-									entry.blockMeta = new BlockMeta(blockField.getText(), NumberUtils.toInt(blockMetaField.getText()));
+									values.add(entry.toString());
 								}
 
-								if (!Strings.isNullOrEmpty(iconField.getText()))
-								{
-									entry.iconIndex = NumberUtils.toInt(iconField.getText(), 19);
-								}
+								configElement.setListFromChildScreen(values.toArray());
 							}
 						});
 					}
 
 					actionPerformed(cancelButton);
 
-					chestList.scrollToTop();
-					chestList.scrollToSelected();
-				}
-				else
-				{
-					actionPerformed(cancelButton);
-
-					chestList.selected.clear();
 					chestList.scrollToTop();
 				}
 
@@ -251,21 +276,12 @@ public class GuiTransportableChests extends GuiScreen
 					initGui();
 
 					chestList.scrollToTop();
-					chestList.scrollToSelected();
 
-					if (chestList.selected.size() == 1)
+					if (chestList.selected != null)
 					{
-						ChestEntry entry = chestList.selected.iterator().next();
-
-						blockField.setText(MIMUtils.getUniqueName(entry.blockMeta.block));
-						blockMetaField.setText(Integer.toString(entry.blockMeta.meta));
-						iconField.setText(Integer.toString(entry.iconIndex));
-					}
-					else
-					{
-						blockField.setText("");
-						blockMetaField.setText("");
-						iconField.setText("");
+						blockField.setText(MIMUtils.getUniqueName(chestList.selected.blockMeta.block));
+						blockMetaField.setText(Integer.toString(chestList.selected.blockMeta.meta));
+						iconField.setText(Integer.toString(chestList.selected.iconIndex));
 					}
 				}
 
@@ -288,7 +304,7 @@ public class GuiTransportableChests extends GuiScreen
 
 				break;
 			case 3:
-				mc.displayGuiScreen(new GuiSelectTransportableChest(this));
+				mc.displayGuiScreen(new GuiSelectTransportableBlock(this));
 				break;
 			case 4:
 				MIMUtils.getPool().execute(new RecursiveAction()
@@ -296,20 +312,17 @@ public class GuiTransportableChests extends GuiScreen
 					@Override
 					protected void compute()
 					{
-						for (ChestEntry entry : chestList.selected)
-						{
-							chestList.chests.remove(entry);
-							chestList.contents.remove(entry);
-						}
-
-						chestList.selected.clear();
+						chestList.chests.remove(chestList.selected);
+						chestList.contents.remove(chestList.selected);
+						chestList.selected = null;
 					}
 				});
 
 				break;
 			case 5:
-				chestList.selected.addAll(chestList.chests);
-				actionPerformed(removeButton);
+				chestList.chests.clear();
+				chestList.contents.clear();
+				chestList.selected = null;
 				break;
 		}
 	}
@@ -326,7 +339,7 @@ public class GuiTransportableChests extends GuiScreen
 		}
 		else
 		{
-			editButton.enabled = !chestList.selected.isEmpty();
+			editButton.enabled = chestList.selected != null;
 			removeButton.enabled = editButton.enabled;
 
 			filterTextField.updateCursorCounter();
@@ -338,7 +351,7 @@ public class GuiTransportableChests extends GuiScreen
 	{
 		chestList.drawScreen(mouseX, mouseY, ticks);
 
-		drawCenteredString(fontRendererObj, I18n.format(MoreInventoryMod.CONFIG_LANG + "general.transportableChests"), width / 2, 15, 0xFFFFFF);
+		drawCenteredString(fontRendererObj, I18n.format(MoreInventoryMod.CONFIG_LANG + "general.transportableBlocks"), width / 2, 15, 0xFFFFFF);
 
 		super.drawScreen(mouseX, mouseY, ticks);
 
@@ -408,7 +421,7 @@ public class GuiTransportableChests extends GuiScreen
 			{
 				blockField.setFocused(false);
 
-				mc.displayGuiScreen(new GuiSelectTransportableChest(this, blockField, blockMetaField));
+				mc.displayGuiScreen(new GuiSelectTransportableBlock(this, blockField, blockMetaField));
 			}
 		}
 		else
@@ -431,87 +444,103 @@ public class GuiTransportableChests extends GuiScreen
 	@Override
 	protected void keyTyped(char c, int code)
 	{
-		if (filterTextField.isFocused())
+		if (editMode)
 		{
-			if (code == Keyboard.KEY_ESCAPE)
+			for (GuiTextField textField : editFieldList)
 			{
-				filterTextField.setFocused(false);
-			}
+				if (code == Keyboard.KEY_ESCAPE)
+				{
+					textField.setFocused(false);
+				}
+				else if (textField.isFocused())
+				{
+					if (textField == iconField)
+					{
+						if (!CharUtils.isAsciiControl(c) && !CharUtils.isAsciiNumeric(c))
+						{
+							continue;
+						}
+					}
 
-			String prev = filterTextField.getText();
-
-			filterTextField.textboxKeyTyped(c, code);
-
-			String text = filterTextField.getText();
-			boolean changed = !text.equals(prev);
-
-			if (Strings.isNullOrEmpty(text) && changed)
-			{
-				chestList.setFilter(null);
-			}
-			else if (changed || code == Keyboard.KEY_RETURN)
-			{
-				chestList.setFilter(text);
+					textField.textboxKeyTyped(c, code);
+				}
 			}
 		}
 		else
 		{
-			if (code == Keyboard.KEY_ESCAPE)
+			if (filterTextField.isFocused())
 			{
-				mc.displayGuiScreen(parent);
+				if (code == Keyboard.KEY_ESCAPE)
+				{
+					filterTextField.setFocused(false);
+				}
 
-				if (parent == null)
+				String prev = filterTextField.getText();
+
+				filterTextField.textboxKeyTyped(c, code);
+
+				String text = filterTextField.getText();
+				boolean changed = !text.equals(prev);
+
+				if (Strings.isNullOrEmpty(text) && changed)
 				{
-					mc.setIngameFocus();
+					chestList.setFilter(null);
+				}
+				else if (changed || code == Keyboard.KEY_RETURN)
+				{
+					chestList.setFilter(text);
 				}
 			}
-			else if (code == Keyboard.KEY_BACK)
+			else
 			{
-				chestList.getSelected().clear();
-			}
-			else if (code == Keyboard.KEY_TAB)
-			{
-				if (++chestList.nameType > 1)
+				if (code == Keyboard.KEY_ESCAPE)
 				{
-					chestList.nameType = 0;
+					mc.displayGuiScreen(parent);
+
+					if (parent == null)
+					{
+						mc.setIngameFocus();
+					}
 				}
-			}
-			else if (code == Keyboard.KEY_UP)
-			{
-				chestList.scrollUp();
-			}
-			else if (code == Keyboard.KEY_DOWN)
-			{
-				chestList.scrollDown();
-			}
-			else if (code == Keyboard.KEY_HOME)
-			{
-				chestList.scrollToTop();
-			}
-			else if (code == Keyboard.KEY_END)
-			{
-				chestList.scrollToEnd();
-			}
-			else if (code == Keyboard.KEY_SPACE)
-			{
-				chestList.scrollToSelected();
-			}
-			else if (code == Keyboard.KEY_PRIOR)
-			{
-				chestList.scrollToPrev();
-			}
-			else if (code == Keyboard.KEY_NEXT)
-			{
-				chestList.scrollToNext();
-			}
-			else if (code == Keyboard.KEY_F || code == mc.gameSettings.keyBindChat.getKeyCode())
-			{
-				filterTextField.setFocused(true);
-			}
-			else if (isCtrlKeyDown() && code == Keyboard.KEY_A)
-			{
-				chestList.getSelected().clear();
-				chestList.getSelected().addAll(chestList.getContents());
+				else if (code == Keyboard.KEY_BACK)
+				{
+					chestList.selected = null;
+				}
+				else if (code == Keyboard.KEY_TAB)
+				{
+					if (++chestList.nameType > 1)
+					{
+						chestList.nameType = 0;
+					}
+				}
+				else if (code == Keyboard.KEY_UP)
+				{
+					chestList.scrollUp();
+				}
+				else if (code == Keyboard.KEY_DOWN)
+				{
+					chestList.scrollDown();
+				}
+				else if (code == Keyboard.KEY_HOME)
+				{
+					chestList.scrollToTop();
+				}
+				else if (code == Keyboard.KEY_END)
+				{
+					chestList.scrollToEnd();
+				}
+				else if (code == Keyboard.KEY_PRIOR)
+				{
+					chestList.scrollToPrev();
+				}
+				else if (code == Keyboard.KEY_NEXT)
+				{
+					chestList.scrollToNext();
+				}
+				else if (code == Keyboard.KEY_F || code == mc.gameSettings.keyBindChat.getKeyCode())
+				{
+					filterTextField.setFocused(true);
+				}
 			}
 		}
 	}
@@ -534,33 +563,92 @@ public class GuiTransportableChests extends GuiScreen
 			this.blockMeta = blockMeta;
 			this.iconIndex = icon;
 		}
+
+		@Override
+		public int hashCode()
+		{
+			return Objects.hashCode(blockMeta, iconIndex);
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (obj instanceof ChestEntry)
+			{
+				ChestEntry entry = (ChestEntry)obj;
+
+				return blockMeta == entry.blockMeta && iconIndex == entry.iconIndex;
+			}
+
+			return false;
+		}
+
+		@Override
+		public String toString()
+		{
+			return blockMeta.toString() + "@" + iconIndex;
+		}
 	}
 
-	class ChestList extends GuiListSlot<ChestEntry> implements Comparator<ChestEntry>
+	protected class ChestList extends GuiListSlot<ChestEntry> implements Comparator<ChestEntry>
 	{
-		private final ArrayListExtended<ChestEntry>
+		protected final ArrayListExtended<ChestEntry>
 		chests = new ArrayListExtended<>(),
 		contents = new ArrayListExtended<>();
-		private final Set<ChestEntry> selected = Sets.newTreeSet(this);
 		private final Map<String, List<ChestEntry>> filterCache = Maps.newHashMap();
 
-		private int nameType;
+		protected int nameType;
+		protected ChestEntry selected;
 
 		public ChestList()
 		{
-			super(GuiTransportableChests.this.mc, 0, 0, 0, 0, 22);
+			super(GuiTransportableBlocks.this.mc, 0, 0, 0, 0, 22);
+			this.initEntries();
+		}
+
+		private void initEntries()
+		{
+			MIMUtils.getPool().execute(new RecursiveAction()
+			{
+				@Override
+				protected void compute()
+				{
+					chests.clear();
+					contents.clear();
+					filterCache.clear();
+					selected = null;
+
+					if (configElement != null)
+					{
+						for (Object obj : configElement.getCurrentValues())
+						{
+							String str = String.valueOf(obj);
+
+							if (Strings.isNullOrEmpty(str) || str.equals("null") || !str.contains("@"))
+							{
+								continue;
+							}
+
+							String[] args = str.split("@");
+							BlockMeta blockMeta = new BlockMeta(args[0], NumberUtils.toInt(args[1]));
+							int icon = args.length > 2 ? NumberUtils.toInt(args[2], 19) : 19;
+
+							if (blockMeta.block != Blocks.air)
+							{
+								chests.addIfAbsent(new ChestEntry(blockMeta, icon));
+							}
+						}
+					}
+
+					contents.addAll(chests);
+				}
+			});
 		}
 
 		@Override
 		protected ArrayListExtended<ChestEntry> getContents()
 		{
 			return contents;
-		}
-
-		@Override
-		protected Set<ChestEntry> getSelected()
-		{
-			return selected;
 		}
 
 		@Override
@@ -619,6 +707,50 @@ public class GuiTransportableChests extends GuiScreen
 			}
 			catch (Throwable ignored) {}
 
+			itemstack = new ItemStack(MoreInventoryMod.transporter);
+
+			if (entry.blockMeta.block == Blocks.chest)
+			{
+				itemstack.setItemDamage(1);
+			}
+			else if (entry.blockMeta.block == Blocks.trapped_chest)
+			{
+				itemstack.setItemDamage(2);
+			}
+			else if (entry.blockMeta.block == MoreInventoryMod.storageBox)
+			{
+				if (entry.blockMeta.meta == -1)
+				{
+					itemstack.setItemDamage(3);
+				}
+				else
+				{
+					itemstack.setItemDamage(entry.blockMeta.meta + 3);
+				}
+			}
+			else
+			{
+				itemstack.setItemDamage(entry.iconIndex + 19);
+			}
+
+			try
+			{
+				GL11.glPushMatrix();
+				GL11.glTranslatef(0.0F, 0.0F, 32.0F);
+				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+				GL11.glEnable(GL11.GL_LIGHTING);
+				RenderHelper.enableGUIStandardItemLighting();
+				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+				itemRender.zLevel += 100.0F;
+				itemRender.renderItemIntoGUI(fontRendererObj, mc.getTextureManager(), itemstack, width / 2 - 100, par3 + 1);
+				itemRender.zLevel -= 100.0F;
+				GL11.glPopMatrix();
+				GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+				GL11.glDisable(GL11.GL_LIGHTING);
+			}
+			catch (Throwable ignored) {}
+
 			if (!Strings.isNullOrEmpty(name))
 			{
 				drawCenteredString(fontRendererObj, name, width / 2, par3 + 1, 0xFFFFFF);
@@ -628,12 +760,7 @@ public class GuiTransportableChests extends GuiScreen
 		@Override
 		protected void elementClicked(int index, boolean flag, int mouseX, int mouseY)
 		{
-			ChestEntry entry = getContents().get(index, null);
-
-			if (entry != null && !getSelected().remove(entry))
-			{
-				getSelected().add(entry);
-			}
+			selected = getContents().get(index, null);
 		}
 
 		@Override
@@ -641,7 +768,7 @@ public class GuiTransportableChests extends GuiScreen
 		{
 			ChestEntry entry = getContents().get(index, null);
 
-			return entry != null && getSelected().contains(entry);
+			return entry != null && selected == entry;
 		}
 
 		protected void setFilter(final String filter)
@@ -659,7 +786,7 @@ public class GuiTransportableChests extends GuiScreen
 					}
 					else if (filter.equals("selected"))
 					{
-						result = Lists.newArrayList(getSelected());
+						result = Lists.newArrayList(selected);
 					}
 					else
 					{

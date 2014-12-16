@@ -90,12 +90,20 @@ moreinv.gui.config=Config
 moreinv.gui.register=Register
 moreinv.gui.owner=Owner
 
+gui.edit=Edit
+gui.cancel=Cancel
+gui.add=Add
+gui.remove=Remove
+gui.clear=Clear
+
 moreinv.config.title=MoreInventoryMod Configuration
+moreinv.config.edit.block=Block
+moreinv.config.edit.iconIndex=Icon Index
 moreinv.config.general.versionNotify=Version Notify
 moreinv.config.general.versionNotify.tooltip=Whether or not to notify when a new MoreInventoryMod version is available.
-moreinv.config.general.transportableChests=Transportable Chests
-moreinv.config.general.transportableChests.tooltip=Specify the transportable chests on the Chest Transporter.
-moreinv.config.general.transportableChests.select=Select the transportable chest
+moreinv.config.general.transportableBlocks=Transportable Blocks
+moreinv.config.general.transportableBlocks.tooltip=Specify the transportable blocks on the Transporter.
+moreinv.config.general.transportableBlocks.select=Select the transportable block
 moreinv.config.general.isCollectTorch=Collect Torch
 moreinv.config.general.isCollectTorch.tooltip=Whether or not to collect to Torch Holder on the player inventory when you pick up a Torch.
 moreinv.config.general.isCollectArrow=Collect Arrow

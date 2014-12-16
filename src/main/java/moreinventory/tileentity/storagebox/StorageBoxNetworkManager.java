@@ -17,9 +17,9 @@ public class StorageBoxNetworkManager
 	private final MIMItemBoxList storageBoxList = new MIMItemBoxList();
 	private final MIMBoxList addonList = new MIMBoxList();
 
-	public StorageBoxNetworkManager(World world, int x, int y, int z, String UUID)
+	public StorageBoxNetworkManager(World world, int x, int y, int z, String uuid)
 	{
-		this.ownerID = UUID;
+		this.ownerID = uuid;
 		this.createNetwork(new MIMBoxList(), world, x, y, z);
 	}
 

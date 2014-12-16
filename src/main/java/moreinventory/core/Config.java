@@ -2,9 +2,10 @@ package moreinventory.core;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import cpw.mods.fml.client.config.GuiConfigEntries.IConfigEntry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
-import moreinventory.item.ItemChestTransporter;
+import moreinventory.item.ItemTransporter;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.util.MIMLog;
 import moreinventory.util.MIMUtils;
@@ -23,8 +24,8 @@ public class Config
 	public static Configuration config;
 
 	public static boolean versionNotify;
-	public static String[] transportableChestsDefault;
-	public static String[] transportableChests;
+	public static String[] transportableBlocksDefault;
+	public static String[] transportableBlocks;
 
 	public static final Set<String> isCollectTorch = Sets.newHashSet();
 	public static final Set<String> isCollectArrow = Sets.newHashSet();
@@ -35,6 +36,8 @@ public class Config
 	public static boolean containerBoxSideTexture;
 	public static boolean pointedContainerBoxInfo;
 	public static boolean clearGlassBox;
+
+	public static Class<? extends IConfigEntry> transportableBlocksEntry;
 
 	public static void syncConfig()
 	{
@@ -73,7 +76,7 @@ public class Config
 		propOrder.add(prop.getName());
 		versionNotify = prop.getBoolean(versionNotify);
 
-		if (transportableChestsDefault == null)
+		if (transportableBlocksDefault == null)
 		{
 			List<String> chests = Lists.newArrayList();
 
@@ -89,20 +92,20 @@ public class Config
 			chests.add("BambooMod:jpChest@-1@10");
 			chests.add("MultiPageChest:multipagechest@-1@11");
 
-			transportableChestsDefault = chests.toArray(new String[chests.size()]);
+			transportableBlocksDefault = chests.toArray(new String[chests.size()]);
 		}
 
-		prop = config.get(category, "transportableChests", transportableChestsDefault);
-		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
+		prop = config.get(category, "transportableBlocks", transportableBlocksDefault);
+		prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName()).setConfigEntryClass(transportableBlocksEntry);
 		prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
 		prop.comment += Configuration.NEW_LINE + Configuration.NEW_LINE;
 		prop.comment += "BlockName @ Metadata(-1~15) @ TextureIndex(1~29)";
 		prop.comment += Configuration.NEW_LINE;
 		prop.comment += "..";
 		propOrder.add(prop.getName());
-		transportableChests = prop.getStringList();
+		transportableBlocks = prop.getStringList();
 
-		ItemChestTransporter.refreshTransportableChests(transportableChests);
+		ItemTransporter.refreshTransportableBlocks(transportableBlocks);
 
 		if (FMLCommonHandler.instance().getSide().isClient())
 		{

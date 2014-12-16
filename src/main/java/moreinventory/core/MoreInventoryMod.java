@@ -23,8 +23,30 @@ import moreinventory.block.BlockTransportManager;
 import moreinventory.handler.MIMEventHooks;
 import moreinventory.handler.MIMGuiHandler;
 import moreinventory.handler.MIMWorldSaveHelper;
-import moreinventory.item.*;
-import moreinventory.network.*;
+import moreinventory.item.ItemArrowHolder;
+import moreinventory.item.ItemBlockSBAddon;
+import moreinventory.item.ItemBlockStorageBox;
+import moreinventory.item.ItemBlockTransportManager;
+import moreinventory.item.ItemNoFunction;
+import moreinventory.item.ItemPlating;
+import moreinventory.item.ItemPotionHolder;
+import moreinventory.item.ItemPouch;
+import moreinventory.item.ItemSpanner;
+import moreinventory.item.ItemTorchHolder;
+import moreinventory.item.ItemTransporter;
+import moreinventory.network.CatchallMessage;
+import moreinventory.network.ConfigSyncMessage;
+import moreinventory.network.ImporterMessage;
+import moreinventory.network.OpenUrlMessage;
+import moreinventory.network.PlayerNameCacheMessage;
+import moreinventory.network.PouchMessage;
+import moreinventory.network.SBAddonBaseConfigMessage;
+import moreinventory.network.SBAddonBaseMessage;
+import moreinventory.network.StorageBoxButtonMessage;
+import moreinventory.network.StorageBoxConfigMessage;
+import moreinventory.network.StorageBoxContentsMessage;
+import moreinventory.network.StorageBoxMessage;
+import moreinventory.network.TransportManagerMessage;
 import moreinventory.recipe.RecipeArrowHolder;
 import moreinventory.recipe.RecipePouch;
 import moreinventory.recipe.RecipeTorchHolder;
@@ -133,7 +155,7 @@ public class MoreInventoryMod
 
 		torchHolder = new Item[3];
 		arrowHolder = new Item[3];
-		transporter = new ItemChestTransporter().setUnlocalizedName("transporter");
+		transporter = new ItemTransporter().setUnlocalizedName("transporter");
 		noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
 		potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
 		spanner = new ItemSpanner().setUnlocalizedName("spanner");
@@ -206,6 +228,8 @@ public class MoreInventoryMod
 		{
 			GameRegistry.registerTileEntity(EnumSBAddon.values()[i].clazz, "moreinventory." + EnumSBAddon.values()[i].name());
 		}
+
+		proxy.initConfigEntryClasses();
 
 		Config.syncConfig();
 
