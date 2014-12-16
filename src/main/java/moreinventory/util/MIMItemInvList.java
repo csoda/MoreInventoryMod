@@ -82,14 +82,14 @@ public class MIMItemInvList extends MIMItemList implements INBTSaveData
 				}
 			}
 
-			if (items[1] == null || items[1].stackSize != items[1].getMaxStackSize())
+			if (items[1] == null || items[1].stackSize < items[1].getMaxStackSize())
 			{
 				if (items[1] != null)
 				{
 					addItem(items[1]);
 				}
 
-				items[1] = loadNewItemStack(index);
+				items[1] = loadNewItemStack(index).copy();
 			}
 		}
 

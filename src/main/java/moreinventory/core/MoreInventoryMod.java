@@ -219,11 +219,6 @@ public class MoreInventoryMod
 		GameRegistry.registerTileEntity(TileEntityImporter.class, "TilEntityImporter");
 		GameRegistry.registerTileEntity(TileEntityExporter.class, "TileEntityExporter");
 
-		for (StorageBoxType type : StorageBoxType.values())
-		{
-			GameRegistry.registerTileEntity(type.clazz, "TileEntity" + type.name() + "StorageBox");
-		}
-
 		for (int i = 0; i < EnumSBAddon.values().length; i++)
 		{
 			GameRegistry.registerTileEntity(EnumSBAddon.values()[i].clazz, "moreinventory." + EnumSBAddon.values()[i].name());
@@ -261,6 +256,8 @@ public class MoreInventoryMod
 		FMLCommonHandler.instance().bus().register(MIMEventHooks.instance);
 
 		MinecraftForge.EVENT_BUS.register(MIMEventHooks.instance);
+
+		StorageBoxType.initialize();
 
 		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[0], 1, ItemTorchHolder.maxDamage[0] - 2),
 			"I L", "I I", "III",
@@ -394,25 +391,6 @@ public class MoreInventoryMod
 			'H', "slabWood"
 		));
 
-		ItemStack woodStorageBox = new ItemStack(storageBox, 1, 0);
-		ItemStack halfStone = new ItemStack(Blocks.stone_slab);
-
-		for (int i = 0; i < StorageBoxType.values().length; i++)
-		{
-			if (StorageBoxType.values()[i].canCraft)
-			{
-				for (int j = 0; j < StorageBoxType.values()[i].materials.length; j++)
-				{
-					GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(storageBox, 3, i), true,
-						"IHI", "ICI", "IHI",
-						'I', StorageBoxType.values()[i].materials[j],
-						'C', woodStorageBox,
-						'H', halfStone
-					));
-				}
-			}
-		}
-
 		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 32, 8),
 			"IHI", "I I", "IHI",
 			'H', Blocks.glass_pane,
@@ -440,18 +418,18 @@ public class MoreInventoryMod
 		ItemStack lava = new ItemStack(Items.lava_bucket);
 		ItemStack brush = new ItemStack(noFunctionItems, 1, 1);
 
-		for (int i = 0; i < ItemPlating.typeIndex.length; i++)
-		{
-			int j = ItemPlating.typeIndex[i];
 
-			for (int k = 0; k < StorageBoxType.values()[j].materials.length; k++)
+		for (int i = 0; i < ItemPlating.typeNameIndex.length; i++)
+		{
+			String type = ItemPlating.typeNameIndex[i];
+
+			for (int t = 0; t < StorageBoxType.types.get(type).materials.length; t++)
 			{
-				Object ingot = StorageBoxType.values()[j].materials[k];
+				Object ingot = StorageBoxType.types.get(type).materials[t];
 
 				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), ingot, ingot, lava, brush));
 			}
 		}
-
 		proxy.registerRenderers();
 	}
 

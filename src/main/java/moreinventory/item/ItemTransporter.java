@@ -23,8 +23,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class ItemTransporter extends Item
 {
@@ -152,13 +151,19 @@ public class ItemTransporter extends Item
 		icons[3] = iconRegister.registerIcon("moreinv:transporter_furnace");
 		icons[4] = iconRegister.registerIcon("moreinv:transporter_furnace_lit");
 
-		for (StorageBoxType type : StorageBoxType.values())
+
+		Set typeSet = StorageBoxType.types.entrySet();
+		int t = 0;
+		for (Iterator i = typeSet.iterator(); i.hasNext(); t++)
 		{
-			if (type != StorageBoxType.Glass && type != StorageBoxType.CobbleStone && type != StorageBoxType.Ender)
+			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
+			String typeName = type.getKey();
+			if (!"Glass".equals(typeName) && !"CobbleStone".equals(typeName) && !"Ender".equals(typeName))
 			{
-				icons[type.ordinal() + 5] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + type.name().toLowerCase(Locale.ENGLISH));
+				icons[t + 5] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH));
 			}
 		}
+
 
 		for (int i = 0; i < 30; ++i)
 		{
@@ -311,7 +316,7 @@ public class ItemTransporter extends Item
 				if (itemstack != null)
 				{
 					if (itemstack.getItem() == MoreInventoryMod.transporter && itemstack.getItemDamage() != 0 ||
-						itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
+							itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
 					{
 						return false;
 					}

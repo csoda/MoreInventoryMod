@@ -184,7 +184,7 @@ public class StorageBoxNetworkManager
 				{
 					TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
 
-					if (tile.getStorageBoxType() != StorageBoxType.Glass && tile.getStorageBoxType() != StorageBoxType.Ender && tile.getContents() == null)
+					if (!StorageBoxType.compareTypes(tile, "Glass") && !StorageBoxType.compareTypes(tile, "Ender") && tile.getContents() == null)
 					{
 						tile.tryPutIn(itemstack);
 

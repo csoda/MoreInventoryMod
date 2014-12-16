@@ -12,11 +12,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -25,17 +23,12 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class BlockStorageBox extends BlockContainer
 {
 	@SideOnly(Side.CLIENT)
-	private IIcon[] icons;
-	@SideOnly(Side.CLIENT)
-	private IIcon[] icons_top;
-	@SideOnly(Side.CLIENT)
-	private IIcon[] icons_face;
+	private final HashMap<String,IIcon[]> iconMap = new HashMap();
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons_glass;
 	@SideOnly(Side.CLIENT)
@@ -56,14 +49,14 @@ public class BlockStorageBox extends BlockContainer
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 
-		if (world.isRemote && tile.getStorageBoxType() != StorageBoxType.Glass)
+		if (world.isRemote && StorageBoxType.compareTypes(tile, "Glass"))
 		{
 			return true;
 		}
 
 		ItemStack itemstack = player.getCurrentEquippedItem();
 
-		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.noFunctionItems && itemstack.getItemDamage() == 3 && tile.getStorageBoxType() != StorageBoxType.Glass)
+		if (itemstack != null && itemstack.getItem() == MoreInventoryMod.noFunctionItems && itemstack.getItemDamage() == 3 && !StorageBoxType.compareTypes(tile, "Glass"))
 		{
 			tile.sendGUIPacketToClient();
 			player.openGui(MoreInventoryMod.instance, 4, world, x, y, z);
@@ -158,7 +151,7 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata)
 	{
-		return StorageBoxType.makeEntity(metadata);
+		return StorageBoxType.makeEntity("Wood");
 	}
 
 	@Override
@@ -203,33 +196,39 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister)
 	{
-		icons = new IIcon[StorageBoxType.values().length];
-		icons_top = new IIcon[StorageBoxType.values().length];
-		icons_face = new IIcon[StorageBoxType.values().length];
 		icons_glass = new IIcon[16];
 		icon_air = iconRegister.registerIcon("moreinv:air");
 
-		for (int i = 0; i < StorageBoxType.values().length; i++)
+		Set typeSet = StorageBoxType.types.entrySet();
+		int t = 0;
+		for (Iterator i = typeSet.iterator(); i.hasNext();t++)
 		{
-			String name = StorageBoxType.values()[i].name().toLowerCase(Locale.ENGLISH);
+			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
 
-			if (i != 8)
+			String name = type.getKey().toLowerCase(Locale.ENGLISH);
+			String folder = StorageBoxType.getTextureFolder(type.getKey());
+
+			if (!type.getKey().equals("Glass"))
 			{
-				icons[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_side");
-				icons_top[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_top");
-				icons_face[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_face");
+				IIcon[] icons = new IIcon[3];
+				icons[0] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_side");
+				icons[1] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_top");
+				icons[2] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_face");
+				iconMap.put(type.getKey(), icons);
 			}
 			else
 			{
-				icons[i] = iconRegister.registerIcon(getTextureName() + "_" + name + "_0");
-				icons_top[i] = icons[i];
-				icons_face[i] = icons[i];
+				IIcon[] icons = new IIcon[3];
+				icons[0] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_0");
+				icons[1] = icons[0];
+				icons[2] = icons[0];
+				iconMap.put(type.getKey(), icons);
 			}
 		}
 
 		for (int i = 0; i < 16; i++)
 		{
-			icons_glass[i] = iconRegister.registerIcon(getTextureName() + "_" + StorageBoxType.Glass.name().toLowerCase(Locale.ENGLISH) + "_" + i);
+			icons_glass[i] = iconRegister.registerIcon(getTextureName() + "_" + "Glass".toLowerCase(Locale.ENGLISH) + "_" + i);
 		}
 	}
 
@@ -237,7 +236,10 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public IIcon getIcon(int side, int metadata)
 	{
-		return side == 0 || side == 1 ? icons_top[metadata] : icons[metadata];
+		//return side == 0 || side == 1 ? icons[metadata] : icons[metadata];
+
+		IIcon[] icons = iconMap.get("Wood");
+		return icons[0];
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -245,8 +247,9 @@ public class BlockStorageBox extends BlockContainer
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
+		String type = tile.getTypeName();
 
-		if (tile.getStorageBoxType() == StorageBoxType.Glass)
+		if (StorageBoxType.compareTypes(tile, "Glass"))
 		{
 			int pos[] = MIMUtils.getSidePos(x, y, z, side);
 
@@ -260,14 +263,14 @@ public class BlockStorageBox extends BlockContainer
 			}
 		}
 
-		int meta = tile.getBlockMetadata();
+		IIcon[] icons = iconMap.get(type);
 
 		if (Config.containerBoxSideTexture)
 		{
-			return side == 0 || side == 1 ? icons_top[meta] : side == tile.face ? icons_face[meta] : icons[meta];
+			return side == 0 || side == 1 ? icons[1] : side == tile.face ? icons[2] : icons[0];
 		}
 
-		return getIcon(side, meta);
+		return icons[0];
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -291,15 +294,5 @@ public class BlockStorageBox extends BlockContainer
 		}
 
 		return icons_glass[index];
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void getSubBlocks(Item item, CreativeTabs tab, List list)
-	{
-		for (int i = 0; i < StorageBoxType.values().length; i++)
-		{
-			list.add(new ItemStack(this, 1, i));
-		}
 	}
 }

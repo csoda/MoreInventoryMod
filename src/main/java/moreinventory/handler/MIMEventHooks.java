@@ -17,6 +17,8 @@ import moreinventory.network.ConfigSyncMessage;
 import moreinventory.network.PlayerNameCacheMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
+import moreinventory.util.MIMItemBoxList;
+import moreinventory.util.MIMItemInvList;
 import moreinventory.util.MIMUtils;
 import moreinventory.util.Version;
 import net.minecraft.enchantment.Enchantment;
@@ -276,6 +278,9 @@ public class MIMEventHooks
 		{
 			if (MoreInventoryMod.saveHandler == null || !MoreInventoryMod.saveHandler.world.getSaveHandler().getWorldDirectoryName().equals(world.getSaveHandler().getWorldDirectoryName()))
 			{
+				TileEntityEnderStorageBox.itemList = new MIMItemInvList("EnderStorageBoxInv");
+				TileEntityEnderStorageBox.enderBoxList = new MIMItemBoxList("EnderStorageBox");
+				TileEntityTeleporter.teleporterList = new MIMItemBoxList("Teleporter");
 				MoreInventoryMod.saveHandler = new MIMWorldSaveHelper(world, "MoreInvData", TileEntityEnderStorageBox.itemList, TileEntityEnderStorageBox.enderBoxList, TileEntityTeleporter.teleporterList, MoreInventoryMod.playerNameCache);
 			}
 		}

@@ -25,7 +25,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	protected ItemStack[] storageItems;
 
 	private String ownerID = MoreInventoryMod.defaultOwnerID;
-	private StorageBoxType type;
+	private String typeName;
 	private StorageBoxNetworkManager storageBoxManager;
 
 	private ItemStack contents;
@@ -48,19 +48,19 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public TileEntityStorageBox()
 	{
-		this(StorageBoxType.Wood);
+		this("Wood");
 	}
 
-	public TileEntityStorageBox(StorageBoxType type)
+	public TileEntityStorageBox(String type)
 	{
-		this.type = type;
-		this.storageItems = new ItemStack[type.inventorySize];
+		this.typeName = type;
+		this.storageItems = new ItemStack[getSizeInventory()];
 		this.face = 0;
 	}
 
-	public StorageBoxType getStorageBoxType()
+	public String getTypeName()
 	{
-		return type;
+		return StorageBoxType.isExistType(typeName) ? typeName : "Wood";
 	}
 
 	@Override
@@ -101,6 +101,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		face = (byte)(face == 2 ? 5 : face == 5 ? 3 : face == 3 ? 4 : 2);
 
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+
 		markDirty();
 	}
 
@@ -125,10 +127,15 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return contents;
 	}
 
+	public int getUsableInventorySize()
+	{
+		return StorageBoxType.getInventorysize(typeName);
+	}
+
 	@Override
 	public int getSizeInventory()
 	{
-		return type.inventorySize + 1;
+		return getUsableInventorySize() + 1;
 	}
 
 	@Override
@@ -147,7 +154,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				registerItems(itemstack);
 			}
 
-			if (!isSameAsContents(itemstack) || slot == type.inventorySize)
+			if (!isSameAsContents(itemstack) || slot == getUsableInventorySize())
 			{
 				getStorageBoxNetworkManager().linkedPutIn(itemstack, this, false);
 
@@ -163,7 +170,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				itemstack.stackSize = getInventoryStackLimit();
 			}
 		}
-		else if (slot < type.inventorySize)
+		else if (slot < getUsableInventorySize())
 		{
 			storageItems[slot] = null;
 		}
@@ -353,7 +360,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public boolean canMergeItemStack(ItemStack itemstack)
 	{
-		int size = type.inventorySize;
+		int size = getUsableInventorySize();
 		ItemStack item;
 
 		for (int i = 0; i < size; i++)
@@ -519,9 +526,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public static int getPowerOutput(TileEntityStorageBox tile)
 	{
-		if (tile.type != StorageBoxType.Glass && tile.type != StorageBoxType.Ender && tile.getContents() != null)
+		if (!StorageBoxType.compareTypes(tile, "Glass") && !StorageBoxType.compareTypes(tile, "Ender") && tile.getContents() != null)
 		{
-			return 15 * tile.contentsCount / tile.type.inventorySize / tile.getContents().getMaxStackSize();
+			return 15 * tile.contentsCount / tile.getUsableInventorySize() / tile.getContents().getMaxStackSize();
 		}
 
 		return 0;
@@ -538,8 +545,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		{
 			ownerID = entity.getUniqueID().toString();
 		}
-
-		markDirty();
 
 		for (int i = 0; i < 6; ++i)
 		{
@@ -560,6 +565,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		{
 			makeNewBoxList();
 		}
+
+		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+		markDirty();
 	}
 
 	public void onNeighborRemoved()
@@ -570,15 +578,23 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		}
 	}
 
-	public TileEntityStorageBox upgrade(int type)
+	public TileEntityStorageBox upgrade(String type)
 	{
 		TileEntityStorageBox tile = StorageBoxType.makeEntity(type);
-		System.arraycopy(storageItems, 0, tile.storageItems, 0, storageItems.length);
+		if(storageItems.length <= tile.storageItems.length){
+			System.arraycopy(storageItems, 0, tile.storageItems, 0, storageItems.length);
+		}
 		tile.face = face;
 		tile.contents = contents;
 		tile.contentsCount = contentsCount;
 		tile.isPrivate = isPrivate;
 		tile.ownerID = ownerID;
+
+		if(worldObj.isRemote)
+		{
+			tile.displayedStackCount = displayedStackCount;
+			tile.displayedStackSize = displayedStackSize;
+		}
 
 		return tile;
 	}
@@ -587,6 +603,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
+
+		typeName = nbt.getString("typeName");
+		this.storageItems = new ItemStack[getSizeInventory()];
 
 		NBTTagList list = (NBTTagList)nbt.getTag("Items");
 
@@ -642,21 +661,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		nbt.setBoolean("canInsert", canInsert);
 		nbt.setBoolean("checkNBT", checkNBT);
 		nbt.setString("owner", ownerID);
-	}
-
-	public TileEntityStorageBox updateFromMetadata(int meta)
-	{
-		if (worldObj != null && worldObj.isRemote)
-		{
-			if (meta != type.ordinal())
-			{
-				worldObj.setTileEntity(xCoord, yCoord, zCoord, StorageBoxType.makeEntity(meta));
-
-				return (TileEntityStorageBox)worldObj.getTileEntity(xCoord, yCoord, zCoord);
-			}
-		}
-
-		return this;
+		nbt.setString("typeName" , typeName);
 	}
 
 	@Override
@@ -669,7 +674,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void handlePacket(int config1, byte config2)
+	public void handlePacket(int config1, byte config2, String config3)
 	{
 		contentsCount = config1;
 		face = config2;
@@ -679,6 +684,14 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			int size = getContents().getMaxStackSize();
 			displayedStackSize = (byte)(contentsCount % size);
 			displayedStackCount = (contentsCount - displayedStackSize) / size;
+		}
+
+		if (!typeName.equals(config3))
+		{
+			typeName = config3;
+			TileEntityStorageBox newTile = upgrade(typeName);
+			worldObj.setTileEntity(xCoord, yCoord, zCoord, newTile);
+			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		}
 	}
 
@@ -721,7 +734,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void sendPacket()
 	{
-		MoreInventoryMod.network.sendToDimension(new StorageBoxMessage(xCoord, yCoord, zCoord, getContentItemCount(), face), worldObj.provider.dimensionId);
+		MoreInventoryMod.network.sendToDimension(new StorageBoxMessage(xCoord, yCoord, zCoord, getContentItemCount(), face, getTypeName()), worldObj.provider.dimensionId);
 	}
 
 	public void sendContents()

@@ -4,6 +4,6 @@ public class TileEntityIronStorageBox extends TileEntityStorageBox
 {
 	public TileEntityIronStorageBox()
 	{
-		super(StorageBoxType.Iron);
+		super("Iron");
 	}
 }

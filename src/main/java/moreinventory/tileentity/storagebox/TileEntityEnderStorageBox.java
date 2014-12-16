@@ -11,12 +11,12 @@ import net.minecraftforge.common.DimensionManager;
 
 public class TileEntityEnderStorageBox extends TileEntityStorageBox
 {
-	public static final MIMItemInvList itemList = new MIMItemInvList("EnderStorageBoxInv");
-	public static final MIMItemBoxList enderBoxList = new MIMItemBoxList("EnderStorageBox");
+	public static  MIMItemInvList itemList;
+	public static  MIMItemBoxList enderBoxList;
 
 	public TileEntityEnderStorageBox()
 	{
-		super(StorageBoxType.Ender);
+		super("Ender");
 	}
 
 	@Override

@@ -9,7 +9,7 @@ public class TileEntityGlassStorageBox extends TileEntityStorageBox
 {
 	public TileEntityGlassStorageBox()
 	{
-		super(StorageBoxType.Glass);
+		super("Glass");
 	}
 
 	@Override
@@ -63,9 +63,6 @@ public class TileEntityGlassStorageBox extends TileEntityStorageBox
 	{
 		return getStorageBoxNetworkManager().canLinkedImport(itemstack, this);
 	}
-
-	@Override
-	public void sendPacket() {}
 
 	@Override
 	public void sendContents() {}

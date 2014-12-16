@@ -1,6 +1,7 @@
 package moreinventory.network;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
@@ -15,16 +16,18 @@ public class StorageBoxMessage implements IMessage, IMessageHandler<StorageBoxMe
 {
 	private int x, y, z, count;
 	private byte face;
+	private String typeName;
 
 	public StorageBoxMessage() {}
 
-	public StorageBoxMessage(int x, int y, int z, int count, byte face)
+	public StorageBoxMessage(int x, int y, int z, int count, byte face, String typeName)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
 		this.count = count;
 		this.face = face;
+		this.typeName = typeName;
 	}
 
 	@Override
@@ -35,6 +38,7 @@ public class StorageBoxMessage implements IMessage, IMessageHandler<StorageBoxMe
 		z = buf.readInt();
 		count = buf.readInt();
 		face = buf.readByte();
+		typeName = ByteBufUtils.readUTF8String(buf);
 	}
 
 	@Override
@@ -45,6 +49,7 @@ public class StorageBoxMessage implements IMessage, IMessageHandler<StorageBoxMe
 		buf.writeInt(z);
 		buf.writeInt(count);
 		buf.writeByte(face);
+		ByteBufUtils.writeUTF8String(buf, typeName);
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -56,7 +61,7 @@ public class StorageBoxMessage implements IMessage, IMessageHandler<StorageBoxMe
 
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
-			((TileEntityStorageBox)tile).handlePacket(message.count, message.face);
+			((TileEntityStorageBox)tile).handlePacket(message.count, message.face, message.typeName);
 		}
 
 		return null;

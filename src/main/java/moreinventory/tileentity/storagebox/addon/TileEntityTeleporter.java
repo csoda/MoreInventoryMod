@@ -9,7 +9,7 @@ import net.minecraftforge.common.DimensionManager;
 
 public class TileEntityTeleporter extends TileEntitySBAddonBase
 {
-	public static final MIMItemBoxList teleporterList = new MIMItemBoxList("Teleporter");
+	public static  MIMItemBoxList teleporterList;
 
 	public TileEntityTeleporter()
 	{

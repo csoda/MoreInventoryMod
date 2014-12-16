@@ -4,6 +4,6 @@ public class TileEntityGoldStorageBox extends TileEntityStorageBox
 {
 	public TileEntityGoldStorageBox()
 	{
-		super(StorageBoxType.Gold);
+		super("Gold");
 	}
 }

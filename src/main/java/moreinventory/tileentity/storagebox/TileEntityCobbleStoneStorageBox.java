@@ -4,6 +4,6 @@ public class TileEntityCobbleStoneStorageBox extends TileEntityStorageBox
 {
 	public TileEntityCobbleStoneStorageBox()
 	{
-		super(StorageBoxType.CobbleStone);
+		super("CobbleStone");
 	}
 }

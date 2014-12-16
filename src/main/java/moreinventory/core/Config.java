@@ -16,7 +16,9 @@ import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Config
@@ -179,19 +181,22 @@ public class Config
 
 		category = "color";
 
-		for (StorageBoxType type : StorageBoxType.values())
+		Set typeSet = StorageBoxType.types.entrySet();
+		for (Iterator i = typeSet.iterator(); i.hasNext();)
 		{
-			if (type == StorageBoxType.Glass)
+			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
+
+			if (type.getKey() == "Glass")
 			{
 				continue;
 			}
 
-			prop = config.get(category, type.name(), type.color == 0 ? "000000" : "FFFFFF");
+			prop = config.get(category, type.getKey(), type.getValue().color == 0 ? "000000" : "FFFFFF");
 			prop.setLanguageKey(MoreInventoryMod.CONFIG_LANG + category + "." + prop.getName());
 			prop.comment = StatCollector.translateToLocal(prop.getLanguageKey() + ".tooltip");
 			prop.comment += " [color: 000000 ~ FFFFFF, default: " + prop.getDefault() + "]";
 			propOrder.add(prop.getName());
-			type.color = Integer.parseInt(prop.getString(), 16);
+			type.getValue().color = Integer.parseInt(prop.getString(), 16);
 		}
 
 		config.setCategoryPropertyOrder(category, propOrder);

@@ -37,7 +37,7 @@ public class GuiStorageBox extends GuiContainer
 		this.usingPlayer = inventory.player;
 		this.storageBox = tile;
 		this.contents = storageBox.getContents();
-		this.maxStack = contents != null ? storageBox.getStorageBoxType().inventorySize * contents.getMaxStackSize() : 0;
+		this.maxStack = contents != null ? storageBox.getUsableInventorySize() * contents.getMaxStackSize() : 0;
 	}
 
 	@Override
@@ -136,13 +136,13 @@ public class GuiStorageBox extends GuiContainer
 		fontRendererObj.drawString("[" + I18n.format("containerbox.gui.details") + "]", 25, 77, 4210752);
 		fontRendererObj.drawString(I18n.format("moreinv.gui.owner") + ": " + storageBox.getOwnerName(), 30, 87, 4210752);
 		fontRendererObj.drawString(I18n.format("containerbox.gui.connection") + ": " + storageBox.connectCount, 30, 98, 4210752);
-		fontRendererObj.drawString(I18n.format("containerbox.gui.tier") + ": " + storageBox.getStorageBoxType().tier, 30, 108, 4210752);
+		fontRendererObj.drawString(I18n.format("containerbox.gui.tier") + ": " + StorageBoxType.getTier(storageBox.getTypeName()), 30, 108, 4210752);
 
 		if (contents != null)
 		{
 			String count = "";
 
-			if (storageBox.getStorageBoxType() != StorageBoxType.Ender)
+			if (!StorageBoxType.compareTypes(storageBox, "Ender"))
 			{
 				count = "/" + maxStack;
 			}
@@ -162,7 +162,7 @@ public class GuiStorageBox extends GuiContainer
 
 		if (contents != null)
 		{
-			if (storageBox.getStorageBoxType() != StorageBoxType.Ender)
+			if (!StorageBoxType.compareTypes(storageBox, "Ender"))
 			{
 				int width = 64 * storageBox.contentsCount / maxStack;
 				drawTexturedModalRect(guiLeft + 57, guiTop + 65, xSize + 8, 5, 64, 5);

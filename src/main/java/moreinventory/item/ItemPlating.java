@@ -10,6 +10,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
@@ -20,7 +21,7 @@ public class ItemPlating extends Item
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons;
 
-	public static final byte[] typeIndex = {1, 2, 3, 4, 5, 6, 7, 10, 12};
+	public static final String[] typeNameIndex = {"Iron", "Gold", "Diamond", "Copper", "Tin", "Bronze", "Silver", "Emerald", "Steel"};
 
 	public ItemPlating()
 	{
@@ -36,19 +37,17 @@ public class ItemPlating extends Item
 			return false;
 		}
 
-		if (world.getBlock(x, y, z) == MoreInventoryMod.storageBox)
+		TileEntity tile = world.getTileEntity(x, y, z);
+		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
-			int index = typeIndex[itemstack.getItemDamage()];
-			int meta = world.getBlockMetadata(x, y, z);
-			int tier1 = StorageBoxType.values()[index].tier;
-			int tier2 = StorageBoxType.values()[meta].tier;
+			String typeA = typeNameIndex[itemstack.getItemDamage()];
+			String typeB =  ((TileEntityStorageBox) tile).getTypeName();
+			int tierA = StorageBoxType.getTier(typeA);
+			int tierB = StorageBoxType.getTier(typeB);
 
-			if (index != 0 && (tier1 == tier2 || tier1 == tier2 + 1) && StorageBoxType.values()[index].inventorySize > StorageBoxType.values()[meta].inventorySize)
+			if (tierB != 0 && (tierA == tierB || tierA == tierB + 1) && StorageBoxType.getInventorysize(typeA) > StorageBoxType.getInventorysize(typeB))
 			{
-				TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
-
-				world.setBlockMetadataWithNotify(x, y, z, index, 2);
-				world.setTileEntity(x, y, z, tile.upgrade(index));
+				world.setTileEntity(x, y, z, ((TileEntityStorageBox) tile).upgrade(typeA));
 
 				if (!player.capabilities.isCreativeMode)
 				{
@@ -69,14 +68,14 @@ public class ItemPlating extends Item
 	@Override
 	public String getUnlocalizedName(ItemStack itemstack)
 	{
-		return "painting:" + StorageBoxType.values()[ItemPlating.typeIndex[itemstack.getItemDamage()]].name();
+		return "painting:" + typeNameIndex[itemstack.getItemDamage()];
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list)
 	{
-		for (int i = 0; i < typeIndex.length; i++)
+		for (int i = 0; i < typeNameIndex.length; i++)
 		{
 			list.add(new ItemStack(this, 1, i));
 		}
@@ -86,11 +85,11 @@ public class ItemPlating extends Item
 	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
-		icons = new IIcon[typeIndex.length];
+		icons = new IIcon[typeNameIndex.length];
 
-		for (int i = 0; i < typeIndex.length; i++)
+		for (int i = 0; i < typeNameIndex.length; i++)
 		{
-			icons[i] = iconRegister.registerIcon("moreinv:plating_" + StorageBoxType.values()[typeIndex[i]].name());
+			icons[i] = iconRegister.registerIcon("moreinv:plating_" + typeNameIndex[i]);
 		}
 	}
 
