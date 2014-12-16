@@ -75,14 +75,11 @@ public class ItemTorchHolder extends Item
 		{
 			int count = 0;
 
-			if (inventory != null)
+			for (int i = 0; i < inventory.getSizeInventory(); i++)
 			{
-				for (int i = 0; i < inventory.getSizeInventory(); i++)
+				if (inventory.getStackInSlot(i) != null && inventory.getStackInSlot(i).getItem() == Item.getItemFromBlock(Blocks.torch))
 				{
-					if (inventory.getStackInSlot(i) != null && inventory.getStackInSlot(i).getItem() == Item.getItemFromBlock(Blocks.torch))
-					{
-						count += inventory.getStackInSlot(i).stackSize;
-					}
+					count += inventory.getStackInSlot(i).stackSize;
 				}
 			}
 
@@ -93,6 +90,8 @@ public class ItemTorchHolder extends Item
 
 				--count;
 			}
+
+			player.worldObj.playSoundAtEntity(player, "random.pop", 1.0F, 0.35F);
 		}
 	}
 
@@ -113,6 +112,18 @@ public class ItemTorchHolder extends Item
 		itemstack.setItemDamage(itemstack.getItemDamage() + 1);
 
 		return itemstack;
+	}
+
+	@Override
+	public boolean isDamaged(ItemStack itemstack)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean showDurabilityBar(ItemStack itemstack)
+	{
+		return itemstack.getItemDamage() > 0;
 	}
 
 	@SideOnly(Side.CLIENT)
