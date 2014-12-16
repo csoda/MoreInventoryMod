@@ -104,6 +104,7 @@ moreinv.config.general.versionNotify.tooltip=Whether or not to notify when a new
 moreinv.config.general.transportableBlocks=Transportable Blocks
 moreinv.config.general.transportableBlocks.tooltip=Specify the transportable blocks on the Transporter.
 moreinv.config.general.transportableBlocks.select=Select the transportable block
+moreinv.config.general.transportableBlocks.select.icon=Select the transporter icon
 moreinv.config.general.isCollectTorch=Collect Torch
 moreinv.config.general.isCollectTorch.tooltip=Whether or not to collect to Torch Holder on the player inventory when you pick up a Torch.
 moreinv.config.general.isCollectArrow=Collect Arrow

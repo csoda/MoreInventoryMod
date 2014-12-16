@@ -19,7 +19,6 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -37,8 +36,6 @@ import java.util.concurrent.RecursiveAction;
 
 public class GuiTransportableBlocks extends GuiScreen
 {
-	protected static RenderItem itemRender = new RenderItem();
-
 	private final GuiScreen parent;
 	protected ArrayEntry configElement;
 
@@ -383,7 +380,7 @@ public class GuiTransportableBlocks extends GuiScreen
 
 			if (i < 0)
 			{
-				blockMetaField.setText(Integer.toString(Math.max(NumberUtils.toInt(blockMetaField.getText()) - 1, 0)));
+				blockMetaField.setText(Integer.toString(Math.max(NumberUtils.toInt(blockMetaField.getText()) - 1, -1)));
 			}
 			else if (i > 0)
 			{
@@ -396,7 +393,7 @@ public class GuiTransportableBlocks extends GuiScreen
 
 			if (i < 0)
 			{
-				iconField.setText(Integer.toString(Math.max(NumberUtils.toInt(iconField.getText()) - 1, 1)));
+				iconField.setText(Integer.toString(Math.max(NumberUtils.toInt(iconField.getText()) - 1, 0)));
 			}
 			else if (i > 0)
 			{
@@ -417,11 +414,20 @@ public class GuiTransportableBlocks extends GuiScreen
 				textField.mouseClicked(x, y, code);
 			}
 
-			if (!isShiftKeyDown() && blockField.isFocused())
+			if (!isShiftKeyDown())
 			{
-				blockField.setFocused(false);
+				if (blockField.isFocused())
+				{
+					blockField.setFocused(false);
 
-				mc.displayGuiScreen(new GuiSelectTransportableBlock(this, blockField, blockMetaField));
+					mc.displayGuiScreen(new GuiSelectTransportableBlock(this, blockField, blockMetaField));
+				}
+				else if (iconField.isFocused())
+				{
+					iconField.setFocused(false);
+
+					mc.displayGuiScreen(new GuiSelectTransportableIcon(this, iconField));
+				}
 			}
 		}
 		else
