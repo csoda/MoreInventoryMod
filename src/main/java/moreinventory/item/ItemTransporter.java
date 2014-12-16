@@ -99,13 +99,21 @@ public class ItemTransporter extends Item
 				{
 					itemstack.setItemDamage(2);
 				}
+				else if (block == Blocks.furnace)
+				{
+					itemstack.setItemDamage(3);
+				}
+				else if (block == Blocks.lit_furnace)
+				{
+					itemstack.setItemDamage(4);
+				}
 				else if (block == MoreInventoryMod.storageBox)
 				{
-					itemstack.setItemDamage(world.getBlockMetadata(x, y, z) + 3);
+					itemstack.setItemDamage(world.getBlockMetadata(x, y, z) + 5);
 				}
 				else
 				{
-					itemstack.setItemDamage(transportableBlocks.get(MIMUtils.getUniqueName(block), meta) + 19);
+					itemstack.setItemDamage(transportableBlocks.get(MIMUtils.getUniqueName(block), meta) + 21);
 				}
 
 				world.setBlockToAir(x, y, z);
@@ -137,22 +145,24 @@ public class ItemTransporter extends Item
 	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
-		icons = new IIcon[49];
+		icons = new IIcon[51];
 		icons[0] = iconRegister.registerIcon("moreinv:transporter");
 		icons[1] = iconRegister.registerIcon("moreinv:transporter_chest");
 		icons[2] = iconRegister.registerIcon("moreinv:transporter_trapchest");
+		icons[3] = iconRegister.registerIcon("moreinv:transporter_furnace");
+		icons[4] = iconRegister.registerIcon("moreinv:transporter_furnace_lit");
 
 		for (StorageBoxType type : StorageBoxType.values())
 		{
 			if (type != StorageBoxType.Glass && type != StorageBoxType.CobbleStone && type != StorageBoxType.Ender)
 			{
-				icons[type.ordinal() + 3] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + type.name().toLowerCase(Locale.ENGLISH));
+				icons[type.ordinal() + 5] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + type.name().toLowerCase(Locale.ENGLISH));
 			}
 		}
 
 		for (int i = 0; i < 30; ++i)
 		{
-			icons[i + 19] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
+			icons[i + 21] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
 		}
 	}
 

@@ -3,6 +3,7 @@ package moreinventory.handler;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEvent;
 import cpw.mods.fml.relauncher.Side;
@@ -28,6 +29,7 @@ import net.minecraft.event.ClickEvent;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
@@ -39,7 +41,6 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.Random;
@@ -86,6 +87,12 @@ public class MIMEventHooks
 		NBTTagCompound data = new NBTTagCompound();
 		MoreInventoryMod.playerNameCache.writeToNBT(data);
 		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new PlayerNameCacheMessage(data)));
+	}
+
+	@SubscribeEvent
+	public void onPlayerLoggedIn(PlayerLoggedInEvent event)
+	{
+		MoreInventoryMod.playerNameCache.refreshOwner(event.player);
 	}
 
 	@SubscribeEvent
@@ -172,7 +179,7 @@ public class MIMEventHooks
 	@SubscribeEvent
 	public void onArrowLoose(ArrowLooseEvent event)
 	{
-		if (event.bow != null && event.bow.getItem() == Items.bow)
+		if (event.bow != null && event.bow.getItem() instanceof ItemBow)
 		{
 			EntityPlayer player = event.entityPlayer;
 			World world = player.worldObj;
@@ -250,7 +257,7 @@ public class MIMEventHooks
 
 			for (Item holder : MoreInventoryMod.arrowHolder)
 			{
-				if (player.capabilities.isCreativeMode || player.inventory.hasItem(holder))
+				if (player.inventory.hasItem(holder))
 				{
 					player.setItemInUse(event.result, event.result.getMaxItemUseDuration());
 
@@ -258,12 +265,6 @@ public class MIMEventHooks
 				}
 			}
 		}
-	}
-
-	@SubscribeEvent
-	public void onPlayerLoad(PlayerEvent.LoadFromFile event)
-	{
-		MoreInventoryMod.playerNameCache.refreshOwner(event.entityPlayer);
 	}
 
 	@SubscribeEvent
