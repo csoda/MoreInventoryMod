@@ -1,5 +1,6 @@
 package moreinventory.tileentity.storagebox;
 
+import com.google.common.collect.Maps;
 import cpw.mods.fml.common.registry.GameRegistry;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.ItemBlockStorageBox;
@@ -8,14 +9,13 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public  class StorageBoxType
 {
-	public static LinkedHashMap<String, StorageBoxType> types = new LinkedHashMap<String, StorageBoxType>();
+	public static final LinkedHashMap<String, StorageBoxType> types = Maps.newLinkedHashMap();
 
 	public int inventorySize;
 	public Class clazz;
@@ -40,22 +40,12 @@ public  class StorageBoxType
 
 	public static boolean compareTypes(TileEntityStorageBox tile1 , TileEntityStorageBox tile2)
 	{
-		if(tile1 != null)
-		{
-			return compareTypes(tile2 , tile1.getTypeName());
-		}
-
-		return false;
+		return tile1 != null && compareTypes(tile2, tile1.getTypeName());
 	}
 
 	public static boolean compareTypes(TileEntityStorageBox tile, String type)
 	{
-		if (tile != null && tile.getTypeName().equals(type))
-		{
-			return true;
-		}
-
-		return false;
+		return tile != null && tile.getTypeName().equals(type);
 	}
 
 	public static boolean isExistType(String type)
@@ -63,7 +53,7 @@ public  class StorageBoxType
 		return types.containsKey(type);
 	}
 
-	public static int getInventorysize(String type)
+	public static int getInventorySize(String type)
 	{
 		if (isExistType(type))
 		{
@@ -93,9 +83,8 @@ public  class StorageBoxType
 		return types.get("Wood").tier;
 	}
 
-	public static TileEntityStorageBox makeEntity(String type)
+	public static TileEntityStorageBox createEntity(String type)
 	{
-
 		if (!isExistType(type))
 		{
 			type = "Wood";
@@ -120,7 +109,7 @@ public  class StorageBoxType
 			return types.get(type).textureFolder;
 		}
 
-		return types.get("CobbleStone").textureFolder;
+		return types.get("Cobblestone").textureFolder;
 	}
 
 	public static void initialize()
@@ -135,18 +124,16 @@ public  class StorageBoxType
 		StorageBoxType.types.put("Bronze", new StorageBoxType(128, TileEntityBronzeStorageBox.class, 0xFFFFFF, 2, true, new Object[] {"ingotBronze", "ingotBrass"}, name, true));
 		StorageBoxType.types.put("Silver", new StorageBoxType(192, TileEntitySilverStorageBox.class, 0xFFFFFF, 3, true, new Object[] {"ingotSilver"} , name, true));
 		StorageBoxType.types.put("Glass", new StorageBoxType(0, TileEntityGlassStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
-		StorageBoxType.types.put("Cobblestone", new StorageBoxType(1, TileEntityCobbleStoneStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
+		StorageBoxType.types.put("Cobblestone", new StorageBoxType(1, TileEntityCobblestoneStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
 		StorageBoxType.types.put("Emerald", new StorageBoxType(1028, TileEntityEmeraldStorageBox.class, 0xFFFFFF, 5, false, new Object[] {new ItemStack(Items.emerald)} , name, true));
 		StorageBoxType.types.put("Ender", new StorageBoxType(2, TileEntityEnderStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
 		StorageBoxType.types.put("Steel", new StorageBoxType(384, TileEntitySteelStorageBox.class, 0xFFFFFF, 3, false, new Object[] {"ingotSteel", "ingotInvar"} , name, true));
 
-
-		Set typeSet = StorageBoxType.types.entrySet();
+		Set<Entry<String, StorageBoxType>> types = StorageBoxType.types.entrySet();
 
 		/* class */
-		for (Iterator i = typeSet.iterator(); i.hasNext();)
+		for (Entry<String, StorageBoxType> type : types)
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
 			GameRegistry.registerTileEntity(type.getValue().clazz, "TileEntity" + type.getKey() + "StorageBox");
 		}
 
@@ -155,21 +142,20 @@ public  class StorageBoxType
 		ItemStack woodStorageBox = new ItemStack(MoreInventoryMod.storageBox, 1, 0);
 		ItemBlockStorageBox.writeToNBT(woodStorageBox, "Wood");
 
-		for (Iterator i = typeSet.iterator(); i.hasNext();)
+		for (Entry<String, StorageBoxType> type : types)
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
 			if (type.getValue().canCraft)
 			{
-				for (int t = 0; t < type.getValue().materials.length; t++)
+				for (Object material : type.getValue().materials)
 				{
-
-					ItemStack itemstack = new ItemStack(MoreInventoryMod.storageBox,3,0);
+					ItemStack itemstack = new ItemStack(MoreInventoryMod.storageBox, 3, 0);
 					ItemBlockStorageBox.writeToNBT(itemstack, type.getKey());
+
 					GameRegistry.addRecipe(new ShapedOreRecipe(itemstack, true,
-							"IHI", "ICI", "IHI",
-							'I', type.getValue().materials[t],
-							'C', woodStorageBox,
-							'H', stoneslab
+						"IHI", "ICI", "IHI",
+						'I', material,
+						'C', woodStorageBox,
+						'H', stoneslab
 					));
 				}
 			}

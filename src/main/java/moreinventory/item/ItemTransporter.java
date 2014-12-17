@@ -1,12 +1,15 @@
 package moreinventory.item;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.tileentity.storagebox.StorageBoxType;
+import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -23,7 +26,11 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ItemTransporter extends Item
 {
@@ -46,8 +53,20 @@ public class ItemTransporter extends Item
 		}
 	}
 
+	public static final Set<String> forceIcons = Sets.newHashSet();
+
+	static
+	{
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.chest));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.trapped_chest));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.furnace));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.lit_furnace));
+	}
+
 	@SideOnly(Side.CLIENT)
-	private IIcon[] icons;
+	public Map<String, IIcon> iconMap;
+	@SideOnly(Side.CLIENT)
+	public IIcon[] icon_modded;
 
 	public ItemTransporter()
 	{
@@ -66,7 +85,7 @@ public class ItemTransporter extends Item
 			return true;
 		}
 
-		if (itemstack.getItemDamage() == 0)
+		if (itemstack.getTagCompound() == null)
 		{
 			Block block = world.getBlock(x, y, z);
 			int meta = world.getBlockMetadata(x, y, z);
@@ -90,30 +109,21 @@ public class ItemTransporter extends Item
 
 			if (new Transporter(itemstack).transferToPlayer(tile))
 			{
-				if (block == Blocks.chest)
+				String unique = MIMUtils.getUniqueName(block);
+
+				if (block == MoreInventoryMod.storageBox)
 				{
-					itemstack.setItemDamage(1);
+					itemstack.getTagCompound().setString("IconName", unique + ":" + ((TileEntityStorageBox)tile).getTypeName());
 				}
-				else if (block == Blocks.trapped_chest)
+				else if (forceIcons.contains(unique))
 				{
-					itemstack.setItemDamage(2);
+					itemstack.getTagCompound().setString("IconName", unique);
 				}
-				else if (block == Blocks.furnace)
+				else if (transportableBlocks.contains(unique, meta))
 				{
-					itemstack.setItemDamage(3);
+					itemstack.getTagCompound().setInteger("Modded", transportableBlocks.get(unique, meta));
 				}
-				else if (block == Blocks.lit_furnace)
-				{
-					itemstack.setItemDamage(4);
-				}
-				else if (block == MoreInventoryMod.storageBox)
-				{
-					itemstack.setItemDamage(world.getBlockMetadata(x, y, z) + 5);
-				}
-				else
-				{
-					itemstack.setItemDamage(transportableBlocks.get(MIMUtils.getUniqueName(block), meta) + 21);
-				}
+				else return false;
 
 				world.setBlockToAir(x, y, z);
 
@@ -132,7 +142,7 @@ public class ItemTransporter extends Item
 			return true;
 		}
 
-		if (itemstack.getItemDamage() != 0 && new Transporter(itemstack).placeBlock(world, player, x, y, z, side, hitX, hitY, hitZ))
+		if (itemstack.getTagCompound() != null && new Transporter(itemstack).placeBlock(world, player, x, y, z, side, hitX, hitY, hitZ))
 		{
 			player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(MoreInventoryMod.transporter));
 		}
@@ -142,40 +152,67 @@ public class ItemTransporter extends Item
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerIcons(IIconRegister iconRegister)
+	public boolean hasEffect(ItemStack itemstack, int pass)
 	{
-		icons = new IIcon[51];
-		icons[0] = iconRegister.registerIcon("moreinv:transporter");
-		icons[1] = iconRegister.registerIcon("moreinv:transporter_chest");
-		icons[2] = iconRegister.registerIcon("moreinv:transporter_trapchest");
-		icons[3] = iconRegister.registerIcon("moreinv:transporter_furnace");
-		icons[4] = iconRegister.registerIcon("moreinv:transporter_furnace_lit");
+		refreshTransporterIcon(itemstack);
 
-
-		Set typeSet = StorageBoxType.types.entrySet();
-		int t = 0;
-		for (Iterator i = typeSet.iterator(); i.hasNext(); t++)
-		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
-			String typeName = type.getKey();
-			if (!"Glass".equals(typeName) && !"CobbleStone".equals(typeName) && !"Ender".equals(typeName))
-			{
-				icons[t + 5] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH));
-			}
-		}
-
-
-		for (int i = 0; i < 30; ++i)
-		{
-			icons[i + 21] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
-		}
+		return super.hasEffect(itemstack, pass);
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public IIcon getIconFromDamage(int damage)
+	public void registerIcons(IIconRegister iconRegister)
 	{
-		return icons[damage];
+		iconMap = Maps.newHashMap();
+		icon_modded = new IIcon[30];
+
+		itemIcon = iconRegister.registerIcon("moreinv:transporter");
+		iconMap.put("default", itemIcon);
+		iconMap.put(MIMUtils.getUniqueName(Blocks.chest), iconRegister.registerIcon("moreinv:transporter_chest"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.trapped_chest), iconRegister.registerIcon("moreinv:transporter_trapchest"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.furnace), iconRegister.registerIcon("moreinv:transporter_furnace"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.lit_furnace), iconRegister.registerIcon("moreinv:transporter_furnace_lit"));
+
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
+		{
+			String typeName = type.getKey();
+
+			if (!"Glass".equals(typeName) && !"Cobblestone".equals(typeName) && !"Ender".equals(typeName))
+			{
+				iconMap.put(MIMUtils.getUniqueName(MoreInventoryMod.storageBox) + ":" + typeName, iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH)));
+			}
+		}
+
+		for (int i = 0; i < icon_modded.length; ++i)
+		{
+			icon_modded[i] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public void refreshTransporterIcon(ItemStack itemstack)
+	{
+		NBTTagCompound nbt = itemstack.getTagCompound();
+
+		if (nbt == null)
+		{
+			itemIcon = iconMap.get("default");
+
+			return;
+		}
+
+		IIcon result = null;
+
+		if (nbt.hasKey("IconName"))
+		{
+			result = iconMap.get(nbt.getString("IconName"));
+		}
+		else if (nbt.hasKey("Modded"))
+		{
+			result = icon_modded[nbt.getInteger("Modded") & (icon_modded.length - 1)];
+		}
+
+		itemIcon = result == null ? iconMap.get("default") : result;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -316,7 +353,7 @@ public class ItemTransporter extends Item
 				if (itemstack != null)
 				{
 					if (itemstack.getItem() == MoreInventoryMod.transporter && itemstack.getItemDamage() != 0 ||
-							itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
+						itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
 					{
 						return false;
 					}

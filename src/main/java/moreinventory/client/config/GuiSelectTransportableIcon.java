@@ -15,16 +15,13 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.List;
 import java.util.Map;
@@ -245,7 +242,7 @@ public class GuiSelectTransportableIcon extends GuiScreen
 			filterCache.clear();
 			selected = null;
 
-			for (int i = 0; i < 30; ++i)
+			for (int i = 0; i < MoreInventoryMod.transporter.icon_modded.length; ++i)
 			{
 				icons.add(i);
 			}
@@ -275,23 +272,15 @@ public class GuiSelectTransportableIcon extends GuiScreen
 				return;
 			}
 
-			ItemStack itemstack = new ItemStack(MoreInventoryMod.transporter, 1, entry + 21);
-
 			try
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslatef(0.0F, 0.0F, 32.0F);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-				GL11.glEnable(GL11.GL_LIGHTING);
-				RenderHelper.enableGUIStandardItemLighting();
-				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				itemRender.zLevel += 100.0F;
-				itemRender.renderItemIntoGUI(fontRendererObj, mc.getTextureManager(), itemstack, width / 2 - 8, par3 - 2);
-				itemRender.zLevel -= 100.0F;
-				GL11.glPopMatrix();
-				GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-				GL11.glDisable(GL11.GL_LIGHTING);
+				mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+				GL11.glEnable(GL11.GL_ALPHA_TEST);
+				GL11.glEnable(GL11.GL_BLEND);
+				itemRender.renderIcon(width / 2 - 8, par3 - 2, MoreInventoryMod.transporter.icon_modded[entry], 16, 16);
+				GL11.glDisable(GL11.GL_ALPHA_TEST);
+				GL11.glDisable(GL11.GL_BLEND);
+				GL11.glEnable(GL11.GL_CULL_FACE);
 			}
 			catch (Throwable ignored) {}
 

@@ -9,24 +9,20 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
-public class ItemBlockStorageBox extends ItemBlock
+public class ItemBlockStorageBox extends ItemBlockWithMetadata
 {
-
 	public ItemBlockStorageBox(Block block)
 	{
-		super(block);
-		this.setHasSubtypes(true);
+		super(block, block);
 	}
 
 	@Override
@@ -48,7 +44,7 @@ public class ItemBlockStorageBox extends ItemBlock
 
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
-			String type = this.readTypeNameFromNBT(itemstack.getTagCompound());
+			String type = readTypeNameFromNBT(itemstack.getTagCompound());
 			TileEntityStorageBox newTile = ((TileEntityStorageBox) tile).upgrade(type);
 			world.setTileEntity(tile.xCoord, tile.yCoord, tile.zCoord, newTile);
 		}
@@ -60,28 +56,18 @@ public class ItemBlockStorageBox extends ItemBlock
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list)
 	{
-		Set typeSet = StorageBoxType.types.entrySet();
-		for (Iterator i = typeSet.iterator(); i.hasNext();)
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
-
 			ItemStack itemstack = new ItemStack(this);
-			this.writeToNBT(itemstack, type.getKey());
+			writeToNBT(itemstack, type.getKey());
 			list.add(itemstack);
 		}
-
-	}
-
-	@Override
-	public int getMetadata(int damage)
-	{
-		return damage;
 	}
 
 	@Override
 	public String getUnlocalizedName(ItemStack itemstack)
 	{
-		return "containerbox:" + this.readTypeNameFromNBT(itemstack.getTagCompound());
+		return "containerbox:" + readTypeNameFromNBT(itemstack.getTagCompound());
 	}
 
 	public static String readTypeNameFromNBT(NBTTagCompound nbt)

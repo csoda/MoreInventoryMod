@@ -1,5 +1,6 @@
 package moreinventory.block;
 
+import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
@@ -23,12 +24,14 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class BlockStorageBox extends BlockContainer
 {
 	@SideOnly(Side.CLIENT)
-	private final HashMap<String,IIcon[]> iconMap = new HashMap();
+	private Map<String, IIcon[]> iconMap;
 	@SideOnly(Side.CLIENT)
 	private IIcon[] icons_glass;
 	@SideOnly(Side.CLIENT)
@@ -151,7 +154,7 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata)
 	{
-		return StorageBoxType.makeEntity("Wood");
+		return StorageBoxType.createEntity("Wood");
 	}
 
 	@Override
@@ -196,15 +199,12 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister)
 	{
+		iconMap = Maps.newHashMap();
 		icons_glass = new IIcon[16];
 		icon_air = iconRegister.registerIcon("moreinv:air");
 
-		Set typeSet = StorageBoxType.types.entrySet();
-		int t = 0;
-		for (Iterator i = typeSet.iterator(); i.hasNext();t++)
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
-
 			String name = type.getKey().toLowerCase(Locale.ENGLISH);
 			String folder = StorageBoxType.getTextureFolder(type.getKey());
 
@@ -228,7 +228,7 @@ public class BlockStorageBox extends BlockContainer
 
 		for (int i = 0; i < 16; i++)
 		{
-			icons_glass[i] = iconRegister.registerIcon(getTextureName() + "_" + "Glass".toLowerCase(Locale.ENGLISH) + "_" + i);
+			icons_glass[i] = iconRegister.registerIcon(getTextureName() + "_" + "glass_" + i);
 		}
 	}
 
@@ -236,10 +236,7 @@ public class BlockStorageBox extends BlockContainer
 	@Override
 	public IIcon getIcon(int side, int metadata)
 	{
-		//return side == 0 || side == 1 ? icons[metadata] : icons[metadata];
-
-		IIcon[] icons = iconMap.get("Wood");
-		return icons[0];
+		return iconMap.get("Wood")[0];
 	}
 
 	@SideOnly(Side.CLIENT)

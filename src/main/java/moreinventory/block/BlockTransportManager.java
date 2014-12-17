@@ -40,7 +40,7 @@ public class BlockTransportManager extends BlockContainer
 			}
 			else if (player.getCurrentEquippedItem() == null)
 			{
-				((TileEntityTransportManager) world.getTileEntity(x, y, z)).rotateBlock();
+				((TileEntityTransportManager)world.getTileEntity(x, y, z)).rotateBlock();
 			}
 		}
 

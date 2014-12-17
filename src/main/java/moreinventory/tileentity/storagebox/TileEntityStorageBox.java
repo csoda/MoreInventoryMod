@@ -129,7 +129,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public int getUsableInventorySize()
 	{
-		return StorageBoxType.getInventorysize(typeName);
+		return StorageBoxType.getInventorySize(typeName);
 	}
 
 	@Override
@@ -580,17 +580,20 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public TileEntityStorageBox upgrade(String type)
 	{
-		TileEntityStorageBox tile = StorageBoxType.makeEntity(type);
-		if(storageItems.length <= tile.storageItems.length){
+		TileEntityStorageBox tile = StorageBoxType.createEntity(type);
+
+		if (storageItems.length <= tile.storageItems.length)
+		{
 			System.arraycopy(storageItems, 0, tile.storageItems, 0, storageItems.length);
 		}
+
 		tile.face = face;
 		tile.contents = contents;
 		tile.contentsCount = contentsCount;
 		tile.isPrivate = isPrivate;
 		tile.ownerID = ownerID;
 
-		if(worldObj.isRemote)
+		if (worldObj.isRemote)
 		{
 			tile.displayedStackCount = displayedStackCount;
 			tile.displayedStackSize = displayedStackSize;

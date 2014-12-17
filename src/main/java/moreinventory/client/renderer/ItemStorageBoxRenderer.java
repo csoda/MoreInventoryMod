@@ -1,6 +1,9 @@
 package moreinventory.client.renderer;
 
+import com.google.common.collect.Maps;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.model.ModelItemStorageBox;
 import moreinventory.item.ItemBlockStorageBox;
 import moreinventory.tileentity.storagebox.StorageBoxType;
@@ -9,25 +12,20 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import org.lwjgl.opengl.GL11;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map.Entry;
 
-/**
- * Created by c_soda on 14/12/16.
- */
+@SideOnly(Side.CLIENT)
 public class ItemStorageBoxRenderer implements IItemRenderer
 {
 	private final ModelItemStorageBox model = new ModelItemStorageBox();
-
-	protected static final HashMap<String, ResourceLocation> textureMap = new HashMap();
+	private final HashMap<String, ResourceLocation> textureMap = Maps.newHashMap();
 
 	public ItemStorageBoxRenderer()
 	{
-		Set typeSet = StorageBoxType.types.entrySet();
-		int t = 0;
-		for (Iterator i = typeSet.iterator(); i.hasNext();t++)
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
-
 			String name = type.getKey().toLowerCase(Locale.ENGLISH);
 			String folder = StorageBoxType.getTextureFolder(type.getKey());
 
@@ -40,7 +38,6 @@ public class ItemStorageBoxRenderer implements IItemRenderer
 				textureMap.put(type.getKey() , new ResourceLocation(folder + ":textures/blocks/storagebox_" + name + "_0.png"));
 			}
 		}
-
 	}
 
 	@Override

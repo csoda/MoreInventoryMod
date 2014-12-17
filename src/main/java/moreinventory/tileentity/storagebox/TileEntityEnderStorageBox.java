@@ -11,8 +11,8 @@ import net.minecraftforge.common.DimensionManager;
 
 public class TileEntityEnderStorageBox extends TileEntityStorageBox
 {
-	public static  MIMItemInvList itemList;
-	public static  MIMItemBoxList enderBoxList;
+	public static MIMItemInvList itemList;
+	public static MIMItemBoxList enderBoxList;
 
 	public TileEntityEnderStorageBox()
 	{

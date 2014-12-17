@@ -10,6 +10,7 @@ import cpw.mods.fml.common.ModMetadata;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -126,14 +127,14 @@ public class MoreInventoryMod
 	public static Block transportManager;
 	public static Block storageBoxAddon;
 
-	public static Item[] torchHolder;
-	public static Item[] arrowHolder;
-	public static Item transporter;
-	public static Item noFunctionItems;
-	public static Item potionHolder;
-	public static Item spanner;
-	public static Item plating;
-	public static Item pouch;
+	public static ItemTorchHolder[] torchHolder;
+	public static ItemArrowHolder[] arrowHolder;
+	public static ItemTransporter transporter;
+	public static ItemNoFunction noFunctionItems;
+	public static ItemPotionHolder potionHolder;
+	public static ItemSpanner spanner;
+	public static ItemPlating plating;
+	public static ItemPouch pouch;
 
 	@EventHandler
 	public void construct(FMLConstructionEvent event)
@@ -153,14 +154,14 @@ public class MoreInventoryMod
 		transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
 		storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
 
-		torchHolder = new Item[3];
-		arrowHolder = new Item[3];
-		transporter = new ItemTransporter().setUnlocalizedName("transporter");
-		noFunctionItems = new ItemNoFunction().setUnlocalizedName("itemnofunction");
-		potionHolder = new ItemPotionHolder().setUnlocalizedName("potionholder");
-		spanner = new ItemSpanner().setUnlocalizedName("spanner");
-		plating = new ItemPlating().setUnlocalizedName("painting");
-		pouch = new ItemPouch().setUnlocalizedName("pouch");
+		torchHolder = new ItemTorchHolder[3];
+		arrowHolder = new ItemArrowHolder[3];
+		transporter = (ItemTransporter)new ItemTransporter().setUnlocalizedName("transporter");
+		noFunctionItems = (ItemNoFunction)new ItemNoFunction().setUnlocalizedName("itemnofunction");
+		potionHolder = (ItemPotionHolder)new ItemPotionHolder().setUnlocalizedName("potionholder");
+		spanner = (ItemSpanner)new ItemSpanner().setUnlocalizedName("spanner");
+		plating = (ItemPlating)new ItemPlating().setUnlocalizedName("painting");
+		pouch = (ItemPouch)new ItemPouch().setUnlocalizedName("pouch");
 
 		GameRegistry.registerBlock(catchall, ItemBlock.class, "catchall");
 		GameRegistry.registerBlock(storageBox, ItemBlockStorageBox.class, "containerbox");
@@ -170,14 +171,14 @@ public class MoreInventoryMod
 		final String[] gradeName = {"Iron", "Gold", "Diamond"};
 		for (int i = 0; i < gradeName.length; i++)
 		{
-			torchHolder[i] = new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
+			torchHolder[i] = (ItemTorchHolder)new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
 
 			GameRegistry.registerItem(torchHolder[i], "torchholder" + gradeName[i]);
 		}
 
 		for (int i = 0; i < gradeName.length; i++)
 		{
-			arrowHolder[i] = new ItemArrowHolder(i).setUnlocalizedName("arrowholder:" + gradeName[i]);
+			arrowHolder[i] = (ItemArrowHolder)new ItemArrowHolder(i).setUnlocalizedName("arrowholder:" + gradeName[i]);
 
 			GameRegistry.registerItem(arrowHolder[i], "arrowholder" + gradeName[i]);
 
@@ -309,10 +310,10 @@ public class MoreInventoryMod
 		}
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(catchall),
-			"P P", "PCP", "HHH",
-			'P', "plankWood",
-			'H', "slabWood",
-			'C', Blocks.chest
+				"P P", "PCP", "HHH",
+				'P', "plankWood",
+				'H', "slabWood",
+				'C', Blocks.chest
 		));
 
 		GameRegistry.addShapedRecipe(new ItemStack(spanner),
@@ -322,16 +323,16 @@ public class MoreInventoryMod
 		);
 
 		GameRegistry.addShapedRecipe(new ItemStack(potionHolder),
-			"SLS", "BBB",
-			'S', Items.string,
-			'L', Items.leather,
-			'B', Items.glass_bottle
+				"SLS", "BBB",
+				'S', Items.string,
+				'L', Items.leather,
+				'B', Items.glass_bottle
 		);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(transporter),
-			"P P", "PHP", "HHH",
-			'H', "slabWood",
-			'P', "plankWood"
+				"P P", "PHP", "HHH",
+				'H', "slabWood",
+				'P', "plankWood"
 		));
 
 		GameRegistry.addShapedRecipe(new ItemStack(transportManager, 1, 0),
@@ -372,10 +373,10 @@ public class MoreInventoryMod
 			'S', Items.stick
 		);
 		GameRegistry.addShapedRecipe(new ItemStack(noFunctionItems, 1, 2),
-			"ODO", "DED", "ODO",
-			'O', Blocks.obsidian,
-			'D', Items.diamond,
-			'E', Items.ender_eye
+				"ODO", "DED", "ODO",
+				'O', Blocks.obsidian,
+				'D', Items.diamond,
+				'E', Items.ender_eye
 		);
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(noFunctionItems, 1, 3),
 			"WIW", "WPW", "WPW",
@@ -418,18 +419,20 @@ public class MoreInventoryMod
 		ItemStack lava = new ItemStack(Items.lava_bucket);
 		ItemStack brush = new ItemStack(noFunctionItems, 1, 1);
 
-
 		for (int i = 0; i < ItemPlating.typeNameIndex.length; i++)
 		{
 			String type = ItemPlating.typeNameIndex[i];
 
-			for (int t = 0; t < StorageBoxType.types.get(type).materials.length; t++)
+			for (Object material : StorageBoxType.types.get(type).materials)
 			{
-				Object ingot = StorageBoxType.types.get(type).materials[t];
-
-				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), ingot, ingot, lava, brush));
+				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), material, material, lava, brush));
 			}
 		}
+	}
+
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event)
+	{
 		proxy.registerRenderers();
 	}
 

@@ -45,7 +45,7 @@ public class ItemPlating extends Item
 			int tierA = StorageBoxType.getTier(typeA);
 			int tierB = StorageBoxType.getTier(typeB);
 
-			if (tierB != 0 && (tierA == tierB || tierA == tierB + 1) && StorageBoxType.getInventorysize(typeA) > StorageBoxType.getInventorysize(typeB))
+			if (tierB != 0 && (tierA == tierB || tierA == tierB + 1) && StorageBoxType.getInventorySize(typeA) > StorageBoxType.getInventorySize(typeB))
 			{
 				world.setTileEntity(x, y, z, ((TileEntityStorageBox) tile).upgrade(typeA));
 

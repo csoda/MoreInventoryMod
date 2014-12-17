@@ -1,15 +1,14 @@
 package moreinventory.client.model;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
-/**
- * Created by c_soda on 14/12/16.
- */
+@SideOnly(Side.CLIENT)
 public class ModelItemStorageBox extends ModelBase
 {
-	//fields
 	ModelRenderer Shape1;
 
 	public ModelItemStorageBox()
@@ -37,7 +36,6 @@ public class ModelItemStorageBox extends ModelBase
 		Shape1.render(0.0625F);
 	}
 
-
 	private void setRotation(ModelRenderer model, float x, float y, float z)
 	{
 		model.rotateAngleX = x;
@@ -50,4 +48,3 @@ public class ModelItemStorageBox extends ModelBase
 		super.setRotationAngles(f, f1, f2, f3, f4, f5, null);
 	}
 }
-

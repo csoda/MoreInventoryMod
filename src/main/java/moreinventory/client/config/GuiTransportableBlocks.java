@@ -10,24 +10,24 @@ import cpw.mods.fml.client.config.GuiButtonExt;
 import cpw.mods.fml.client.config.GuiConfigEntries.ArrayEntry;
 import moreinventory.client.gui.GuiListSlot;
 import moreinventory.core.MoreInventoryMod;
+import moreinventory.item.ItemTransporter;
 import moreinventory.util.ArrayListExtended;
 import moreinventory.util.BlockMeta;
 import moreinventory.util.MIMUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.Comparator;
 import java.util.List;
@@ -713,57 +713,41 @@ public class GuiTransportableBlocks extends GuiScreen
 			}
 			catch (Throwable ignored) {}
 
-			itemstack = new ItemStack(MoreInventoryMod.transporter);
+			IIcon icon;
+			String unique = MIMUtils.getUniqueName(entry.blockMeta.block);
 
-			if (entry.blockMeta.block == Blocks.chest)
+			if (entry.blockMeta.block == MoreInventoryMod.storageBox)
 			{
-				itemstack.setItemDamage(1);
+				icon = MoreInventoryMod.transporter.iconMap.get(unique + ":Wood");
 			}
-			else if (entry.blockMeta.block == Blocks.trapped_chest)
+			else if (ItemTransporter.forceIcons.contains(unique))
 			{
-				itemstack.setItemDamage(2);
+				icon = MoreInventoryMod.transporter.iconMap.get(unique);
 			}
-			else if (entry.blockMeta.block == Blocks.furnace)
+			else if (ItemTransporter.transportableBlocks.contains(unique, entry.blockMeta.meta))
 			{
-				itemstack.setItemDamage(3);
-			}
-			else if (entry.blockMeta.block == Blocks.lit_furnace)
-			{
-				itemstack.setItemDamage(4);
-			}
-			else if (entry.blockMeta.block == MoreInventoryMod.storageBox)
-			{
-				if (entry.blockMeta.meta == -1)
-				{
-					itemstack.setItemDamage(5);
-				}
-				else
-				{
-					itemstack.setItemDamage(entry.blockMeta.meta + 5);
-				}
+				IIcon[] icons = MoreInventoryMod.transporter.icon_modded;
+				icon = icons[ItemTransporter.transportableBlocks.get(unique, entry.blockMeta.meta) & (icons.length - 1)];
 			}
 			else
 			{
-				itemstack.setItemDamage(entry.iconIndex + 21);
+				icon = MoreInventoryMod.transporter.iconMap.get("default");
 			}
 
-			try
+			if (icon != null)
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslatef(0.0F, 0.0F, 32.0F);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-				GL11.glEnable(GL11.GL_LIGHTING);
-				RenderHelper.enableGUIStandardItemLighting();
-				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				itemRender.zLevel += 100.0F;
-				itemRender.renderItemIntoGUI(fontRendererObj, mc.getTextureManager(), itemstack, width / 2 - 100, par3 + 1);
-				itemRender.zLevel -= 100.0F;
-				GL11.glPopMatrix();
-				GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-				GL11.glDisable(GL11.GL_LIGHTING);
+				try
+				{
+					mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+					GL11.glEnable(GL11.GL_ALPHA_TEST);
+					GL11.glEnable(GL11.GL_BLEND);
+					itemRender.renderIcon(width / 2 - 100, par3 + 1, icon, 16, 16);
+					GL11.glDisable(GL11.GL_ALPHA_TEST);
+					GL11.glDisable(GL11.GL_BLEND);
+					GL11.glEnable(GL11.GL_CULL_FACE);
+				}
+				catch (Throwable ignored) {}
 			}
-			catch (Throwable ignored) {}
 
 			if (!Strings.isNullOrEmpty(name))
 			{
