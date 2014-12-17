@@ -1,10 +1,12 @@
 package moreinventory.item;
 
+import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -14,24 +16,42 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ItemTorchHolder extends Item
 {
-	public static final int[] maxDamage = {258, 1026, 4098};
-
-	private final int grade;
-
 	@SideOnly(Side.CLIENT)
-	private IIcon[] holderIcon;
+	private Map<String, IIcon> iconMap;
 
-	public ItemTorchHolder(int grade)
+	public ItemTorchHolder()
 	{
-		this.grade = grade;
 		this.setMaxStackSize(1);
-		this.setMaxDamage(maxDamage[grade]);
 		this.setNoRepair();
 		this.setContainerItem(this);
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
+	}
+
+	@Override
+	public String getUnlocalizedName(ItemStack itemstack)
+	{
+		if (itemstack.getTagCompound() == null)
+		{
+			return super.getUnlocalizedName();
+		}
+
+		return super.getUnlocalizedName() + ":" + itemstack.getTagCompound().getString("Type");
+	}
+
+	@Override
+	public int getMaxDamage(ItemStack itemstack)
+	{
+		if (itemstack.getTagCompound() == null)
+		{
+			return 256 + 2;
+		}
+
+		return TorchHolderType.getCapacity(itemstack.getTagCompound().getString("Type")) + 2;
 	}
 
 	@Override
@@ -130,25 +150,16 @@ public class ItemTorchHolder extends Item
 	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
-		holderIcon = new IIcon[2];
+		iconMap = Maps.newHashMap();
 
-		switch (grade)
+		for (Entry<String, TorchHolderType> entry : TorchHolderType.types.entrySet())
 		{
-			case 0:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_iron");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_iron");
-				break;
-			case 1:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_gold");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_gold");
-				break;
-			case 2:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_diamond");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_diamond");
-				break;
-		}
+			String name = entry.getKey();
+			TorchHolderType type = entry.getValue();
 
-		itemIcon = holderIcon[1];
+			iconMap.put(name, iconRegister.registerIcon(type.iconName));
+			iconMap.put(name + ":empty", iconRegister.registerIcon(type.emptyIconName));
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -162,12 +173,25 @@ public class ItemTorchHolder extends Item
 	@Override
 	public IIcon getIconIndex(ItemStack itemstack)
 	{
-		if (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 <= 0)
+		if (itemstack.getTagCompound() == null)
 		{
-			return holderIcon[1];
+			return iconMap.get("Iron");
 		}
 
-		return holderIcon[0];
+		String type = itemstack.getTagCompound().getString("Type");
+		IIcon icon = null;
+
+		if (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 <= 0)
+		{
+			icon = iconMap.get(type + ":empty");
+		}
+
+		if (icon == null)
+		{
+			icon = iconMap.get(type);
+		}
+
+		return icon;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -175,5 +199,15 @@ public class ItemTorchHolder extends Item
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
 	{
 		list.add(I18n.format("item.torchholder.rest") + ": " + (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2));
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void getSubItems(Item item, CreativeTabs tab, List list)
+	{
+		for (String type : TorchHolderType.types.keySet())
+		{
+			list.add(TorchHolderType.createItemStack(type));
+		}
 	}
 }

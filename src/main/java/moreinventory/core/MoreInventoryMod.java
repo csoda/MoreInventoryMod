@@ -24,6 +24,7 @@ import moreinventory.block.BlockTransportManager;
 import moreinventory.handler.MIMEventHooks;
 import moreinventory.handler.MIMGuiHandler;
 import moreinventory.handler.MIMWorldSaveHelper;
+import moreinventory.item.ArrowHolderType;
 import moreinventory.item.ItemArrowHolder;
 import moreinventory.item.ItemBlockSBAddon;
 import moreinventory.item.ItemBlockStorageBox;
@@ -35,6 +36,7 @@ import moreinventory.item.ItemPouch;
 import moreinventory.item.ItemSpanner;
 import moreinventory.item.ItemTorchHolder;
 import moreinventory.item.ItemTransporter;
+import moreinventory.item.TorchHolderType;
 import moreinventory.network.CatchallMessage;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.network.ImporterMessage;
@@ -70,7 +72,6 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -126,8 +127,8 @@ public class MoreInventoryMod
 	public static BlockTransportManager transportManager;
 	public static BlockStorageBoxAddon storageBoxAddon;
 
-	public static ItemTorchHolder[] torchHolder;
-	public static ItemArrowHolder[] arrowHolder;
+	public static ItemTorchHolder torchHolder;
+	public static ItemArrowHolder arrowHolder;
 	public static ItemTransporter transporter;
 	public static ItemNoFunction noFunctionItems;
 	public static ItemPotionHolder potionHolder;
@@ -153,8 +154,8 @@ public class MoreInventoryMod
 		transportManager = (BlockTransportManager)new BlockTransportManager(Material.rock).setBlockName("transportmanager");
 		storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
 
-		torchHolder = new ItemTorchHolder[3];
-		arrowHolder = new ItemArrowHolder[3];
+		torchHolder = (ItemTorchHolder)new ItemTorchHolder().setUnlocalizedName("torchholder");
+		arrowHolder = (ItemArrowHolder)new ItemArrowHolder().setUnlocalizedName("arrowholder");
 		transporter = (ItemTransporter)new ItemTransporter().setUnlocalizedName("transporter");
 		noFunctionItems = (ItemNoFunction)new ItemNoFunction().setUnlocalizedName("itemnofunction");
 		potionHolder = (ItemPotionHolder)new ItemPotionHolder().setUnlocalizedName("potionholder");
@@ -167,46 +168,8 @@ public class MoreInventoryMod
 		GameRegistry.registerBlock(transportManager, ItemBlockTransportManager.class, "transportmanager");
 		GameRegistry.registerBlock(storageBoxAddon, ItemBlockSBAddon.class, "StorageBoxAddon");
 
-		final String[] gradeName = {"Iron", "Gold", "Diamond"};
-		for (int i = 0; i < gradeName.length; ++i)
-		{
-			torchHolder[i] = (ItemTorchHolder)new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
-
-			GameRegistry.registerItem(torchHolder[i], "torchholder" + gradeName[i]);
-		}
-
-		for (int i = 0; i < gradeName.length; i++)
-		{
-			arrowHolder[i] = (ItemArrowHolder)new ItemArrowHolder(i).setUnlocalizedName("arrowholder:" + gradeName[i]);
-
-			GameRegistry.registerItem(arrowHolder[i], "arrowholder" + gradeName[i]);
-
-			BlockDispenser.dispenseBehaviorRegistry.putObject(arrowHolder[i], new BehaviorProjectileDispense()
-			{
-				@Override
-				public ItemStack dispenseStack(IBlockSource blockSource, ItemStack itemstack)
-				{
-					World world = blockSource.getWorld();
-					EnumFacing facing = BlockDispenser.func_149937_b(blockSource.getBlockMetadata());
-					IProjectile projectile = getProjectileEntity(world, BlockDispenser.func_149939_a(blockSource));
-					projectile.setThrowableHeading((double)facing.getFrontOffsetX(), (double)((float)facing.getFrontOffsetY() + 0.1F), (double)facing.getFrontOffsetZ(), func_82500_b(), func_82498_a());
-					world.spawnEntityInWorld((Entity)projectile);
-					itemstack.damageItem(1, FakePlayerFactory.getMinecraft((WorldServer)world));
-
-					return itemstack;
-				}
-
-				@Override
-				protected IProjectile getProjectileEntity(World world, IPosition pos)
-				{
-					EntityArrow entity = new EntityArrow(world, pos.getX(), pos.getY(), pos.getZ());
-					entity.canBePickedUp = 1;
-
-					return entity;
-				}
-			});
-		}
-
+		GameRegistry.registerItem(torchHolder, "torchholder");
+		GameRegistry.registerItem(arrowHolder, "arrowholder");
 		GameRegistry.registerItem(transporter, "transporter");
 		GameRegistry.registerItem(noFunctionItems, "itemnofunction");
 		GameRegistry.registerItem(potionHolder, "potionholder");
@@ -223,6 +186,31 @@ public class MoreInventoryMod
 		{
 			GameRegistry.registerTileEntity(EnumSBAddon.values()[i].clazz, "moreinventory." + EnumSBAddon.values()[i].name());
 		}
+
+		BlockDispenser.dispenseBehaviorRegistry.putObject(arrowHolder, new BehaviorProjectileDispense()
+		{
+			@Override
+			public ItemStack dispenseStack(IBlockSource blockSource, ItemStack itemstack)
+			{
+				World world = blockSource.getWorld();
+				EnumFacing facing = BlockDispenser.func_149937_b(blockSource.getBlockMetadata());
+				IProjectile projectile = getProjectileEntity(world, BlockDispenser.func_149939_a(blockSource));
+				projectile.setThrowableHeading((double)facing.getFrontOffsetX(), (double)((float)facing.getFrontOffsetY() + 0.1F), (double)facing.getFrontOffsetZ(), func_82500_b(), func_82498_a());
+				world.spawnEntityInWorld((Entity)projectile);
+				itemstack.damageItem(1, FakePlayerFactory.getMinecraft((WorldServer)world));
+
+				return itemstack;
+			}
+
+			@Override
+			protected IProjectile getProjectileEntity(World world, IPosition pos)
+			{
+				EntityArrow entity = new EntityArrow(world, pos.getX(), pos.getY(), pos.getZ());
+				entity.canBePickedUp = 1;
+
+				return entity;
+			}
+		});
 
 		proxy.initConfigEntryClasses();
 
@@ -258,44 +246,65 @@ public class MoreInventoryMod
 		MinecraftForge.EVENT_BUS.register(MIMEventHooks.instance);
 
 		StorageBoxType.initialize();
+		TorchHolderType.initialize();
+		ArrowHolderType.initialize();
 
-		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[0], 1, ItemTorchHolder.maxDamage[0] - 2),
+		ItemStack itemstack = TorchHolderType.createItemStack("Iron");
+		itemstack.setItemDamage(itemstack.getMaxDamage() - 2);
+
+		GameRegistry.addShapedRecipe(itemstack,
 			"I L", "I I", "III",
 			'I', Items.iron_ingot,
 			'L', Items.leather
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[1], 1, ItemTorchHolder.maxDamage[1] - 2),
+
+		itemstack = TorchHolderType.createItemStack("Gold");
+		itemstack.setItemDamage(itemstack.getMaxDamage() - 2);
+
+		GameRegistry.addShapedRecipe(itemstack,
 			"I L", "I I", "ISI",
 			'I', Items.gold_ingot,
 			'L', Items.leather,
 			'S', Items.blaze_rod
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(torchHolder[2], 1, ItemTorchHolder.maxDamage[2] - 2),
+
+		itemstack = TorchHolderType.createItemStack("Diamond");
+		itemstack.setItemDamage(itemstack.getMaxDamage() - 2);
+
+		GameRegistry.addShapedRecipe(itemstack,
 			"I L", "I I", "ISI",
 			'I', Items.diamond,
 			'L', Items.leather,
 			'S', Items.nether_star
 		);
 
-		for (Item holder : torchHolder)
-		{
-			GameRegistry.addRecipe(new RecipeTorchHolder(new ItemStack(Blocks.torch), Lists.newArrayList(new ItemStack(holder, 1, OreDictionary.WILDCARD_VALUE))));
-		}
+		GameRegistry.addRecipe(new RecipeTorchHolder(new ItemStack(Blocks.torch), Lists.newArrayList(new ItemStack(torchHolder, 1, OreDictionary.WILDCARD_VALUE))));
 
-		GameRegistry.addShapedRecipe(new ItemStack(arrowHolder[0], 1, ItemTorchHolder.maxDamage[0] - 3),
+		itemstack = ArrowHolderType.createItemStack("Iron");
+		itemstack.setItemDamage(itemstack.getMaxDamage() - 3);
+
+		GameRegistry.addShapedRecipe(itemstack,
 			"IAL", "I I", "III",
 			'I', Items.iron_ingot,
 			'L', Items.leather,
 			'A', Items.arrow
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(arrowHolder[1], 1, ItemTorchHolder.maxDamage[1] - 3),
+
+		itemstack = ArrowHolderType.createItemStack("Gold");
+		itemstack.setItemDamage(itemstack.getMaxDamage() - 3);
+
+		GameRegistry.addShapedRecipe(itemstack,
 			"IAL", "I I", "ISI",
 			'I', Items.gold_ingot,
 			'L', Items.leather,
 			'S', Items.blaze_rod,
 			'A', Items.arrow
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(arrowHolder[2], 1, ItemTorchHolder.maxDamage[2] - 3),
+
+		itemstack = ArrowHolderType.createItemStack("Diamond");
+		itemstack.setItemDamage(itemstack.getMaxDamage() - 3);
+
+		GameRegistry.addShapedRecipe(itemstack,
 			"IAL", "I I", "ISI",
 			'I', Items.diamond,
 			'L', Items.leather,
@@ -303,10 +312,7 @@ public class MoreInventoryMod
 			'A', Items.arrow
 		);
 
-		for (Item holder : arrowHolder)
-		{
-			GameRegistry.addRecipe(new RecipeArrowHolder(new ItemStack(Items.arrow), Lists.newArrayList(new ItemStack(holder, 1, OreDictionary.WILDCARD_VALUE))));
-		}
+		GameRegistry.addRecipe(new RecipeArrowHolder(new ItemStack(Items.arrow), Lists.newArrayList(new ItemStack(arrowHolder, 1, OreDictionary.WILDCARD_VALUE))));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(catchall),
 			"P P", "PCP", "HHH",

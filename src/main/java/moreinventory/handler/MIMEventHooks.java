@@ -187,65 +187,61 @@ public class MIMEventHooks
 			World world = player.worldObj;
 			ItemStack bow = event.bow;
 
-			for (Item holder : MoreInventoryMod.arrowHolder)
+			if (player.inventory.hasItem(MoreInventoryMod.arrowHolder))
 			{
-				if (player.inventory.hasItem(holder))
+				float f = (float)event.charge / 20.0F;
+				f = (f * f + f * 2.0F) / 3.0F;
+
+				if ((double)f < 0.1D)
 				{
-					float f = (float)event.charge / 20.0F;
-					f = (f * f + f * 2.0F) / 3.0F;
-
-					if ((double)f < 0.1D)
-					{
-						return;
-					}
-
-					if (f > 1.0F)
-					{
-						f = 1.0F;
-					}
-
-					EntityArrow entity = new EntityArrow(world, player, f * 2.0F);
-
-					if (f == 1.0F)
-					{
-						entity.setIsCritical(true);
-					}
-
-					int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, bow);
-
-					if (k > 0)
-					{
-						entity.setDamage(entity.getDamage() + (double)k * 0.5D + 0.5D);
-					}
-
-					int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, bow);
-
-					if (l > 0)
-					{
-						entity.setKnockbackStrength(l);
-					}
-
-					if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, bow) > 0)
-					{
-						entity.setFire(100);
-					}
-
-					bow.damageItem(1, player);
-					world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (eventRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
-
-					if (!player.capabilities.isCreativeMode)
-					{
-						player.inventory.mainInventory[MIMUtils.getFirstSlot(player.inventory.mainInventory, holder)].damageItem(1, player);
-					}
-
-					if (!world.isRemote)
-					{
-						world.spawnEntityInWorld(entity);
-					}
-
-					event.setCanceled(true);
-					break;
+					return;
 				}
+
+				if (f > 1.0F)
+				{
+					f = 1.0F;
+				}
+
+				EntityArrow entity = new EntityArrow(world, player, f * 2.0F);
+
+				if (f == 1.0F)
+				{
+					entity.setIsCritical(true);
+				}
+
+				int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, bow);
+
+				if (k > 0)
+				{
+					entity.setDamage(entity.getDamage() + (double)k * 0.5D + 0.5D);
+				}
+
+				int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, bow);
+
+				if (l > 0)
+				{
+					entity.setKnockbackStrength(l);
+				}
+
+				if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, bow) > 0)
+				{
+					entity.setFire(100);
+				}
+
+				bow.damageItem(1, player);
+				world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (eventRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+
+				if (!player.capabilities.isCreativeMode)
+				{
+					player.inventory.mainInventory[MIMUtils.getFirstSlot(player.inventory.mainInventory, MoreInventoryMod.arrowHolder)].damageItem(1, player);
+				}
+
+				if (!world.isRemote)
+				{
+					world.spawnEntityInWorld(entity);
+				}
+
+				event.setCanceled(true);
 			}
 		}
 	}
@@ -257,14 +253,9 @@ public class MIMEventHooks
 		{
 			EntityPlayer player = event.entityPlayer;
 
-			for (Item holder : MoreInventoryMod.arrowHolder)
+			if (player.inventory.hasItem(MoreInventoryMod.arrowHolder))
 			{
-				if (player.inventory.hasItem(holder))
-				{
-					player.setItemInUse(event.result, event.result.getMaxItemUseDuration());
-
-					break;
-				}
+				player.setItemInUse(event.result, event.result.getMaxItemUseDuration());
 			}
 		}
 	}

@@ -23,6 +23,6 @@ public class CreativeTabMoreInventoryMod extends CreativeTabs
 	@Override
 	public Item getTabIconItem()
 	{
-		return MoreInventoryMod.torchHolder[0];
+		return Item.getItemFromBlock(MoreInventoryMod.catchall);
 	}
 }
