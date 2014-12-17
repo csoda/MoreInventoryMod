@@ -27,31 +27,19 @@ public class MIMItemBoxList extends MIMBoxList
 
 	public boolean addBox(int x, int y, int z, int d, ItemStack itemstack)
 	{
+		boolean flg = false;
+
 		if (!isOnBoxList(x, y, z, d))
 		{
 			super.addBox(x, y, z, d);
-			itemList.add(itemstack);
 
-			return true;
+			itemList.add(null);
+			flg = true;
 		}
 
 		registerItem(x, y, z, d, itemstack);
 
-		return false;
-	}
-
-	@Override
-	public boolean insBox(int index, int x, int y, int z, int d)
-	{
-		return insBox(index, x, y, z, d, null);
-	}
-
-	public boolean insBox(int index, int x, int y, int z, int d, ItemStack itemstack)
-	{
-		super.insBox(index, x, y, z, d);
-		itemList.add(index, itemstack);
-
-		return true;
+		return flg;
 	}
 
 	@Override
@@ -78,21 +66,27 @@ public class MIMItemBoxList extends MIMBoxList
 
 	public void registerItem(int x, int y, int z, int d, ItemStack itemstack)
 	{
-		boolean flag = false;
-
-		for (int i = 0; i < getListSize(); i++)
+		if (isOnBoxList(x, y, z, d))
 		{
-			int[] pos = getBoxPos(i);
-			int dim = getDimensionID(i);
-
-			if (x == pos[0] && y == pos[1] && z == pos[2] && dim == d)
+			for (int i = 0; i < getListSize(); i++)
 			{
-				itemList.add(i, itemstack);
-				flag = true;
+				int[] pos = getBoxPos(i);
+				int dim = getDimensionID(i);
+
+				if (x == pos[0] && y == pos[1] && z == pos[2] && dim == d)
+				{
+					if (itemstack != null)
+					{
+						itemList.set(i, itemstack.copy());
+					}
+					else
+					{
+						itemList.set(i, null);
+					}
+				}
 			}
 		}
-
-		if (!flag)
+		else
 		{
 			addBox(x, y, z, d, itemstack);
 		}

@@ -161,6 +161,7 @@ public class StorageBoxNetworkManager
 
 		for (int i = 0; i < list.getListSize(); i++)
 		{
+			int[] pos = list.getBoxPos(i);
 			TileEntityStorageBox tile = (TileEntityStorageBox)list.getTileBeyondDim(i);
 
 			if (tile != storageBox && !tile.isFull())
@@ -219,6 +220,4 @@ public class StorageBoxNetworkManager
 	}
 
 	public void updateOnInvChanged(World world, int x, int y, int z, ItemStack item) {}
-
-	public void updateOnTripleClicked(World world, int x, int y, int z, ItemStack item) {}
 }

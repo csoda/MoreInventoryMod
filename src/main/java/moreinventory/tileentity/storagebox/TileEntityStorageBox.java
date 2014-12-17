@@ -322,9 +322,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (isSameAsContents(itemstack))
 		{
-			MIMUtils.mergeItemStack(itemstack, this);
-
-			return true;
+			return MIMUtils.mergeItemStack(itemstack, this);
 		}
 
 		return false;
@@ -442,7 +440,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			case 1:
 				clickTime = 16;
 				ItemStack itemstack = player.getCurrentEquippedItem();
-
 				if (itemstack != null)
 				{
 					registerItems(itemstack);
@@ -467,8 +464,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				clickCount = 0;
 
 				getStorageBoxNetworkManager().linkedCollect(player.inventory);
-				storageBoxManager.updateOnTripleClicked(worldObj, xCoord, yCoord, zCoord, getContents());
 				updatePlayerInventory(player);
+
 				break;
 			default:
 				clickCount = 0;
@@ -566,7 +563,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			makeNewBoxList();
 		}
 
-		worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		markDirty();
 	}
 
@@ -689,8 +685,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		if (!typeName.equals(config3))
 		{
 			typeName = config3;
-			TileEntityStorageBox newTile = upgrade(typeName);
-			worldObj.setTileEntity(xCoord, yCoord, zCoord, newTile);
 			worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
 		}
 	}

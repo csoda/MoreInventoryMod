@@ -61,21 +61,6 @@ public class MIMBoxList implements INBTSaveData
 		return false;
 	}
 
-	public boolean insBox(int index, int x, int y, int z, int d)
-	{
-		if (!isOnBoxList(x, y, z, d))
-		{
-			listX.add(index, x);
-			listY.add(index, y);
-			listZ.add(index, z);
-			dimension.add(index, d);
-
-			return true;
-		}
-
-		return false;
-	}
-
 	public void removeBox(int i)
 	{
 		listX.remove(i);

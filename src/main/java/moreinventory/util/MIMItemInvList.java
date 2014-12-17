@@ -89,7 +89,7 @@ public class MIMItemInvList extends MIMItemList implements INBTSaveData
 					addItem(items[1]);
 				}
 
-				items[1] = loadNewItemStack(index).copy();
+				items[1] = loadNewItemStack(index);
 			}
 		}
 

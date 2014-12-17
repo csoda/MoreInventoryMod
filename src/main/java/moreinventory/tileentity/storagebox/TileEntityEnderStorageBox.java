@@ -86,8 +86,11 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 		{
 			enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, itemstack);
 			itemList.registerItem(itemstack);
-			markDirty();
 			storageItems = itemList.getInventory(getContents());
+
+			markDirty();
+
+			return true;
 		}
 
 		return false;
