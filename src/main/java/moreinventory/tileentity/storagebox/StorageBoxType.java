@@ -115,19 +115,19 @@ public  class StorageBoxType
 	public static void initialize()
 	{
 		String name = "moreinv";
-		StorageBoxType.types.put("Wood", new StorageBoxType(64, TileEntityStorageBox.class, 0xFFFFFF, 1, false, null , name, true));
+		StorageBoxType.types.put("Wood", new StorageBoxType(64, TileEntityStorageBox.class, 0xFFFFFF, 1, false, null, name, true));
 		StorageBoxType.types.put("Iron", new StorageBoxType(128, TileEntityIronStorageBox.class, 0xFFFFFF, 2, true, new Object[] {new ItemStack(Items.iron_ingot), "ingotRefinedIron", "blockTofuMetal"}, name, true));
 		StorageBoxType.types.put("Gold", new StorageBoxType(256, TileEntityGoldStorageBox.class, 0xFFFFFF, 3, true, new Object[] {new ItemStack(Items.gold_ingot), "ingotElectrum"}, name, true));
 		StorageBoxType.types.put("Diamond", new StorageBoxType(512, TileEntityDiamondStorageBox.class, 0xFFFFFF, 4, true, new Object[] {new ItemStack(Items.diamond), "blockTofuDiamond"}, name, true));
 		StorageBoxType.types.put("Copper", new StorageBoxType(96, TileEntityCopperStorageBox.class, 0xFFFFFF, 2, true, new Object[] {"ingotCopper"}, name, true));
-		StorageBoxType.types.put("Tin", new StorageBoxType(96, TileEntityTinStorageBox.class, 0xFFFFFF, 2, true, new String[] {"ingotTin"} , name, true));
+		StorageBoxType.types.put("Tin", new StorageBoxType(96, TileEntityTinStorageBox.class, 0xFFFFFF, 2, true, new String[] {"ingotTin"}, name, true));
 		StorageBoxType.types.put("Bronze", new StorageBoxType(128, TileEntityBronzeStorageBox.class, 0xFFFFFF, 2, true, new Object[] {"ingotBronze", "ingotBrass"}, name, true));
-		StorageBoxType.types.put("Silver", new StorageBoxType(192, TileEntitySilverStorageBox.class, 0xFFFFFF, 3, true, new Object[] {"ingotSilver"} , name, true));
-		StorageBoxType.types.put("Glass", new StorageBoxType(0, TileEntityGlassStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
-		StorageBoxType.types.put("Cobblestone", new StorageBoxType(1, TileEntityCobblestoneStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
-		StorageBoxType.types.put("Emerald", new StorageBoxType(1028, TileEntityEmeraldStorageBox.class, 0xFFFFFF, 5, false, new Object[] {new ItemStack(Items.emerald)} , name, true));
-		StorageBoxType.types.put("Ender", new StorageBoxType(2, TileEntityEnderStorageBox.class, 0xFFFFFF, 0, false, null , name, true));
-		StorageBoxType.types.put("Steel", new StorageBoxType(384, TileEntitySteelStorageBox.class, 0xFFFFFF, 3, false, new Object[] {"ingotSteel", "ingotInvar"} , name, true));
+		StorageBoxType.types.put("Silver", new StorageBoxType(192, TileEntitySilverStorageBox.class, 0xFFFFFF, 3, true, new Object[] {"ingotSilver"}, name, true));
+		StorageBoxType.types.put("Glass", new StorageBoxType(0, TileEntityGlassStorageBox.class, 0xFFFFFF, 0, false, null, name, true));
+		StorageBoxType.types.put("Cobblestone", new StorageBoxType(1, TileEntityCobblestoneStorageBox.class, 0xFFFFFF, 0, false, null, name, true));
+		StorageBoxType.types.put("Emerald", new StorageBoxType(1028, TileEntityEmeraldStorageBox.class, 0xFFFFFF, 5, false, new Object[] {new ItemStack(Items.emerald)}, name, true));
+		StorageBoxType.types.put("Ender", new StorageBoxType(2, TileEntityEnderStorageBox.class, 0xFFFFFF, 0, false, null, name, true));
+		StorageBoxType.types.put("Steel", new StorageBoxType(384, TileEntitySteelStorageBox.class, 0xFFFFFF, 3, false, new Object[] {"ingotSteel", "ingotInvar"}, name, true));
 
 		Set<Entry<String, StorageBoxType>> types = StorageBoxType.types.entrySet();
 
