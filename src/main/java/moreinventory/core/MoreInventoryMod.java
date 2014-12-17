@@ -59,7 +59,6 @@ import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
 import moreinventory.util.PlayerNameCache;
 import moreinventory.util.Version;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -122,10 +121,10 @@ public class MoreInventoryMod
 
 	public static final PlayerNameCache playerNameCache = new PlayerNameCache();
 
-	public static Block catchall;
-	public static Block storageBox;
-	public static Block transportManager;
-	public static Block storageBoxAddon;
+	public static BlockCatchall catchall;
+	public static BlockStorageBox storageBox;
+	public static BlockTransportManager transportManager;
+	public static BlockStorageBoxAddon storageBoxAddon;
 
 	public static ItemTorchHolder[] torchHolder;
 	public static ItemArrowHolder[] arrowHolder;
@@ -149,9 +148,9 @@ public class MoreInventoryMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		catchall = new BlockCatchall(Material.wood).setBlockName("catchall");
-		storageBox = new BlockStorageBox(Material.iron).setBlockName("containerbox");
-		transportManager = new BlockTransportManager(Material.rock).setBlockName("transportmanager");
+		catchall = (BlockCatchall)new BlockCatchall(Material.wood).setBlockName("catchall");
+		storageBox = (BlockStorageBox)new BlockStorageBox(Material.iron).setBlockName("containerbox");
+		transportManager = (BlockTransportManager)new BlockTransportManager(Material.rock).setBlockName("transportmanager");
 		storageBoxAddon = new BlockStorageBoxAddon(Material.iron);
 
 		torchHolder = new ItemTorchHolder[3];
@@ -169,7 +168,7 @@ public class MoreInventoryMod
 		GameRegistry.registerBlock(storageBoxAddon, ItemBlockSBAddon.class, "StorageBoxAddon");
 
 		final String[] gradeName = {"Iron", "Gold", "Diamond"};
-		for (int i = 0; i < gradeName.length; i++)
+		for (int i = 0; i < gradeName.length; ++i)
 		{
 			torchHolder[i] = (ItemTorchHolder)new ItemTorchHolder(i).setUnlocalizedName("torchholder:" + gradeName[i]);
 
@@ -310,10 +309,10 @@ public class MoreInventoryMod
 		}
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(catchall),
-				"P P", "PCP", "HHH",
-				'P', "plankWood",
-				'H', "slabWood",
-				'C', Blocks.chest
+			"P P", "PCP", "HHH",
+			'P', "plankWood",
+			'H', "slabWood",
+			'C', Blocks.chest
 		));
 
 		GameRegistry.addShapedRecipe(new ItemStack(spanner),
@@ -323,16 +322,16 @@ public class MoreInventoryMod
 		);
 
 		GameRegistry.addShapedRecipe(new ItemStack(potionHolder),
-				"SLS", "BBB",
-				'S', Items.string,
-				'L', Items.leather,
-				'B', Items.glass_bottle
+			"SLS", "BBB",
+			'S', Items.string,
+			'L', Items.leather,
+			'B', Items.glass_bottle
 		);
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(transporter),
-				"P P", "PHP", "HHH",
-				'H', "slabWood",
-				'P', "plankWood"
+			"P P", "PHP", "HHH",
+			'H', "slabWood",
+			'P', "plankWood"
 		));
 
 		GameRegistry.addShapedRecipe(new ItemStack(transportManager, 1, 0),
@@ -373,10 +372,10 @@ public class MoreInventoryMod
 			'S', Items.stick
 		);
 		GameRegistry.addShapedRecipe(new ItemStack(noFunctionItems, 1, 2),
-				"ODO", "DED", "ODO",
-				'O', Blocks.obsidian,
-				'D', Items.diamond,
-				'E', Items.ender_eye
+			"ODO", "DED", "ODO",
+			'O', Blocks.obsidian,
+			'D', Items.diamond,
+			'E', Items.ender_eye
 		);
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(noFunctionItems, 1, 3),
 			"WIW", "WPW", "WPW",
@@ -410,10 +409,10 @@ public class MoreInventoryMod
 		);
 
 		GameRegistry.addShapedRecipe(new ItemStack(storageBoxAddon, 1, 0),
-				"SSS", "CEC", "SSS",
-				'S', Blocks.end_stone,
-				'C', new ItemStack(noFunctionItems, 1, 2),
-				'E', new ItemStack(storageBox, 1, 10)
+			"SSS", "CEC", "SSS",
+			'S', Blocks.end_stone,
+			'C', new ItemStack(noFunctionItems, 1, 2),
+			'E', new ItemStack(storageBox, 1, 10)
 		);
 
 		ItemStack lava = new ItemStack(Items.lava_bucket);

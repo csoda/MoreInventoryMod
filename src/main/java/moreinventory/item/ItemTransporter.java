@@ -71,8 +71,9 @@ public class ItemTransporter extends Item
 	public ItemTransporter()
 	{
 		this.setMaxStackSize(1);
+		this.setMaxDamage(50);
+		this.setFull3D();
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
-		this.setHasSubtypes(true);
 	}
 
 	@Override
@@ -125,7 +126,17 @@ public class ItemTransporter extends Item
 				}
 				else return false;
 
-				world.setBlockToAir(x, y, z);
+				if (world.setBlockToAir(x, y, z))
+				{
+					itemstack.damageItem(1, player);
+
+					if (itemstack.getItemDamage() >= itemstack.getMaxDamage())
+					{
+						player.destroyCurrentEquippedItem();
+
+						world.playSoundAtEntity(player, "dig.wood", 1.5F, 0.85F);
+					}
+				}
 
 				return true;
 			}
@@ -144,7 +155,15 @@ public class ItemTransporter extends Item
 
 		if (itemstack.getTagCompound() != null && new Transporter(itemstack).placeBlock(world, player, x, y, z, side, hitX, hitY, hitZ))
 		{
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(MoreInventoryMod.transporter));
+			itemstack.setTagCompound(null);
+			itemstack.damageItem(1, player);
+
+			if (itemstack.getItemDamage() >= itemstack.getMaxDamage())
+			{
+				player.destroyCurrentEquippedItem();
+
+				world.playSoundAtEntity(player, "dig.wood", 1.5F, 0.85F);
+			}
 		}
 
 		return true;
@@ -219,11 +238,17 @@ public class ItemTransporter extends Item
 	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
 	{
-		int damage = itemstack.getItemDamage();
-
-		if (3 <= damage && damage <= 18)
+		if (itemstack.getTagCompound() != null && itemstack.getTagCompound().getString("IconName").startsWith(MIMUtils.getUniqueName(MoreInventoryMod.storageBox)))
 		{
-			list.add("\"" + new Transporter(itemstack).getContentsItemName(itemstack) + "\"");
+			String name = "Empty";
+			ItemStack contents = ItemStack.loadItemStackFromNBT(itemstack.getTagCompound().getCompoundTag("Contents"));
+
+			if (contents != null)
+			{
+				name = contents.getDisplayName();
+			}
+
+			list.add("\"" + name + "\"");
 		}
 	}
 
@@ -352,7 +377,7 @@ public class ItemTransporter extends Item
 
 				if (itemstack != null)
 				{
-					if (itemstack.getItem() == MoreInventoryMod.transporter && itemstack.getItemDamage() != 0 ||
+					if (itemstack.getItem() == ItemTransporter.this && itemstack.getTagCompound() != null ||
 						itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
 					{
 						return false;
@@ -361,24 +386,6 @@ public class ItemTransporter extends Item
 			}
 
 			return true;
-		}
-
-		public String getContentsItemName(ItemStack itemstack)
-		{
-			String name = "Empty";
-			NBTTagCompound nbt = itemstack.getTagCompound();
-
-			if (nbt != null)
-			{
-				ItemStack item = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Contents"));
-
-				if (item != null)
-				{
-					name = item.getDisplayName();
-				}
-			}
-
-			return name;
 		}
 
 		public void readFromNBT()
