@@ -10,6 +10,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -19,6 +20,9 @@ public class ItemTorchHolder extends Item
 	public static final int[] maxDamage = {258, 1026, 4098};
 
 	private final int grade;
+
+	@SideOnly(Side.CLIENT)
+	private IIcon[] holderIcon;
 
 	public ItemTorchHolder(int grade)
 	{
@@ -126,18 +130,44 @@ public class ItemTorchHolder extends Item
 	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
+		holderIcon = new IIcon[2];
+
 		switch (grade)
 		{
+			case 0:
+				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_iron");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_iron");
+				break;
 			case 1:
-				itemIcon = iconRegister.registerIcon("moreinv:torchholder_gold");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_gold");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_gold");
 				break;
 			case 2:
-				itemIcon = iconRegister.registerIcon("moreinv:torchholder_diamond");
-				break;
-			default:
-				itemIcon = iconRegister.registerIcon("moreinv:torchholder_iron");
+				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_diamond");
+				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_diamond");
 				break;
 		}
+
+		itemIcon = holderIcon[1];
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIcon(ItemStack itemstack, int pass)
+	{
+		return getIconIndex(itemstack);
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIconIndex(ItemStack itemstack)
+	{
+		if (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 <= 0)
+		{
+			return holderIcon[1];
+		}
+
+		return holderIcon[0];
 	}
 
 	@SideOnly(Side.CLIENT)

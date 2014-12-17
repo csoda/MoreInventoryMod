@@ -171,15 +171,6 @@ public class ItemTransporter extends Item
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean hasEffect(ItemStack itemstack, int pass)
-	{
-		refreshTransporterIcon(itemstack);
-
-		return super.hasEffect(itemstack, pass);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
 		iconMap = Maps.newHashMap();
@@ -209,15 +200,21 @@ public class ItemTransporter extends Item
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void refreshTransporterIcon(ItemStack itemstack)
+	@Override
+	public IIcon getIcon(ItemStack itemstack, int pass)
+	{
+		return getIconIndex(itemstack);
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIconIndex(ItemStack itemstack)
 	{
 		NBTTagCompound nbt = itemstack.getTagCompound();
 
 		if (nbt == null)
 		{
-			itemIcon = iconMap.get("default");
-
-			return;
+			return iconMap.get("default");
 		}
 
 		IIcon result = null;
@@ -231,7 +228,7 @@ public class ItemTransporter extends Item
 			result = icon_modded[nbt.getInteger("Modded") & (icon_modded.length - 1)];
 		}
 
-		itemIcon = result == null ? iconMap.get("default") : result;
+		return result == null ? iconMap.get("default") : result;
 	}
 
 	@SideOnly(Side.CLIENT)
