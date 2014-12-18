@@ -38,6 +38,7 @@ public class ItemPlating extends Item
 		}
 
 		TileEntity tile = world.getTileEntity(x, y, z);
+
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
 			String typeA = typeNameIndex[itemstack.getItemDamage()];

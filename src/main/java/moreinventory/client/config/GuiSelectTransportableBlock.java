@@ -108,6 +108,8 @@ public class GuiSelectTransportableBlock extends GuiScreen
 							{
 								BlockEntry entry = gui.new BlockEntry(new BlockMeta(blockList.selected.block, blockList.selected.meta), 19);
 
+								gui.blockField.setText(MIMUtils.getUniqueName(blockList.selected.block));
+								gui.blockMetaField.setText(Integer.toString(blockList.selected.meta));
 								gui.blockList.blocks.addIfAbsent(entry);
 								gui.blockList.contents.addIfAbsent(entry);
 								gui.blockList.selected = entry;

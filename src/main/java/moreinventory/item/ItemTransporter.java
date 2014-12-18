@@ -23,6 +23,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -225,10 +226,16 @@ public class ItemTransporter extends Item
 		}
 		else if (nbt.hasKey("Modded"))
 		{
-			result = icon_modded[nbt.getInteger("Modded") & (icon_modded.length - 1)];
+			result = getModIcon(nbt.getInteger("Modded"));
 		}
 
 		return result == null ? iconMap.get("default") : result;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public IIcon getModIcon(int index)
+	{
+		return icon_modded[MathHelper.clamp_int(index, 0, icon_modded.length - 1)];
 	}
 
 	@SideOnly(Side.CLIENT)

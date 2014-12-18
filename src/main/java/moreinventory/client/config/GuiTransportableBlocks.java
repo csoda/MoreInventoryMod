@@ -232,8 +232,6 @@ public class GuiTransportableBlocks extends GuiScreen
 					}
 
 					actionPerformed(cancelButton);
-
-					blockList.scrollToTop();
 				}
 				else
 				{
@@ -271,8 +269,6 @@ public class GuiTransportableBlocks extends GuiScreen
 				{
 					editMode = true;
 					initGui();
-
-					blockList.scrollToTop();
 
 					if (blockList.selected != null)
 					{
@@ -397,7 +393,7 @@ public class GuiTransportableBlocks extends GuiScreen
 			}
 			else if (i > 0)
 			{
-				iconField.setText(Integer.toString(Math.min(NumberUtils.toInt(iconField.getText()) + 1, 30)));
+				iconField.setText(Integer.toString(Math.min(NumberUtils.toInt(iconField.getText()) + 1, MoreInventoryMod.transporter.icon_modded.length - 1)));
 			}
 		}
 	}
@@ -724,14 +720,9 @@ public class GuiTransportableBlocks extends GuiScreen
 			{
 				icon = MoreInventoryMod.transporter.iconMap.get(unique);
 			}
-			else if (ItemTransporter.transportableBlocks.contains(unique, entry.blockMeta.meta))
-			{
-				IIcon[] icons = MoreInventoryMod.transporter.icon_modded;
-				icon = icons[ItemTransporter.transportableBlocks.get(unique, entry.blockMeta.meta) & (icons.length - 1)];
-			}
 			else
 			{
-				icon = MoreInventoryMod.transporter.iconMap.get("default");
+				icon = MoreInventoryMod.transporter.getModIcon(editMode ? NumberUtils.toInt(iconField.getText(), 19) : entry.iconIndex);
 			}
 
 			if (icon != null)

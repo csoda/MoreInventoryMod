@@ -277,7 +277,7 @@ public class GuiSelectTransportableIcon extends GuiScreen
 				mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
 				GL11.glEnable(GL11.GL_ALPHA_TEST);
 				GL11.glEnable(GL11.GL_BLEND);
-				itemRender.renderIcon(width / 2 - 8, par3 - 2, MoreInventoryMod.transporter.icon_modded[entry], 16, 16);
+				itemRender.renderIcon(width / 2 - 8, par3 - 2, MoreInventoryMod.transporter.getModIcon(entry), 16, 16);
 				GL11.glDisable(GL11.GL_ALPHA_TEST);
 				GL11.glDisable(GL11.GL_BLEND);
 				GL11.glEnable(GL11.GL_CULL_FACE);
