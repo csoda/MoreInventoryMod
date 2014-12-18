@@ -50,7 +50,7 @@ public class ItemTransporter extends Item
 				continue;
 			}
 
-			transportableBlocks.put(args[0].trim(), Integer.parseInt(args[1].trim()), args.length > 2 && args[2].trim().length() > 0 ? NumberUtils.toInt(args[2].trim()) & 29 : 0);
+			transportableBlocks.put(args[0].trim(), Integer.parseInt(args[1].trim()), args.length > 2 && args[2].trim().length() > 0 ? NumberUtils.toInt(args[2].trim()) : 0);
 		}
 	}
 
@@ -72,7 +72,7 @@ public class ItemTransporter extends Item
 	public ItemTransporter()
 	{
 		this.setMaxStackSize(1);
-		this.setMaxDamage(50);
+		this.setMaxDamage(40);
 		this.setFull3D();
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
