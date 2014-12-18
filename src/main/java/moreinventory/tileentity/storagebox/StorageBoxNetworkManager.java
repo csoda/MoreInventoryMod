@@ -122,7 +122,10 @@ public class StorageBoxNetworkManager
 				{
 					TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
 
-					list.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
+					if (tile != null)
+					{
+						list.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
+					}
 				}
 			}
 		}

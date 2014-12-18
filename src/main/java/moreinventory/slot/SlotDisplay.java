@@ -12,6 +12,18 @@ public class SlotDisplay extends Slot
 		super(par1iInventory, par2, par3, par4);
 	}
 
+	public ItemStack getStack()
+	{
+		ItemStack itemstack = this.inventory.getStackInSlot(this.getSlotIndex());
+
+		if (itemstack != null)
+		{
+			itemstack.stackSize = 1;
+		}
+
+		return itemstack;
+	}
+
 	@Override
 	public int getSlotStackLimit()
 	{

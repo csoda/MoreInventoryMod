@@ -256,8 +256,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return itemstack != null && (slot != storageItems.length && (getContents() == null || isSameAsContents(itemstack)) ||
-			slot == storageItems.length && canInsert && getStorageBoxNetworkManager().canLinkedImport(itemstack, this));
+		return itemstack != null && !isFull() &&((slot != getSizeInventory() && (getContents() == null || isSameAsContents(itemstack))) ||
+				(slot == getSizeInventory() && canInsert && getStorageBoxNetworkManager().canLinkedImport(itemstack, this)));
 	}
 
 	public boolean registerItems(ItemStack itemstack)
@@ -374,10 +374,17 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		for (int i = 0; i < size; i++)
 		{
 			item = getStackInSlot(i);
-
+			int count = 0;
 			if (item.stackSize != item.getMaxStackSize())
 			{
-				return item.getMaxStackSize() - item.stackSize >= itemstack.stackSize;
+				if(item.getMaxStackSize() - item.stackSize >= itemstack.stackSize - count)
+				{
+					return true;
+				}
+				else
+				{
+					count += item.getMaxStackSize() - item.stackSize;
+				}
 			}
 		}
 
@@ -435,41 +442,44 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		boolean prevInsert = canInsert;
 
-		switch (++clickCount)
+		if (!world.isRemote)
 		{
-			case 1:
-				clickTime = 16;
-				ItemStack itemstack = player.getCurrentEquippedItem();
-				if (itemstack != null)
-				{
-					registerItems(itemstack);
+			switch (++clickCount)
+			{
+				case 1:
+					clickTime = 16;
+					ItemStack itemstack = player.getCurrentEquippedItem();
+					if (itemstack != null)
+					{
+						registerItems(itemstack);
 
+						canInsert = false;
+						tryPutIn(itemstack);
+						canInsert = prevInsert;
+					}
+					else if (player.isSneaking())
+					{
+						clearRegister();
+					}
+
+					break;
+				case 2:
 					canInsert = false;
-					tryPutIn(itemstack);
+					collectAllItemStack(player.inventory);
 					canInsert = prevInsert;
-				}
-				else if (player.isSneaking())
-				{
-					clearRegister();
-				}
+					updatePlayerInventory(player);
+					break;
+				case 3:
+					clickCount = 0;
 
-				break;
-			case 2:
-				canInsert = false;
-				collectAllItemStack(player.inventory);
-				canInsert = prevInsert;
-				updatePlayerInventory(player);
-				break;
-			case 3:
-				clickCount = 0;
+					getStorageBoxNetworkManager().linkedCollect(player.inventory);
+					updatePlayerInventory(player);
 
-				getStorageBoxNetworkManager().linkedCollect(player.inventory);
-				updatePlayerInventory(player);
-
-				break;
-			default:
-				clickCount = 0;
-				break;
+					break;
+				default:
+					clickCount = 0;
+					break;
+			}
 		}
 
 		return true;
@@ -543,6 +553,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			ownerID = entity.getUniqueID().toString();
 		}
 
+		updateTileFromType();
+
 		for (int i = 0; i < 6; ++i)
 		{
 			int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, Facing.oppositeSide[i]);
@@ -563,8 +575,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			makeNewBoxList();
 		}
 
-		updateTileFromTile();
-
 		markDirty();
 	}
 
@@ -577,7 +587,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		}
 	}
 
-	public void updateTileFromTile()
+	public void updateTileFromType()
 	{
 		if(this.getClass() != StorageBoxType.types.get(getTypeName()).clazz)
 		{
@@ -604,12 +614,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			tile.displayedStackSize = displayedStackSize;
 		}
 
-		tile.onUpgrade();
-
 		return tile;
 	}
-
-	public void onUpgrade(){}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)

@@ -1,16 +1,15 @@
 package moreinventory.util;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-import java.util.List;
+import java.util.*;
 
 public class MIMItemBoxList extends MIMBoxList
 {
-	private final List<ItemStack> itemList = Lists.newArrayList();
+	private final HashMap<int[], ItemStack> itemMap = new HashMap<>();
 
 	public MIMItemBoxList() {}
 
@@ -32,8 +31,7 @@ public class MIMItemBoxList extends MIMBoxList
 		if (!isOnBoxList(x, y, z, d))
 		{
 			super.addBox(x, y, z, d);
-
-			itemList.add(null);
+			itemMap.put(new int[]{x, y, z, d}, null);
 			flg = true;
 		}
 
@@ -45,16 +43,44 @@ public class MIMItemBoxList extends MIMBoxList
 	@Override
 	public void removeBox(int i)
 	{
+		int[] pos = getBoxPos(i);
+		itemMap.remove(pos);
 		super.removeBox(i);
-		itemList.remove(i);
 	}
 
 	@Override
 	public void addAllBox(MIMBoxList csList) {}
 
+	public void putItem (int[] pos, ItemStack itemstack)
+	{
+		Set entrySet = itemMap.entrySet();
+		for (Iterator t = entrySet.iterator(); t.hasNext();)
+		{
+			Map.Entry<int[],ItemStack> entry = (Map.Entry<int[], ItemStack>) t.next();
+			if (Arrays.equals(pos, entry.getKey()))
+			{
+				entry.setValue(itemstack);
+			}
+		}
+	}
+
 	public ItemStack getItem(int i)
 	{
-		return i >= 0 && i < itemList.size() ? itemList.get(i) : null;
+		ItemStack itemstack = null;
+
+		int[] pos = getBoxPos(i);
+
+		Set entrySet = itemMap.entrySet();
+		for (Iterator t = entrySet.iterator(); t.hasNext();)
+		{
+			Map.Entry<int[],ItemStack> entry = (Map.Entry<int[], ItemStack>) t.next();
+			if (Arrays.equals(pos, entry.getKey()))
+			{
+				itemstack = entry.getValue();
+			}
+		}
+
+		return itemstack;
 	}
 
 	public int getItemDamage(int i)
@@ -68,23 +94,8 @@ public class MIMItemBoxList extends MIMBoxList
 	{
 		if (isOnBoxList(x, y, z, d))
 		{
-			for (int i = 0; i < getListSize(); i++)
-			{
-				int[] pos = getBoxPos(i);
-				int dim = getDimensionID(i);
-
-				if (x == pos[0] && y == pos[1] && z == pos[2] && dim == d)
-				{
-					if (itemstack != null)
-					{
-						itemList.set(i, itemstack.copy());
-					}
-					else
-					{
-						itemList.set(i, null);
-					}
-				}
-			}
+			ItemStack newItem = itemstack != null ? itemstack.copy() : null;
+			putItem(new int[]{x, y, z, d}, newItem);
 		}
 		else
 		{
@@ -100,7 +111,7 @@ public class MIMItemBoxList extends MIMBoxList
 			super.writeToNBT(nbt);
 			NBTTagList list = new NBTTagList();
 
-			for (int i = 0; i < itemList.size(); ++i)
+			for (int i = 0; i < getListSize(); ++i)
 			{
 				ItemStack itemstack = getItem(i);
 
@@ -125,12 +136,12 @@ public class MIMItemBoxList extends MIMBoxList
 
 		if (list != null)
 		{
-			itemList.clear();
+			itemMap.clear();
 
 			for (int i = 0; i < list.tagCount(); i++)
 			{
 				NBTTagCompound data = list.getCompoundTagAt(i);
-				itemList.add(data.getInteger("Index"), ItemStack.loadItemStackFromNBT(data));
+				itemMap.put(getBoxPos(data.getInteger("Index")), ItemStack.loadItemStackFromNBT(data));
 			}
 		}
 	}

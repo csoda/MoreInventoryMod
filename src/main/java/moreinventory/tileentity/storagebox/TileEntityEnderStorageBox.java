@@ -4,7 +4,6 @@ import moreinventory.util.MIMItemBoxList;
 import moreinventory.util.MIMItemInvList;
 import moreinventory.util.MIMUtils;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -108,13 +107,5 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 			storageItems = itemList.getInventory(getContents());
 			tryPutIn(oldStorage[1]);
 		}
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
-
-		updateStorageItems();
 	}
 }

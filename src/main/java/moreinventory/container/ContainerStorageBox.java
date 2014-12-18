@@ -15,7 +15,6 @@ public class ContainerStorageBox extends Container
 	{
 		this.storageBox = tile;
 		this.addSlotToContainer(new SlotDisplay(tile, tile.getFirstItemIndex(), 30, 16));
-		System.out.println(tile.getFirstItemIndex());
 	}
 
 	@Override

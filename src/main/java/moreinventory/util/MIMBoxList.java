@@ -11,10 +11,7 @@ import java.util.List;
 
 public class MIMBoxList implements INBTSaveData
 {
-	private final List<Integer> listX = Lists.newArrayList();
-	private final List<Integer> listY = Lists.newArrayList();
-	private final List<Integer> listZ = Lists.newArrayList();
-	private final List<Integer> dimension = Lists.newArrayList();
+	private final List<int[]> posList = Lists.newArrayList();
 	protected String tagName;
 
 	public MIMBoxList() {}
@@ -26,17 +23,17 @@ public class MIMBoxList implements INBTSaveData
 
 	public int getListSize()
 	{
-		return listX.size();
+		return posList.size();
 	}
 
 	public int[] getBoxPos(int i)
 	{
-		return new int[] {listX.get(i), listY.get(i), listZ.get(i)};
+		return posList.get(i);
 	}
 
 	public int getDimensionID(int i)
 	{
-		return dimension.get(i);
+		return posList.get(i)[3];
 	}
 
 	public TileEntity getTileBeyondDim(int i)
@@ -50,11 +47,7 @@ public class MIMBoxList implements INBTSaveData
 	{
 		if (!isOnBoxList(x, y, z, d))
 		{
-			listX.add(x);
-			listY.add(y);
-			listZ.add(z);
-			dimension.add(d);
-
+			posList.add(new int[] {x, y, z, d});
 			return true;
 		}
 
@@ -63,27 +56,19 @@ public class MIMBoxList implements INBTSaveData
 
 	public void removeBox(int i)
 	{
-		listX.remove(i);
-		listY.remove(i);
-		listZ.remove(i);
-		dimension.remove(i);
+		posList.remove(i);
 	}
 
 	public void addAllBox(MIMBoxList csList)
 	{
-		listX.addAll(csList.listX);
-		listY.addAll(csList.listY);
-		listZ.addAll(csList.listZ);
-		dimension.addAll(csList.dimension);
+		posList.addAll(getDifference(csList).posList);
 	}
 
 	public boolean isOnBoxList(int x, int y, int z, int d)
 	{
-		for (int i = 0; i < getListSize(); i++)
+		for (int[] pos : posList)
 		{
-			int[] pos = getBoxPos(i);
-
-			if (x == pos[0] && y == pos[1] && z == pos[2] && dimension.get(i) == d)
+			if (x == pos[0] && y == pos[1] && z == pos[2] && d == pos[3])
 			{
 				return true;
 			}
@@ -137,7 +122,7 @@ public class MIMBoxList implements INBTSaveData
 				data.setInteger("X", pos[0]);
 				data.setInteger("Y", pos[1]);
 				data.setInteger("Z", pos[2]);
-				data.setInteger("D", dimension.get(i));
+				data.setInteger("D", pos[3]);
 				list.appendTag(data);
 			}
 
@@ -155,10 +140,7 @@ public class MIMBoxList implements INBTSaveData
 			for (int i = 0; i < list.tagCount(); i++)
 			{
 				NBTTagCompound data = list.getCompoundTagAt(i);
-				listX.add(data.getInteger("X"));
-				listY.add(data.getInteger("Y"));
-				listZ.add(data.getInteger("Z"));
-				dimension.add(data.getInteger("D"));
+				posList.add(new int[]{data.getInteger("X"), data.getInteger("Y"), data.getInteger("Z"), data.getInteger("D")});
 			}
 		}
 	}
