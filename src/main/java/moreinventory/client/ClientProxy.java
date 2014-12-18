@@ -4,7 +4,11 @@ import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.config.TransportableBlocksEntry;
-import moreinventory.client.renderer.*;
+import moreinventory.client.renderer.ItemCatchallRenderer;
+import moreinventory.client.renderer.ItemStorageBoxRenderer;
+import moreinventory.client.renderer.TileEntityCatchallRenderer;
+import moreinventory.client.renderer.TileEntityStorageBoxRenderer;
+import moreinventory.client.renderer.TileEntityTransportManagerRenderer;
 import moreinventory.core.CommonProxy;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
@@ -32,6 +36,5 @@ public class ClientProxy extends CommonProxy
 
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(MoreInventoryMod.catchall), new ItemCatchallRenderer());
 		MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(MoreInventoryMod.storageBox), new ItemStorageBoxRenderer());
-
 	}
 }

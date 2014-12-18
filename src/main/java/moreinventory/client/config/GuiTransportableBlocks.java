@@ -10,24 +10,24 @@ import cpw.mods.fml.client.config.GuiButtonExt;
 import cpw.mods.fml.client.config.GuiConfigEntries.ArrayEntry;
 import moreinventory.client.gui.GuiListSlot;
 import moreinventory.core.MoreInventoryMod;
+import moreinventory.item.ItemTransporter;
 import moreinventory.util.ArrayListExtended;
 import moreinventory.util.BlockMeta;
 import moreinventory.util.MIMUtils;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.Comparator;
 import java.util.List;
@@ -39,7 +39,7 @@ public class GuiTransportableBlocks extends GuiScreen
 	private final GuiScreen parent;
 	protected ArrayEntry configElement;
 
-	protected ChestList chestList;
+	protected BlockList blockList;
 	protected GuiButton doneButton, editButton, cancelButton, addButton, removeButton, clearButton;
 	protected GuiTextField filterTextField;
 
@@ -67,12 +67,12 @@ public class GuiTransportableBlocks extends GuiScreen
 	{
 		Keyboard.enableRepeatEvents(true);
 
-		if (chestList == null)
+		if (blockList == null)
 		{
-			chestList = new ChestList();
+			blockList = new BlockList();
 		}
 
-		chestList.func_148122_a(width, height, 32, height - (editMode ? 74 : 28));
+		blockList.func_148122_a(width, height, 32, height - (editMode ? 74 : 28));
 
 		if (doneButton == null)
 		{
@@ -90,7 +90,7 @@ public class GuiTransportableBlocks extends GuiScreen
 
 		editButton.xPosition = doneButton.xPosition - doneButton.width - 3;
 		editButton.yPosition = doneButton.yPosition;
-		editButton.enabled = chestList.selected != null;
+		editButton.enabled = blockList.selected != null;
 		editButton.visible = !editMode;
 
 		if (cancelButton == null)
@@ -171,7 +171,7 @@ public class GuiTransportableBlocks extends GuiScreen
 
 		int i = maxLabelWidth + 8 + width / 2;
 		blockField.xPosition = width / 2 - i / 2 + maxLabelWidth + 10;
-		blockField.yPosition = chestList.bottom + 5;
+		blockField.yPosition = blockList.bottom + 5;
 		int fieldWidth = width / 2 + i / 2 - 45 - blockField.xPosition + 40;
 		blockField.width = fieldWidth / 4 + fieldWidth / 2 - 1;
 
@@ -218,22 +218,22 @@ public class GuiTransportableBlocks extends GuiScreen
 			case 0:
 				if (editMode)
 				{
-					if (chestList.selected != null)
+					if (blockList.selected != null)
 					{
 						if (!Strings.isNullOrEmpty(blockField.getText()))
 						{
-							chestList.selected.blockMeta = new BlockMeta(blockField.getText(), NumberUtils.toInt(blockMetaField.getText()));
+							blockList.selected.blockMeta = new BlockMeta(blockField.getText(), NumberUtils.toInt(blockMetaField.getText()));
 						}
 
 						if (!Strings.isNullOrEmpty(iconField.getText()))
 						{
-							chestList.selected.iconIndex = NumberUtils.toInt(iconField.getText(), 19);
+							blockList.selected.iconIndex = NumberUtils.toInt(iconField.getText(), 19);
 						}
 					}
 
 					actionPerformed(cancelButton);
 
-					chestList.scrollToTop();
+					blockList.scrollToTop();
 				}
 				else
 				{
@@ -246,7 +246,7 @@ public class GuiTransportableBlocks extends GuiScreen
 							{
 								List<String> values = Lists.newArrayList();
 
-								for (ChestEntry entry : chestList.chests)
+								for (BlockEntry entry : blockList.blocks)
 								{
 									values.add(entry.toString());
 								}
@@ -258,7 +258,7 @@ public class GuiTransportableBlocks extends GuiScreen
 
 					actionPerformed(cancelButton);
 
-					chestList.scrollToTop();
+					blockList.scrollToTop();
 				}
 
 				break;
@@ -272,13 +272,13 @@ public class GuiTransportableBlocks extends GuiScreen
 					editMode = true;
 					initGui();
 
-					chestList.scrollToTop();
+					blockList.scrollToTop();
 
-					if (chestList.selected != null)
+					if (blockList.selected != null)
 					{
-						blockField.setText(MIMUtils.getUniqueName(chestList.selected.blockMeta.block));
-						blockMetaField.setText(Integer.toString(chestList.selected.blockMeta.meta));
-						iconField.setText(Integer.toString(chestList.selected.iconIndex));
+						blockField.setText(MIMUtils.getUniqueName(blockList.selected.blockMeta.block));
+						blockMetaField.setText(Integer.toString(blockList.selected.blockMeta.meta));
+						iconField.setText(Integer.toString(blockList.selected.iconIndex));
 					}
 				}
 
@@ -309,17 +309,17 @@ public class GuiTransportableBlocks extends GuiScreen
 					@Override
 					protected void compute()
 					{
-						chestList.chests.remove(chestList.selected);
-						chestList.contents.remove(chestList.selected);
-						chestList.selected = null;
+						blockList.blocks.remove(blockList.selected);
+						blockList.contents.remove(blockList.selected);
+						blockList.selected = null;
 					}
 				});
 
 				break;
 			case 5:
-				chestList.chests.clear();
-				chestList.contents.clear();
-				chestList.selected = null;
+				blockList.blocks.clear();
+				blockList.contents.clear();
+				blockList.selected = null;
 				break;
 		}
 	}
@@ -336,7 +336,7 @@ public class GuiTransportableBlocks extends GuiScreen
 		}
 		else
 		{
-			editButton.enabled = chestList.selected != null;
+			editButton.enabled = blockList.selected != null;
 			removeButton.enabled = editButton.enabled;
 
 			filterTextField.updateCursorCounter();
@@ -346,7 +346,7 @@ public class GuiTransportableBlocks extends GuiScreen
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float ticks)
 	{
-		chestList.drawScreen(mouseX, mouseY, ticks);
+		blockList.drawScreen(mouseX, mouseY, ticks);
 
 		drawCenteredString(fontRendererObj, I18n.format(MoreInventoryMod.CONFIG_LANG + "general.transportableBlocks"), width / 2, 15, 0xFFFFFF);
 
@@ -490,11 +490,11 @@ public class GuiTransportableBlocks extends GuiScreen
 
 				if (Strings.isNullOrEmpty(text) && changed)
 				{
-					chestList.setFilter(null);
+					blockList.setFilter(null);
 				}
 				else if (changed || code == Keyboard.KEY_RETURN)
 				{
-					chestList.setFilter(text);
+					blockList.setFilter(text);
 				}
 			}
 			else
@@ -510,38 +510,38 @@ public class GuiTransportableBlocks extends GuiScreen
 				}
 				else if (code == Keyboard.KEY_BACK)
 				{
-					chestList.selected = null;
+					blockList.selected = null;
 				}
 				else if (code == Keyboard.KEY_TAB)
 				{
-					if (++chestList.nameType > 1)
+					if (++blockList.nameType > 1)
 					{
-						chestList.nameType = 0;
+						blockList.nameType = 0;
 					}
 				}
 				else if (code == Keyboard.KEY_UP)
 				{
-					chestList.scrollUp();
+					blockList.scrollUp();
 				}
 				else if (code == Keyboard.KEY_DOWN)
 				{
-					chestList.scrollDown();
+					blockList.scrollDown();
 				}
 				else if (code == Keyboard.KEY_HOME)
 				{
-					chestList.scrollToTop();
+					blockList.scrollToTop();
 				}
 				else if (code == Keyboard.KEY_END)
 				{
-					chestList.scrollToEnd();
+					blockList.scrollToEnd();
 				}
 				else if (code == Keyboard.KEY_PRIOR)
 				{
-					chestList.scrollToPrev();
+					blockList.scrollToPrev();
 				}
 				else if (code == Keyboard.KEY_NEXT)
 				{
-					chestList.scrollToNext();
+					blockList.scrollToNext();
 				}
 				else if (code == Keyboard.KEY_F || code == mc.gameSettings.keyBindChat.getKeyCode())
 				{
@@ -559,12 +559,12 @@ public class GuiTransportableBlocks extends GuiScreen
 		Keyboard.enableRepeatEvents(false);
 	}
 
-	class ChestEntry
+	class BlockEntry
 	{
 		BlockMeta blockMeta;
 		int iconIndex;
 
-		public ChestEntry(BlockMeta blockMeta, int icon)
+		public BlockEntry(BlockMeta blockMeta, int icon)
 		{
 			this.blockMeta = blockMeta;
 			this.iconIndex = icon;
@@ -579,9 +579,9 @@ public class GuiTransportableBlocks extends GuiScreen
 		@Override
 		public boolean equals(Object obj)
 		{
-			if (obj instanceof ChestEntry)
+			if (obj instanceof BlockEntry)
 			{
-				ChestEntry entry = (ChestEntry)obj;
+				BlockEntry entry = (BlockEntry)obj;
 
 				return blockMeta == entry.blockMeta && iconIndex == entry.iconIndex;
 			}
@@ -596,17 +596,17 @@ public class GuiTransportableBlocks extends GuiScreen
 		}
 	}
 
-	protected class ChestList extends GuiListSlot<ChestEntry> implements Comparator<ChestEntry>
+	protected class BlockList extends GuiListSlot<BlockEntry> implements Comparator<BlockEntry>
 	{
-		protected final ArrayListExtended<ChestEntry>
-		chests = new ArrayListExtended<>(),
+		protected final ArrayListExtended<BlockEntry>
+		blocks = new ArrayListExtended<>(),
 		contents = new ArrayListExtended<>();
-		private final Map<String, List<ChestEntry>> filterCache = Maps.newHashMap();
+		private final Map<String, List<BlockEntry>> filterCache = Maps.newHashMap();
 
 		protected int nameType;
-		protected ChestEntry selected;
+		protected BlockEntry selected;
 
-		public ChestList()
+		public BlockList()
 		{
 			super(GuiTransportableBlocks.this.mc, 0, 0, 0, 0, 22);
 			this.initEntries();
@@ -619,7 +619,7 @@ public class GuiTransportableBlocks extends GuiScreen
 				@Override
 				protected void compute()
 				{
-					chests.clear();
+					blocks.clear();
 					contents.clear();
 					filterCache.clear();
 					selected = null;
@@ -641,18 +641,18 @@ public class GuiTransportableBlocks extends GuiScreen
 
 							if (blockMeta.block != Blocks.air)
 							{
-								chests.addIfAbsent(new ChestEntry(blockMeta, icon));
+								blocks.addIfAbsent(new BlockEntry(blockMeta, icon));
 							}
 						}
 					}
 
-					contents.addAll(chests);
+					contents.addAll(blocks);
 				}
 			});
 		}
 
 		@Override
-		protected ArrayListExtended<ChestEntry> getContents()
+		protected ArrayListExtended<BlockEntry> getContents()
 		{
 			return contents;
 		}
@@ -666,7 +666,7 @@ public class GuiTransportableBlocks extends GuiScreen
 		@Override
 		protected void drawSlot(int index, int par2, int par3, int par4, Tessellator tessellator, int mouseX, int mouseY)
 		{
-			ChestEntry entry = getContents().get(index, null);
+			BlockEntry entry = getContents().get(index, null);
 
 			if (entry == null)
 			{
@@ -713,57 +713,41 @@ public class GuiTransportableBlocks extends GuiScreen
 			}
 			catch (Throwable ignored) {}
 
-			itemstack = new ItemStack(MoreInventoryMod.transporter);
+			IIcon icon;
+			String unique = MIMUtils.getUniqueName(entry.blockMeta.block);
 
-			if (entry.blockMeta.block == Blocks.chest)
+			if (entry.blockMeta.block == MoreInventoryMod.storageBox)
 			{
-				itemstack.setItemDamage(1);
+				icon = MoreInventoryMod.transporter.iconMap.get(unique + ":Wood");
 			}
-			else if (entry.blockMeta.block == Blocks.trapped_chest)
+			else if (ItemTransporter.forceIcons.contains(unique))
 			{
-				itemstack.setItemDamage(2);
+				icon = MoreInventoryMod.transporter.iconMap.get(unique);
 			}
-			else if (entry.blockMeta.block == Blocks.furnace)
+			else if (ItemTransporter.transportableBlocks.contains(unique, entry.blockMeta.meta))
 			{
-				itemstack.setItemDamage(3);
-			}
-			else if (entry.blockMeta.block == Blocks.lit_furnace)
-			{
-				itemstack.setItemDamage(4);
-			}
-			else if (entry.blockMeta.block == MoreInventoryMod.storageBox)
-			{
-				if (entry.blockMeta.meta == -1)
-				{
-					itemstack.setItemDamage(5);
-				}
-				else
-				{
-					itemstack.setItemDamage(entry.blockMeta.meta + 5);
-				}
+				IIcon[] icons = MoreInventoryMod.transporter.icon_modded;
+				icon = icons[ItemTransporter.transportableBlocks.get(unique, entry.blockMeta.meta) & (icons.length - 1)];
 			}
 			else
 			{
-				itemstack.setItemDamage(entry.iconIndex + 21);
+				icon = MoreInventoryMod.transporter.iconMap.get("default");
 			}
 
-			try
+			if (icon != null)
 			{
-				GL11.glPushMatrix();
-				GL11.glTranslatef(0.0F, 0.0F, 32.0F);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-				GL11.glEnable(GL11.GL_LIGHTING);
-				RenderHelper.enableGUIStandardItemLighting();
-				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				itemRender.zLevel += 100.0F;
-				itemRender.renderItemIntoGUI(fontRendererObj, mc.getTextureManager(), itemstack, width / 2 - 100, par3 + 1);
-				itemRender.zLevel -= 100.0F;
-				GL11.glPopMatrix();
-				GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-				GL11.glDisable(GL11.GL_LIGHTING);
+				try
+				{
+					mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+					GL11.glEnable(GL11.GL_ALPHA_TEST);
+					GL11.glEnable(GL11.GL_BLEND);
+					itemRender.renderIcon(width / 2 - 100, par3 + 1, icon, 16, 16);
+					GL11.glDisable(GL11.GL_ALPHA_TEST);
+					GL11.glDisable(GL11.GL_BLEND);
+					GL11.glEnable(GL11.GL_CULL_FACE);
+				}
+				catch (Throwable ignored) {}
 			}
-			catch (Throwable ignored) {}
 
 			if (!Strings.isNullOrEmpty(name))
 			{
@@ -780,7 +764,7 @@ public class GuiTransportableBlocks extends GuiScreen
 		@Override
 		protected boolean isSelected(int index)
 		{
-			ChestEntry entry = getContents().get(index, null);
+			BlockEntry entry = getContents().get(index, null);
 
 			return entry != null && selected == entry;
 		}
@@ -792,11 +776,11 @@ public class GuiTransportableBlocks extends GuiScreen
 				@Override
 				protected void compute()
 				{
-					List<ChestEntry> result;
+					List<BlockEntry> result;
 
 					if (Strings.isNullOrEmpty(filter))
 					{
-						result = chests;
+						result = blocks;
 					}
 					else if (filter.equals("selected"))
 					{
@@ -806,10 +790,10 @@ public class GuiTransportableBlocks extends GuiScreen
 					{
 						if (!filterCache.containsKey(filter))
 						{
-							filterCache.put(filter, Lists.newArrayList(Collections2.filter(chests, new Predicate<ChestEntry>()
+							filterCache.put(filter, Lists.newArrayList(Collections2.filter(blocks, new Predicate<BlockEntry>()
 							{
 								@Override
-								public boolean apply(ChestEntry entry)
+								public boolean apply(BlockEntry entry)
 								{
 									return MIMUtils.blockMetaFilter(entry.blockMeta, filter);
 								}
@@ -829,7 +813,7 @@ public class GuiTransportableBlocks extends GuiScreen
 		}
 
 		@Override
-		public int compare(ChestEntry o1, ChestEntry o2)
+		public int compare(BlockEntry o1, BlockEntry o2)
 		{
 			int i = MIMUtils.compareWithNull(o1, o2);
 

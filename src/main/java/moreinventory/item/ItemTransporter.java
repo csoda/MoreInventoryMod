@@ -1,12 +1,15 @@
 package moreinventory.item;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.tileentity.storagebox.StorageBoxType;
+import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -23,7 +26,11 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class ItemTransporter extends Item
 {
@@ -46,14 +53,27 @@ public class ItemTransporter extends Item
 		}
 	}
 
+	public static final Set<String> forceIcons = Sets.newHashSet();
+
+	static
+	{
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.chest));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.trapped_chest));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.furnace));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.lit_furnace));
+	}
+
 	@SideOnly(Side.CLIENT)
-	private IIcon[] icons;
+	public Map<String, IIcon> iconMap;
+	@SideOnly(Side.CLIENT)
+	public IIcon[] icon_modded;
 
 	public ItemTransporter()
 	{
 		this.setMaxStackSize(1);
+		this.setMaxDamage(50);
+		this.setFull3D();
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
-		this.setHasSubtypes(true);
 	}
 
 	@Override
@@ -66,7 +86,7 @@ public class ItemTransporter extends Item
 			return true;
 		}
 
-		if (itemstack.getItemDamage() == 0)
+		if (itemstack.getTagCompound() == null)
 		{
 			Block block = world.getBlock(x, y, z);
 			int meta = world.getBlockMetadata(x, y, z);
@@ -90,32 +110,33 @@ public class ItemTransporter extends Item
 
 			if (new Transporter(itemstack).transferToPlayer(tile))
 			{
-				if (block == Blocks.chest)
-				{
-					itemstack.setItemDamage(1);
-				}
-				else if (block == Blocks.trapped_chest)
-				{
-					itemstack.setItemDamage(2);
-				}
-				else if (block == Blocks.furnace)
-				{
-					itemstack.setItemDamage(3);
-				}
-				else if (block == Blocks.lit_furnace)
-				{
-					itemstack.setItemDamage(4);
-				}
-				else if (block == MoreInventoryMod.storageBox)
-				{
-					itemstack.setItemDamage(world.getBlockMetadata(x, y, z) + 5);
-				}
-				else
-				{
-					itemstack.setItemDamage(transportableBlocks.get(MIMUtils.getUniqueName(block), meta) + 21);
-				}
+				String unique = MIMUtils.getUniqueName(block);
 
-				world.setBlockToAir(x, y, z);
+				if (block == MoreInventoryMod.storageBox)
+				{
+					itemstack.getTagCompound().setString("IconName", unique + ":" + ((TileEntityStorageBox)tile).getTypeName());
+				}
+				else if (forceIcons.contains(unique))
+				{
+					itemstack.getTagCompound().setString("IconName", unique);
+				}
+				else if (transportableBlocks.contains(unique, meta))
+				{
+					itemstack.getTagCompound().setInteger("Modded", transportableBlocks.get(unique, meta));
+				}
+				else return false;
+
+				if (world.setBlockToAir(x, y, z))
+				{
+					itemstack.damageItem(1, player);
+
+					if (itemstack.getItemDamage() >= itemstack.getMaxDamage())
+					{
+						player.destroyCurrentEquippedItem();
+
+						world.playSoundAtEntity(player, "dig.wood", 1.5F, 0.85F);
+					}
+				}
 
 				return true;
 			}
@@ -132,9 +153,17 @@ public class ItemTransporter extends Item
 			return true;
 		}
 
-		if (itemstack.getItemDamage() != 0 && new Transporter(itemstack).placeBlock(world, player, x, y, z, side, hitX, hitY, hitZ))
+		if (itemstack.getTagCompound() != null && new Transporter(itemstack).placeBlock(world, player, x, y, z, side, hitX, hitY, hitZ))
 		{
-			player.inventory.setInventorySlotContents(player.inventory.currentItem, new ItemStack(MoreInventoryMod.transporter));
+			itemstack.setTagCompound(null);
+			itemstack.damageItem(1, player);
+
+			if (itemstack.getItemDamage() >= itemstack.getMaxDamage())
+			{
+				player.destroyCurrentEquippedItem();
+
+				world.playSoundAtEntity(player, "dig.wood", 1.5F, 0.85F);
+			}
 		}
 
 		return true;
@@ -144,49 +173,79 @@ public class ItemTransporter extends Item
 	@Override
 	public void registerIcons(IIconRegister iconRegister)
 	{
-		icons = new IIcon[51];
-		icons[0] = iconRegister.registerIcon("moreinv:transporter");
-		icons[1] = iconRegister.registerIcon("moreinv:transporter_chest");
-		icons[2] = iconRegister.registerIcon("moreinv:transporter_trapchest");
-		icons[3] = iconRegister.registerIcon("moreinv:transporter_furnace");
-		icons[4] = iconRegister.registerIcon("moreinv:transporter_furnace_lit");
+		iconMap = Maps.newHashMap();
+		icon_modded = new IIcon[30];
 
+		itemIcon = iconRegister.registerIcon("moreinv:transporter");
+		iconMap.put("default", itemIcon);
+		iconMap.put(MIMUtils.getUniqueName(Blocks.chest), iconRegister.registerIcon("moreinv:transporter_chest"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.trapped_chest), iconRegister.registerIcon("moreinv:transporter_trapchest"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.furnace), iconRegister.registerIcon("moreinv:transporter_furnace"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.lit_furnace), iconRegister.registerIcon("moreinv:transporter_furnace_lit"));
 
-		Set typeSet = StorageBoxType.types.entrySet();
-		int t = 0;
-		for (Iterator i = typeSet.iterator(); i.hasNext(); t++)
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
 			String typeName = type.getKey();
-			if (!"Glass".equals(typeName) && !"CobbleStone".equals(typeName) && !"Ender".equals(typeName))
+
+			if (!"Glass".equals(typeName) && !"Cobblestone".equals(typeName) && !"Ender".equals(typeName))
 			{
-				icons[t + 5] = iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH));
+				iconMap.put(MIMUtils.getUniqueName(MoreInventoryMod.storageBox) + ":" + typeName, iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH)));
 			}
 		}
 
-
-		for (int i = 0; i < 30; ++i)
+		for (int i = 0; i < icon_modded.length; ++i)
 		{
-			icons[i + 21] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
+			icon_modded[i] = iconRegister.registerIcon("moreinv:transporter_mod_" + i);
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public IIcon getIconFromDamage(int damage)
+	public IIcon getIcon(ItemStack itemstack, int pass)
 	{
-		return icons[damage];
+		return getIconIndex(itemstack);
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public IIcon getIconIndex(ItemStack itemstack)
+	{
+		NBTTagCompound nbt = itemstack.getTagCompound();
+
+		if (nbt == null)
+		{
+			return iconMap.get("default");
+		}
+
+		IIcon result = null;
+
+		if (nbt.hasKey("IconName"))
+		{
+			result = iconMap.get(nbt.getString("IconName"));
+		}
+		else if (nbt.hasKey("Modded"))
+		{
+			result = icon_modded[nbt.getInteger("Modded") & (icon_modded.length - 1)];
+		}
+
+		return result == null ? iconMap.get("default") : result;
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
 	{
-		int damage = itemstack.getItemDamage();
-
-		if (3 <= damage && damage <= 18)
+		if (itemstack.getTagCompound() != null && itemstack.getTagCompound().getString("IconName").startsWith(MIMUtils.getUniqueName(MoreInventoryMod.storageBox)))
 		{
-			list.add("\"" + new Transporter(itemstack).getContentsItemName(itemstack) + "\"");
+			String name = "Empty";
+			ItemStack contents = ItemStack.loadItemStackFromNBT(itemstack.getTagCompound().getCompoundTag("Contents"));
+
+			if (contents != null)
+			{
+				name = contents.getDisplayName();
+			}
+
+			list.add("\"" + name + "\"");
 		}
 	}
 
@@ -315,8 +374,8 @@ public class ItemTransporter extends Item
 
 				if (itemstack != null)
 				{
-					if (itemstack.getItem() == MoreInventoryMod.transporter && itemstack.getItemDamage() != 0 ||
-							itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
+					if (itemstack.getItem() == ItemTransporter.this && itemstack.getTagCompound() != null ||
+						itemstack.getItem() == MoreInventoryMod.pouch && !checkMatryoshka(new InventoryPouch(itemstack)))
 					{
 						return false;
 					}
@@ -324,24 +383,6 @@ public class ItemTransporter extends Item
 			}
 
 			return true;
-		}
-
-		public String getContentsItemName(ItemStack itemstack)
-		{
-			String name = "Empty";
-			NBTTagCompound nbt = itemstack.getTagCompound();
-
-			if (nbt != null)
-			{
-				ItemStack item = ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Contents"));
-
-				if (item != null)
-				{
-					name = item.getDisplayName();
-				}
-			}
-
-			return name;
 		}
 
 		public void readFromNBT()

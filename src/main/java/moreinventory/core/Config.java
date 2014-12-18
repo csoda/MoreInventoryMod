@@ -16,9 +16,8 @@ import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class Config
@@ -181,12 +180,9 @@ public class Config
 
 		category = "color";
 
-		Set typeSet = StorageBoxType.types.entrySet();
-		for (Iterator i = typeSet.iterator(); i.hasNext();)
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			Map.Entry<String, StorageBoxType> type = (Map.Entry<String, StorageBoxType>)i.next();
-
-			if (type.getKey() == "Glass")
+			if (type.getKey().equals("Glass"))
 			{
 				continue;
 			}

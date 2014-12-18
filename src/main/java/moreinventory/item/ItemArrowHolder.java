@@ -1,10 +1,12 @@
 package moreinventory.item;
 
+import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Items;
@@ -14,22 +16,42 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ItemArrowHolder extends Item
 {
-	private final int grade;
-
 	@SideOnly(Side.CLIENT)
-	private IIcon[] holderIcon;
+	private Map<String, IIcon> iconMap;
 
-	public ItemArrowHolder(int grade)
+	public ItemArrowHolder()
 	{
-		this.grade = grade;
 		this.setMaxStackSize(1);
-		this.setMaxDamage(ItemTorchHolder.maxDamage[grade]);
 		this.setNoRepair();
 		this.setContainerItem(this);
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
+	}
+
+	@Override
+	public String getUnlocalizedName(ItemStack itemstack)
+	{
+		if (itemstack.getTagCompound() == null)
+		{
+			return super.getUnlocalizedName();
+		}
+
+		return super.getUnlocalizedName() + ":" + itemstack.getTagCompound().getString("Type");
+	}
+
+	@Override
+	public int getMaxDamage(ItemStack itemstack)
+	{
+		if (itemstack.getTagCompound() == null)
+		{
+			return 256 + 2;
+		}
+
+		return ArrowHolderType.getCapacity(itemstack.getTagCompound().getString("Type")) + 2;
 	}
 
 	@Override
@@ -115,54 +137,50 @@ public class ItemArrowHolder extends Item
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean hasEffect(ItemStack itemstack, int pass)
+	public void registerIcons(IIconRegister iconRegister)
 	{
-		refreshHolderIcon(itemstack);
+		iconMap = Maps.newHashMap();
 
-		return super.hasEffect(itemstack, pass);
+		for (Entry<String, ArrowHolderType> entry : ArrowHolderType.types.entrySet())
+		{
+			String name = entry.getKey();
+			ArrowHolderType type = entry.getValue();
+
+			iconMap.put(name, iconRegister.registerIcon(type.iconName));
+			iconMap.put(name + ":empty", iconRegister.registerIcon(type.emptyIconName));
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerIcons(IIconRegister iconRegister)
+	public IIcon getIcon(ItemStack itemstack, int pass)
 	{
-		holderIcon = new IIcon[2];
-
-		switch (grade)
-		{
-			case 0:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:arrowholder_iron");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_iron");
-				break;
-			case 1:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:arrowholder_gold");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_gold");
-				break;
-			case 2:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:arrowholder_diamond");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_diamond");
-				break;
-		}
-
-		itemIcon = holderIcon[1];
+		return getIconIndex(itemstack);
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void refreshHolderIcon(ItemStack itemstack)
+	@Override
+	public IIcon getIconIndex(ItemStack itemstack)
 	{
-		if (holderIcon == null)
+		if (itemstack.getTagCompound() == null)
 		{
-			return;
+			return iconMap.get("Iron");
 		}
+
+		String type = itemstack.getTagCompound().getString("Type");
+		IIcon icon = null;
 
 		if (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 <= 0)
 		{
-			itemIcon = holderIcon[1];
+			icon = iconMap.get(type + ":empty");
 		}
-		else
+
+		if (icon == null)
 		{
-			itemIcon = holderIcon[0];
+			icon = iconMap.get(type);
 		}
+
+		return icon;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -170,5 +188,15 @@ public class ItemArrowHolder extends Item
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
 	{
 		list.add(I18n.format("item.arrowholder.rest") + ": " + (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2));
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void getSubItems(Item item, CreativeTabs tab, List list)
+	{
+		for (String type : ArrowHolderType.types.keySet())
+		{
+			list.add(ArrowHolderType.createItemStack(type));
+		}
 	}
 }

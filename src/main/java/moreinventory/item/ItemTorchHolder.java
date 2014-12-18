@@ -1,10 +1,12 @@
 package moreinventory.item;
 
+import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.Blocks;
@@ -14,24 +16,42 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ItemTorchHolder extends Item
 {
-	public static final int[] maxDamage = {258, 1026, 4098};
-
-	private final int grade;
-
 	@SideOnly(Side.CLIENT)
-	private IIcon[] holderIcon;
+	private Map<String, IIcon> iconMap;
 
-	public ItemTorchHolder(int grade)
+	public ItemTorchHolder()
 	{
-		this.grade = grade;
 		this.setMaxStackSize(1);
-		this.setMaxDamage(maxDamage[grade]);
 		this.setNoRepair();
 		this.setContainerItem(this);
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
+	}
+
+	@Override
+	public String getUnlocalizedName(ItemStack itemstack)
+	{
+		if (itemstack.getTagCompound() == null)
+		{
+			return super.getUnlocalizedName();
+		}
+
+		return super.getUnlocalizedName() + ":" + itemstack.getTagCompound().getString("Type");
+	}
+
+	@Override
+	public int getMaxDamage(ItemStack itemstack)
+	{
+		if (itemstack.getTagCompound() == null)
+		{
+			return 256 + 2;
+		}
+
+		return TorchHolderType.getCapacity(itemstack.getTagCompound().getString("Type")) + 2;
 	}
 
 	@Override
@@ -128,54 +148,50 @@ public class ItemTorchHolder extends Item
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public boolean hasEffect(ItemStack itemstack, int pass)
+	public void registerIcons(IIconRegister iconRegister)
 	{
-		refreshHolderIcon(itemstack);
+		iconMap = Maps.newHashMap();
 
-		return super.hasEffect(itemstack, pass);
+		for (Entry<String, TorchHolderType> entry : TorchHolderType.types.entrySet())
+		{
+			String name = entry.getKey();
+			TorchHolderType type = entry.getValue();
+
+			iconMap.put(name, iconRegister.registerIcon(type.iconName));
+			iconMap.put(name + ":empty", iconRegister.registerIcon(type.emptyIconName));
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void registerIcons(IIconRegister iconRegister)
+	public IIcon getIcon(ItemStack itemstack, int pass)
 	{
-		holderIcon = new IIcon[2];
-
-		switch (grade)
-		{
-			case 0:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_iron");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_iron");
-				break;
-			case 1:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_gold");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_gold");
-				break;
-			case 2:
-				holderIcon[0] = iconRegister.registerIcon("moreinv:torchholder_diamond");
-				holderIcon[1] = iconRegister.registerIcon("moreinv:emptyholder_diamond");
-				break;
-		}
-
-		itemIcon = holderIcon[1];
+		return getIconIndex(itemstack);
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void refreshHolderIcon(ItemStack itemstack)
+	@Override
+	public IIcon getIconIndex(ItemStack itemstack)
 	{
-		if (holderIcon == null)
+		if (itemstack.getTagCompound() == null)
 		{
-			return;
+			return iconMap.get("Iron");
 		}
+
+		String type = itemstack.getTagCompound().getString("Type");
+		IIcon icon = null;
 
 		if (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2 <= 0)
 		{
-			itemIcon = holderIcon[1];
+			icon = iconMap.get(type + ":empty");
 		}
-		else
+
+		if (icon == null)
 		{
-			itemIcon = holderIcon[0];
+			icon = iconMap.get(type);
 		}
+
+		return icon;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -183,5 +199,15 @@ public class ItemTorchHolder extends Item
 	public void addInformation(ItemStack itemstack, EntityPlayer player, List list, boolean advanced)
 	{
 		list.add(I18n.format("item.torchholder.rest") + ": " + (itemstack.getMaxDamage() - itemstack.getItemDamage() - 2));
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public void getSubItems(Item item, CreativeTabs tab, List list)
+	{
+		for (String type : TorchHolderType.types.keySet())
+		{
+			list.add(TorchHolderType.createItemStack(type));
+		}
 	}
 }

@@ -1,9 +1,9 @@
 package moreinventory.tileentity.storagebox;
 
-public class TileEntityCobbleStoneStorageBox extends TileEntityStorageBox
+public class TileEntityCobblestoneStorageBox extends TileEntityStorageBox
 {
-	public TileEntityCobbleStoneStorageBox()
+	public TileEntityCobblestoneStorageBox()
 	{
-		super("CobbleStone");
+		super("Cobblestone");
 	}
 }
