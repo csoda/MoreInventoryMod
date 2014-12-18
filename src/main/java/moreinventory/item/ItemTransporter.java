@@ -62,6 +62,8 @@ public class ItemTransporter extends Item
 		forceIcons.add(MIMUtils.getUniqueName(Blocks.trapped_chest));
 		forceIcons.add(MIMUtils.getUniqueName(Blocks.furnace));
 		forceIcons.add(MIMUtils.getUniqueName(Blocks.lit_furnace));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.dispenser));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.dropper));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -183,6 +185,8 @@ public class ItemTransporter extends Item
 		iconMap.put(MIMUtils.getUniqueName(Blocks.trapped_chest), iconRegister.registerIcon("moreinv:transporter_trapchest"));
 		iconMap.put(MIMUtils.getUniqueName(Blocks.furnace), iconRegister.registerIcon("moreinv:transporter_furnace"));
 		iconMap.put(MIMUtils.getUniqueName(Blocks.lit_furnace), iconRegister.registerIcon("moreinv:transporter_furnace_lit"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.dispenser), iconRegister.registerIcon("moreinv:transporter_dispenser"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.dropper), iconRegister.registerIcon("moreinv:transporter_dropper"));
 
 		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{

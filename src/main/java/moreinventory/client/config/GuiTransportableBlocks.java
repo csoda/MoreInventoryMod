@@ -742,7 +742,7 @@ public class GuiTransportableBlocks extends GuiScreen
 
 			if (!Strings.isNullOrEmpty(name))
 			{
-				drawCenteredString(fontRendererObj, name, width / 2, par3 + 1, 0xFFFFFF);
+				drawCenteredString(fontRendererObj, name, width / 2, par3 + 3, 0xFFFFFF);
 			}
 		}
 
