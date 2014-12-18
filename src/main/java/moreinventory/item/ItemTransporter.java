@@ -23,6 +23,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -49,7 +50,7 @@ public class ItemTransporter extends Item
 				continue;
 			}
 
-			transportableBlocks.put(args[0].trim(), Integer.parseInt(args[1].trim()), args.length > 2 && args[2].trim().length() > 0 ? NumberUtils.toInt(args[2].trim()) & 29 : 0);
+			transportableBlocks.put(args[0].trim(), Integer.parseInt(args[1].trim()), args.length > 2 && args[2].trim().length() > 0 ? NumberUtils.toInt(args[2].trim()) : 0);
 		}
 	}
 
@@ -61,6 +62,8 @@ public class ItemTransporter extends Item
 		forceIcons.add(MIMUtils.getUniqueName(Blocks.trapped_chest));
 		forceIcons.add(MIMUtils.getUniqueName(Blocks.furnace));
 		forceIcons.add(MIMUtils.getUniqueName(Blocks.lit_furnace));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.dispenser));
+		forceIcons.add(MIMUtils.getUniqueName(Blocks.dropper));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -71,7 +74,7 @@ public class ItemTransporter extends Item
 	public ItemTransporter()
 	{
 		this.setMaxStackSize(1);
-		this.setMaxDamage(50);
+		this.setMaxDamage(40);
 		this.setFull3D();
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
@@ -182,6 +185,8 @@ public class ItemTransporter extends Item
 		iconMap.put(MIMUtils.getUniqueName(Blocks.trapped_chest), iconRegister.registerIcon("moreinv:transporter_trapchest"));
 		iconMap.put(MIMUtils.getUniqueName(Blocks.furnace), iconRegister.registerIcon("moreinv:transporter_furnace"));
 		iconMap.put(MIMUtils.getUniqueName(Blocks.lit_furnace), iconRegister.registerIcon("moreinv:transporter_furnace_lit"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.dispenser), iconRegister.registerIcon("moreinv:transporter_dispenser"));
+		iconMap.put(MIMUtils.getUniqueName(Blocks.dropper), iconRegister.registerIcon("moreinv:transporter_dropper"));
 
 		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
@@ -222,10 +227,16 @@ public class ItemTransporter extends Item
 		}
 		else if (nbt.hasKey("Modded"))
 		{
-			result = icon_modded[nbt.getInteger("Modded") & (icon_modded.length - 1)];
+			result = getModIcon(nbt.getInteger("Modded"));
 		}
 
 		return result == null ? iconMap.get("default") : result;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public IIcon getModIcon(int index)
+	{
+		return icon_modded[MathHelper.clamp_int(index, 0, icon_modded.length - 1)];
 	}
 
 	@SideOnly(Side.CLIENT)
