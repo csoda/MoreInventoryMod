@@ -187,10 +187,7 @@ public class ItemTransporter extends Item
 		{
 			String typeName = type.getKey();
 
-			if (!"Glass".equals(typeName) && !"Cobblestone".equals(typeName) && !"Ender".equals(typeName))
-			{
-				iconMap.put(MIMUtils.getUniqueName(MoreInventoryMod.storageBox) + ":" + typeName, iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH)));
-			}
+			iconMap.put(MIMUtils.getUniqueName(MoreInventoryMod.storageBox) + ":" + typeName, iconRegister.registerIcon("moreinv:transporter_storagebox_" + typeName.toLowerCase(Locale.ENGLISH)));
 		}
 
 		for (int i = 0; i < icon_modded.length; ++i)
