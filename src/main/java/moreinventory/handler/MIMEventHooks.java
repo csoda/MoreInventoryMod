@@ -36,6 +36,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
@@ -135,12 +136,12 @@ public class MIMEventHooks
 
 		if (!world.isRemote && (player == null || !player.capabilities.isCreativeMode))
 		{
-			TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(event.x, event.y, event.z);
+			TileEntity tile =  world.getTileEntity(event.x, event.y, event.z);
 
-			if (tile != null)
+			if (tile != null && tile instanceof TileEntityStorageBox)
 			{
 				ItemStack itemstack = new ItemStack(Item.getItemFromBlock(event.block));
-				ItemBlockStorageBox.writeToNBT(itemstack, tile.getTypeName());
+				ItemBlockStorageBox.writeToNBT(itemstack, ((TileEntityStorageBox) tile).getTypeName());
 				MIMUtils.dropItem(world, itemstack, event.x, event.y, event.z);
 			}
 		}
