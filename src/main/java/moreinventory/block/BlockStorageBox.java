@@ -28,6 +28,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 public class BlockStorageBox extends BlockContainer
 {
