@@ -212,7 +212,7 @@ public class StorageBoxNetworkManager
 			{
 				TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
 
-				if (tile != storageBox && tile.canMergeItemStack(itemstack))
+				if (tile != null && tile != storageBox && tile.canMergeItemStack(itemstack))
 				{
 					return true;
 				}

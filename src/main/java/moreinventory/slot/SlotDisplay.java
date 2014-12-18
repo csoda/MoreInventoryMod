@@ -15,13 +15,14 @@ public class SlotDisplay extends Slot
 	public ItemStack getStack()
 	{
 		ItemStack itemstack = this.inventory.getStackInSlot(this.getSlotIndex());
-
+		ItemStack retItem = null;
 		if (itemstack != null)
 		{
-			itemstack.stackSize = 1;
+			retItem = itemstack.copy();
+			retItem.stackSize = 1;
 		}
 
-		return itemstack;
+		return retItem;
 	}
 
 	@Override

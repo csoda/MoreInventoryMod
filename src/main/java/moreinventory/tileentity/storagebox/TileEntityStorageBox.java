@@ -246,7 +246,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (!worldObj.isRemote)
 		{
-			getStorageBoxNetworkManager().updateOnInvChanged(worldObj, xCoord, yCoord, zCoord, getContents());
 			sendPacket();
 		}
 

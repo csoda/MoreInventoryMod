@@ -127,7 +127,7 @@ public final class MIMUtils
 				entity.getEntityItem().setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
 			}
 
-			float factor = 0.05F;
+			float factor = 0.02F;
 			entity.motionX = rand.nextGaussian() * factor;
 			entity.motionY = rand.nextGaussian() * factor + 0.2F;
 			entity.motionZ = rand.nextGaussian() * factor;
@@ -168,12 +168,14 @@ public final class MIMUtils
 						{
 							itemstack.stackSize = 0;
 							item.stackSize = sum;
+							inventory.setInventorySlotContents(i, item.copy());
 							success = true;
 						}
 						else if (item.stackSize < itemstack.getMaxStackSize())
 						{
 							itemstack.stackSize -= itemstack.getMaxStackSize() - item.stackSize;
 							item.stackSize = itemstack.getMaxStackSize();
+							inventory.setInventorySlotContents(i, item.copy());
 							success = true;
 						}
 					}

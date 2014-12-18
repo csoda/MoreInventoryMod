@@ -130,8 +130,9 @@ public class MIMEventHooks
 	@SubscribeEvent
 	public void onStorageBoxBroken(BlockEvent.BreakEvent event)
 	{
+		EntityPlayer player = event.getPlayer();
 		World world = event.getPlayer().worldObj;
-		if (!world.isRemote)
+		if (!world.isRemote && (player == null || !player.capabilities.isCreativeMode))
 		{
 			TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(event.x, event.y, event.z);
 
