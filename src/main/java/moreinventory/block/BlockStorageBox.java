@@ -28,6 +28,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 public class BlockStorageBox extends BlockContainer
 {
@@ -143,8 +144,8 @@ public class BlockStorageBox extends BlockContainer
 		tile.onPlaced(entity);
 	}
 
-
-	public Item getItemDropped(int p_149650_1_, Random p_149650_2_, int p_149650_3_)
+	@Override
+	public Item getItemDropped(int damage, Random random, int fortune)
 	{
 		return null;
 	}

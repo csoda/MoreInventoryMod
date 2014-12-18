@@ -12,15 +12,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import org.lwjgl.opengl.GL11;
 
-import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
 
 @SideOnly(Side.CLIENT)
 public class ItemStorageBoxRenderer implements IItemRenderer
 {
 	private final ModelItemStorageBox model = new ModelItemStorageBox();
-	private final HashMap<String, ResourceLocation> textureMap = Maps.newHashMap();
+	private final Map<String, ResourceLocation> textureMap = Maps.newHashMap();
 
 	public ItemStorageBoxRenderer()
 	{
@@ -55,12 +55,21 @@ public class ItemStorageBoxRenderer implements IItemRenderer
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
 	{
-		if(item != null)
+		if (item != null)
 		{
 			String typeName = ItemBlockStorageBox.readTypeNameFromNBT(item.getTagCompound());
 			FMLClientHandler.instance().getClient().getTextureManager().bindTexture(textureMap.get(typeName));
 			GL11.glPushMatrix();
-			GL11.glTranslatef(0.5F, 1.5F, 0.5F);
+
+			if (type == ItemRenderType.EQUIPPED || type == ItemRenderType.EQUIPPED_FIRST_PERSON)
+			{
+				GL11.glTranslatef(1.0F, 2.0F, 1.0F);
+			}
+			else
+			{
+				GL11.glTranslatef(0.5F, 1.5F, 0.5F);
+			}
+
 			GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
 			model.renderAll();
 			GL11.glPopMatrix();

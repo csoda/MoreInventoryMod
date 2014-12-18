@@ -29,7 +29,7 @@ public class ItemBlockStorageBox extends ItemBlockWithMetadata
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
 		TileEntity tile;
-		boolean flg = !world.getBlock(x, y, z).isReplaceable(world, x, y, z) ? true : false;
+		boolean flg = !world.getBlock(x, y, z).isReplaceable(world, x, y, z);
 
 		super.onItemUse(itemstack, player, world, x, y, z, side, hitX, hitY, hitZ);
 

@@ -132,6 +132,7 @@ public class MIMEventHooks
 	{
 		EntityPlayer player = event.getPlayer();
 		World world = event.getPlayer().worldObj;
+
 		if (!world.isRemote && (player == null || !player.capabilities.isCreativeMode))
 		{
 			TileEntityStorageBox tile = (TileEntityStorageBox) world.getTileEntity(event.x, event.y, event.z);
