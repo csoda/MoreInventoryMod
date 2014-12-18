@@ -48,6 +48,7 @@ public class ItemPlating extends Item
 			if (tierB != 0 && (tierA == tierB || tierA == tierB + 1) && StorageBoxType.getInventorySize(typeA) > StorageBoxType.getInventorySize(typeB))
 			{
 				world.setTileEntity(x, y, z, ((TileEntityStorageBox) tile).upgrade(typeA));
+				world.markBlockForUpdate(x, y, z);
 
 				if (!player.capabilities.isCreativeMode)
 				{
