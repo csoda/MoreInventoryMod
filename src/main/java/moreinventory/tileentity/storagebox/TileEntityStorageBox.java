@@ -274,7 +274,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return false;
 	}
 
-	private void clearRegister()
+	protected void clearRegister()
 	{
 		if (contentsCount == 0)
 		{
@@ -563,14 +563,26 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			makeNewBoxList();
 		}
 
+		updateTileFromTile();
+
 		markDirty();
 	}
+
 
 	public void onNeighborRemoved()
 	{
 		if (getStorageBoxNetworkManager().getBoxList().isOnBoxList(xCoord, yCoord, zCoord, worldObj.getWorldInfo().getVanillaDimension()))
 		{
 			getStorageBoxNetworkManager().recreateNetwork();
+		}
+	}
+
+	public void updateTileFromTile()
+	{
+		if(this.getClass() != StorageBoxType.types.get(getTypeName()).clazz)
+		{
+			TileEntity tile = upgrade(getTypeName());
+			worldObj.setTileEntity(xCoord, yCoord, zCoord, tile);
 		}
 	}
 
@@ -592,8 +604,12 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			tile.displayedStackSize = displayedStackSize;
 		}
 
+		tile.onUpgrade();
+
 		return tile;
 	}
+
+	public void onUpgrade(){}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)

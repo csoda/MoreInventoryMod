@@ -136,7 +136,6 @@ public class BlockStorageBox extends BlockContainer
 				tile.face = 2;
 				break;
 		}
-
 		tile.onPlaced(entity);
 	}
 

@@ -41,6 +41,8 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	@Override
 	public void markDirty()
 	{
+		updateStorageItems();
+
 		ItemStack itemstack = itemList.updateState(itemList.getItemIndex(getContents()));
 
 		if (itemstack != null)
@@ -84,10 +86,7 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 	{
 		if (super.registerItems(itemstack))
 		{
-			enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, itemstack);
-			itemList.registerItem(itemstack);
-			storageItems = itemList.getInventory(getContents());
-
+			updateStorageItems();
 			markDirty();
 
 			return true;
@@ -96,11 +95,26 @@ public class TileEntityEnderStorageBox extends TileEntityStorageBox
 		return false;
 	}
 
+	public void updateStorageItems()
+	{
+		if(storageItems != itemList.getInventory(getContents()))
+		{
+			if(worldObj != null)
+			{
+				enderBoxList.registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
+				itemList.registerItem(getContents());
+			}
+			ItemStack[] oldStorage = storageItems.clone();
+			storageItems = itemList.getInventory(getContents());
+			tryPutIn(oldStorage[1]);
+		}
+	}
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
 
-		storageItems = itemList.getInventory(getContents());
+		updateStorageItems();
 	}
 }

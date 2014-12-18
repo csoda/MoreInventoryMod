@@ -32,11 +32,12 @@ public class ItemBlockStorageBox extends ItemBlock
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
+		TileEntity tile;
+		boolean flg = !world.getBlock(x, y, z).isReplaceable(world, x, y, z) ? true : false;
+
 		super.onItemUse(itemstack, player, world, x, y, z, side, hitX, hitY, hitZ);
 
-		TileEntity tile;
-
-		if (!world.getBlock(x, y, z).isReplaceable(world, x, y, z))
+		if (flg)
 		{
 			int[] pos = MIMUtils.getSidePos(x, y, z, side);
 			tile = world.getTileEntity(pos[0], pos[1], pos[2]);
