@@ -280,11 +280,13 @@ public class ItemTransporter extends Item
 
 			if (block != null)
 			{
+				boolean flag = world.getBlock(x, y, z).isReplaceable(world, x, y, z);
+
 				if (tileBlock.getItem().onItemUse(tileBlock, player, world, x, y, z, side, hitX, hitY, hitZ))
 				{
 					TileEntity tile;
 
-					if (world.getBlock(x, y, z) == block)
+					if (flag)
 					{
 						tile = world.getTileEntity(x, y, z);
 
@@ -299,11 +301,6 @@ public class ItemTransporter extends Item
 					{
 						int[] pos = MIMUtils.getSidePos(x, y, z, side);
 
-						if (world.getBlock(pos[0], pos[1], pos[2]) != block)
-						{
-							return false;
-						}
-
 						tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 
 						if (tile == null)
@@ -317,6 +314,7 @@ public class ItemTransporter extends Item
 					transferToBlock(tile);
 					block.onBlockPlacedBy(world, tile.xCoord, tile.yCoord, tile.zCoord, player, tileBlock);
 					block.onPostBlockPlaced(world, tile.xCoord, tile.yCoord, tile.zCoord, tile.getBlockMetadata());
+					world.markBlockForUpdate(tile.xCoord, tile.yCoord, tile.zCoord);
 
 					return true;
 				}

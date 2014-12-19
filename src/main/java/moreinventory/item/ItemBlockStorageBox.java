@@ -9,7 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlockWithMetadata;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -18,36 +18,41 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.Map.Entry;
 
-public class ItemBlockStorageBox extends ItemBlockWithMetadata
+public class ItemBlockStorageBox extends ItemBlock
 {
 	public ItemBlockStorageBox(Block block)
 	{
-		super(block, block);
+		super(block);
 	}
 
 	@Override
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
-		TileEntity tile;
-		boolean flg = !world.getBlock(x, y, z).isReplaceable(world, x, y, z);
+		boolean flag = world.getBlock(x, y, z).isReplaceable(world, x, y, z);
 
-		super.onItemUse(itemstack, player, world, x, y, z, side, hitX, hitY, hitZ);
-
-		if (flg)
+		if (!super.onItemUse(itemstack, player, world, x, y, z, side, hitX, hitY, hitZ))
 		{
-			int[] pos = MIMUtils.getSidePos(x, y, z, side);
-			tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+			return false;
+		}
+
+		TileEntity tile;
+
+		if (flag)
+		{
+			tile = world.getTileEntity(x, y, z);
 		}
 		else
 		{
-			tile = world.getTileEntity(x, y, z);
+			int[] pos = MIMUtils.getSidePos(x, y, z, side);
+
+			tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 		}
 
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
 			String type = readTypeNameFromNBT(itemstack.getTagCompound());
-			TileEntityStorageBox newTile = ((TileEntityStorageBox) tile).upgrade(type);
-			world.setTileEntity(tile.xCoord, tile.yCoord, tile.zCoord, newTile);
+
+			world.setTileEntity(tile.xCoord, tile.yCoord, tile.zCoord, ((TileEntityStorageBox)tile).upgrade(type));
 		}
 
 		return true;

@@ -132,17 +132,21 @@ public class MIMEventHooks
 	public void onStorageBoxBroken(BlockEvent.BreakEvent event)
 	{
 		EntityPlayer player = event.getPlayer();
-		World world = event.getPlayer().worldObj;
 
-		if (!world.isRemote && (player == null || !player.capabilities.isCreativeMode))
+		if (player == null || !(player instanceof EntityPlayerMP))
 		{
-			TileEntity tile =  world.getTileEntity(event.x, event.y, event.z);
+			return;
+		}
+
+		if (!player.capabilities.isCreativeMode)
+		{
+			TileEntity tile =  player.worldObj.getTileEntity(event.x, event.y, event.z);
 
 			if (tile != null && tile instanceof TileEntityStorageBox)
 			{
 				ItemStack itemstack = new ItemStack(Item.getItemFromBlock(event.block));
-				ItemBlockStorageBox.writeToNBT(itemstack, ((TileEntityStorageBox) tile).getTypeName());
-				MIMUtils.dropItem(world, itemstack, event.x, event.y, event.z);
+				ItemBlockStorageBox.writeToNBT(itemstack, ((TileEntityStorageBox)tile).getTypeName());
+				MIMUtils.dropItem(player.worldObj, itemstack, event.x, event.y, event.z);
 			}
 		}
 	}
