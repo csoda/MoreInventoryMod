@@ -54,7 +54,7 @@ public class CommandMoreInventoryMod implements ICommand
 			IChatComponent component;
 			IChatComponent message = new ChatComponentText(" ");
 
-			component = new ChatComponentText("FriendlyMobs");
+			component = new ChatComponentText("MoreInventoryMod");
 			component.getChatStyle().setColor(EnumChatFormatting.GREEN);
 			message.appendSibling(component);
 			message.appendText(" " + Version.getCurrent());
