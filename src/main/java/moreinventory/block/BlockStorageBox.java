@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
+import moreinventory.item.ItemBlockStorageBox;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
@@ -21,6 +22,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -199,7 +201,20 @@ public class BlockStorageBox extends BlockContainer
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
 
-		return tile instanceof TileEntityStorageBox ? TileEntityStorageBox.getPowerOutput((TileEntityStorageBox)tile) : 0;
+		return tile != null && tile instanceof TileEntityStorageBox ? TileEntityStorageBox.getPowerOutput((TileEntityStorageBox)tile) : 0;
+	}
+
+	@Override
+	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z)
+	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+
+		if (tile != null && tile instanceof TileEntityStorageBox)
+		{
+			return ItemBlockStorageBox.writeToNBT(new ItemStack(this), ((TileEntityStorageBox)tile).getTypeName());
+		}
+
+		return ItemBlockStorageBox.writeToNBT(new ItemStack(this), "Wood");
 	}
 
 	@SideOnly(Side.CLIENT)
