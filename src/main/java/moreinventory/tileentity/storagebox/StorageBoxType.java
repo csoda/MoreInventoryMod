@@ -139,7 +139,7 @@ public  class StorageBoxType
 
 		/* recipe */
 		ItemStack stoneslab = new ItemStack(Blocks.stone_slab);
-		ItemStack woodStorageBox = new ItemStack(MoreInventoryMod.storageBox, 1, 0);
+		ItemStack woodStorageBox = new ItemStack(MoreInventoryMod.storageBox);
 		ItemBlockStorageBox.writeToNBT(woodStorageBox, "Wood");
 
 		for (Entry<String, StorageBoxType> type : types)
@@ -148,10 +148,7 @@ public  class StorageBoxType
 			{
 				for (Object material : type.getValue().materials)
 				{
-					ItemStack itemstack = new ItemStack(MoreInventoryMod.storageBox, 3, 0);
-					ItemBlockStorageBox.writeToNBT(itemstack, type.getKey());
-
-					GameRegistry.addRecipe(new ShapedOreRecipe(itemstack, true,
+					GameRegistry.addRecipe(new ShapedOreRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), type.getKey()), true,
 						"IHI", "ICI", "IHI",
 						'I', material,
 						'C', woodStorageBox,

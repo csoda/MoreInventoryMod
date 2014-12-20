@@ -390,35 +390,33 @@ public class MoreInventoryMod
 			'P', Items.paper
 		));
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(storageBox, 1, 0),
+		GameRegistry.addRecipe(new ShapedOreRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), "Wood"),
 			"IHI", "I I", "IHI",
-			'I', "logWood",
-			'C', new ItemStack(storageBox, 1, 0),
-			'H', "slabWood"
+			'H', "slabWood",
+			'I', "logWood"
 		));
-
-		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 32, 8),
+		GameRegistry.addShapedRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox, 32), "Glass"),
 			"IHI", "I I", "IHI",
 			'H', Blocks.glass_pane,
 			'I', Blocks.glass
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 1, 9),
+		GameRegistry.addShapedRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), "Cobblestone"),
 			"IHI", "I I", "IHI",
 			'H', new ItemStack(Blocks.stone_slab, 1, 3),
 			'I', Blocks.cobblestone
 		);
-		GameRegistry.addShapedRecipe(new ItemStack(storageBox, 2, 11),
+		GameRegistry.addShapedRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox, 2), "Ender"),
 			"OOO", "CEC", "OOO",
 			'O', Blocks.obsidian,
 			'C', new ItemStack(noFunctionItems, 1, 2),
-			'E', new ItemStack(storageBox, 1, 10)
+			'E', ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), "Emerald")
 		);
 
 		GameRegistry.addShapedRecipe(new ItemStack(storageBoxAddon, 1, 0),
 			"SSS", "CEC", "SSS",
 			'S', Blocks.end_stone,
 			'C', new ItemStack(noFunctionItems, 1, 2),
-			'E', new ItemStack(storageBox, 1, 10)
+			'E', ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), "Emerald")
 		);
 
 		ItemStack lava = new ItemStack(Items.lava_bucket);

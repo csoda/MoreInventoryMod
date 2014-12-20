@@ -86,13 +86,17 @@ public class ItemBlockStorageBox extends ItemBlock
 		return nbt.getString("TypeName");
 	}
 
-	public static void writeToNBT(ItemStack itemstack, String type)
+	public static ItemStack writeToNBT(ItemStack itemstack, String type)
 	{
 		if (itemstack != null)
 		{
 			NBTTagCompound nbt = new NBTTagCompound();
 			nbt.setString("TypeName", type);
 			itemstack.setTagCompound(nbt);
+
+			return itemstack;
 		}
+
+		return null;
 	}
 }
