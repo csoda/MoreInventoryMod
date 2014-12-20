@@ -58,22 +58,22 @@ public class ItemBlockStorageBox extends ItemBlock
 		return true;
 	}
 
+	@Override
+	public String getUnlocalizedName(ItemStack itemstack)
+	{
+		NBTTagCompound nbt = itemstack.getTagCompound();
+
+		return nbt == null || !nbt.hasKey("TypeName") ? "containerbox" : "containerbox:" + readTypeNameFromNBT(nbt);
+	}
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list)
 	{
 		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			ItemStack itemstack = new ItemStack(this);
-			writeToNBT(itemstack, type.getKey());
-			list.add(itemstack);
+			list.add(writeToNBT(new ItemStack(this), type.getKey()));
 		}
-	}
-
-	@Override
-	public String getUnlocalizedName(ItemStack itemstack)
-	{
-		return "containerbox:" + readTypeNameFromNBT(itemstack.getTagCompound());
 	}
 
 	public static String readTypeNameFromNBT(NBTTagCompound nbt)

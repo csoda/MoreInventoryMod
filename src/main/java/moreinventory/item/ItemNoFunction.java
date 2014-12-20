@@ -18,9 +18,9 @@ public class ItemNoFunction extends Item
 
 	public ItemNoFunction()
 	{
-		this.setMaxStackSize(64);
-		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
+		this.setMaxDamage(0);
 		this.setHasSubtypes(true);
+		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
 	@Override

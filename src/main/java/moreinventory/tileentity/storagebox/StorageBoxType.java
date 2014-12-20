@@ -144,7 +144,7 @@ public  class StorageBoxType
 
 		for (Entry<String, StorageBoxType> type : types)
 		{
-			if (type.getValue().canCraft)
+			if (type.getValue().canCraft && type.getValue().materials != null && type.getValue().materials.length > 0)
 			{
 				for (Object material : type.getValue().materials)
 				{

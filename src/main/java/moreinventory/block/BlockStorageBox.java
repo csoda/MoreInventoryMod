@@ -3,6 +3,7 @@ package moreinventory.block;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import moreinventory.client.renderer.ItemStorageBoxRenderer;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.ItemBlockStorageBox;
@@ -13,6 +14,8 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -24,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -36,13 +40,13 @@ import java.util.Random;
 public class BlockStorageBox extends BlockContainer
 {
 	@SideOnly(Side.CLIENT)
-	private Map<String, IIcon[]> iconMap;
+	public Map<String, IIcon[]> iconMap;
 	@SideOnly(Side.CLIENT)
-	private IIcon[] icons_glass;
+	public IIcon[] icons_glass;
 	@SideOnly(Side.CLIENT)
-	private IIcon icon_air;
+	public IIcon icon_air;
 	@SideOnly(Side.CLIENT)
-	private byte[][] glassIndex;
+	public byte[][] glassIndex;
 
 	public BlockStorageBox(Material material)
 	{
@@ -53,7 +57,7 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int idk, float hitX, float hitY, float hitZ)
+	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 
@@ -149,6 +153,12 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
+	public int quantityDropped(Random random)
+	{
+		return 0;
+	}
+
+	@Override
 	public Item getItemDropped(int damage, Random random, int fortune)
 	{
 		return null;
@@ -169,12 +179,6 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
-	public int getRenderType()
-	{
-		return 0;
-	}
-
-	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
@@ -184,12 +188,6 @@ public class BlockStorageBox extends BlockContainer
 	public boolean renderAsNormalBlock()
 	{
 		return false;
-	}
-
-	@Override
-	public int damageDropped(int metadata)
-	{
-		return metadata;
 	}
 
 	@Override
@@ -240,6 +238,79 @@ public class BlockStorageBox extends BlockContainer
 
 	@SideOnly(Side.CLIENT)
 	@Override
+	public boolean addHitEffects(World world, MovingObjectPosition target, EffectRenderer effectRenderer)
+	{
+		int x = target.blockX;
+		int y = target.blockY;
+		int z = target.blockZ;
+		int side = target.sideHit;
+		Block block = world.getBlock(x, y, z);
+		float scale = 0.1F;
+		double effectX = (double)x + world.rand.nextDouble() * (block.getBlockBoundsMaxX() - block.getBlockBoundsMinX() - (double)(scale * 2.0F)) + (double)scale + block.getBlockBoundsMinX();
+		double effectY = (double)y + world.rand.nextDouble() * (block.getBlockBoundsMaxY() - block.getBlockBoundsMinY() - (double)(scale * 2.0F)) + (double)scale + block.getBlockBoundsMinY();
+		double effectZ = (double)z + world.rand.nextDouble() * (block.getBlockBoundsMaxZ() - block.getBlockBoundsMinZ() - (double)(scale * 2.0F)) + (double)scale + block.getBlockBoundsMinZ();
+
+		switch (side)
+		{
+			case 0:
+				effectY = (double)y + block.getBlockBoundsMinY() - (double)scale;
+				break;
+			case 1:
+				effectY = (double)y + block.getBlockBoundsMaxY() + (double)scale;
+				break;
+			case 2:
+				effectZ = (double)z + block.getBlockBoundsMinZ() - (double)scale;
+				break;
+			case 3:
+				effectZ = (double)z + block.getBlockBoundsMaxZ() + (double)scale;
+				break;
+			case 4:
+				effectX = (double)x + block.getBlockBoundsMinX() - (double)scale;
+				break;
+			case 5:
+				effectX = (double)x + block.getBlockBoundsMaxX() + (double)scale;
+				break;
+		}
+
+		EntityDiggingFX effect = new EntityDiggingFX(world, effectX, effectY, effectZ, 0.0D, 0.0D, 0.0D, block, world.getBlockMetadata(x, y, z));
+		effect.multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
+		effect.setParticleIcon(block.getIcon(world, x, y, z, side));
+
+		effectRenderer.addEffect(effect);
+
+		return true;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer)
+	{
+		Block block = world.getBlock(x, y, z);
+		byte scale = 4;
+
+		for (int effectX = 0; effectX < scale; ++effectX)
+		{
+			for (int effectY = 0; effectY < scale; ++effectY)
+			{
+				for (int effectZ = 0; effectZ < scale; ++effectZ)
+				{
+					double renderX = (double)x + ((double)effectX + 0.5D) / (double)scale;
+					double renderY = (double)y + ((double)effectY + 0.5D) / (double)scale;
+					double renderZ = (double)z + ((double)effectZ + 0.5D) / (double)scale;
+					int side = world.rand.nextInt(6);
+					EntityDiggingFX effect = new EntityDiggingFX(world, renderX, renderY, renderZ, renderX - (double)x - 0.5D, renderY - (double)y - 0.5D, renderZ - (double)z - 0.5D, block, meta, side);
+					effect.setParticleIcon(block.getIcon(world, x, y, z, side));
+
+					effectRenderer.addEffect(effect);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
 	public void registerBlockIcons(IIconRegister iconRegister)
 	{
 		iconMap = Maps.newHashMap();
@@ -250,22 +321,25 @@ public class BlockStorageBox extends BlockContainer
 		{
 			String name = type.getKey().toLowerCase(Locale.ENGLISH);
 			String folder = StorageBoxType.getTextureFolder(type.getKey());
+			IIcon[] icons = new IIcon[3];
 
 			if (!type.getKey().equals("Glass"))
 			{
-				IIcon[] icons = new IIcon[3];
 				icons[0] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_side");
 				icons[1] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_top");
 				icons[2] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_face");
 				iconMap.put(type.getKey(), icons);
+
+				ItemStorageBoxRenderer.textureMap.put(type.getKey(), new ResourceLocation(folder, "textures/blocks/storagebox_" + name + "_side.png"));
 			}
 			else
 			{
-				IIcon[] icons = new IIcon[3];
 				icons[0] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_0");
 				icons[1] = icons[0];
 				icons[2] = icons[0];
 				iconMap.put(type.getKey(), icons);
+
+				ItemStorageBoxRenderer.textureMap.put(type.getKey(), new ResourceLocation(folder, "textures/blocks/storagebox_" + name + "_0.png"));
 			}
 		}
 
