@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
+import moreinventory.item.ItemBlockStorageBox;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
@@ -14,6 +15,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -21,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -141,6 +144,7 @@ public class BlockStorageBox extends BlockContainer
 				tile.face = 2;
 				break;
 		}
+
 		tile.onPlaced(entity);
 	}
 
@@ -199,7 +203,39 @@ public class BlockStorageBox extends BlockContainer
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
 
-		return tile instanceof TileEntityStorageBox ? TileEntityStorageBox.getPowerOutput((TileEntityStorageBox)tile) : 0;
+		return tile != null && tile instanceof TileEntityStorageBox ? TileEntityStorageBox.getPowerOutput((TileEntityStorageBox)tile) : 0;
+	}
+
+	@Override
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
+	{
+		if (!world.isRemote && !player.capabilities.isCreativeMode && willHarvest)
+		{
+			TileEntity tile = world.getTileEntity(x, y, z);
+
+			if (tile != null && tile instanceof TileEntityStorageBox)
+			{
+				EntityItem item = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, ItemBlockStorageBox.writeToNBT(new ItemStack(this), ((TileEntityStorageBox)tile).getTypeName()));
+				item.delayBeforeCanPickup = 20;
+
+				world.spawnEntityInWorld(item);
+			}
+		}
+
+		return super.removedByPlayer(world, player, x, y, z, willHarvest);
+	}
+
+	@Override
+	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z)
+	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+
+		if (tile != null && tile instanceof TileEntityStorageBox)
+		{
+			return ItemBlockStorageBox.writeToNBT(new ItemStack(this), ((TileEntityStorageBox)tile).getTypeName());
+		}
+
+		return ItemBlockStorageBox.writeToNBT(new ItemStack(this), "Wood");
 	}
 
 	@SideOnly(Side.CLIENT)
