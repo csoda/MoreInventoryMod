@@ -148,7 +148,7 @@ public  class StorageBoxType
 			{
 				for (Object material : type.getValue().materials)
 				{
-					GameRegistry.addRecipe(new ShapedOreRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), type.getKey()), true,
+					GameRegistry.addRecipe(new ShapedOreRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox, 3), type.getKey()), true,
 						"IHI", "ICI", "IHI",
 						'I', material,
 						'C', woodStorageBox,
