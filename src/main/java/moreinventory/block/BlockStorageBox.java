@@ -13,6 +13,8 @@ import moreinventory.util.MIMUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.EffectRenderer;
+import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -236,6 +238,79 @@ public class BlockStorageBox extends BlockContainer
 		}
 
 		return ItemBlockStorageBox.writeToNBT(new ItemStack(this), "Wood");
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public boolean addHitEffects(World world, MovingObjectPosition target, EffectRenderer effectRenderer)
+	{
+		int x = target.blockX;
+		int y = target.blockY;
+		int z = target.blockZ;
+		int side = target.sideHit;
+		Block block = world.getBlock(x, y, z);
+		float scale = 0.1F;
+		double effectX = (double)x + world.rand.nextDouble() * (block.getBlockBoundsMaxX() - block.getBlockBoundsMinX() - (double)(scale * 2.0F)) + (double)scale + block.getBlockBoundsMinX();
+		double effectY = (double)y + world.rand.nextDouble() * (block.getBlockBoundsMaxY() - block.getBlockBoundsMinY() - (double)(scale * 2.0F)) + (double)scale + block.getBlockBoundsMinY();
+		double effectZ = (double)z + world.rand.nextDouble() * (block.getBlockBoundsMaxZ() - block.getBlockBoundsMinZ() - (double)(scale * 2.0F)) + (double)scale + block.getBlockBoundsMinZ();
+
+		switch (side)
+		{
+			case 0:
+				effectY = (double)y + block.getBlockBoundsMinY() - (double)scale;
+				break;
+			case 1:
+				effectY = (double)y + block.getBlockBoundsMaxY() + (double)scale;
+				break;
+			case 2:
+				effectZ = (double)z + block.getBlockBoundsMinZ() - (double)scale;
+				break;
+			case 3:
+				effectZ = (double)z + block.getBlockBoundsMaxZ() + (double)scale;
+				break;
+			case 4:
+				effectX = (double)x + block.getBlockBoundsMinX() - (double)scale;
+				break;
+			case 5:
+				effectX = (double)x + block.getBlockBoundsMaxX() + (double)scale;
+				break;
+		}
+
+		EntityDiggingFX effect = new EntityDiggingFX(world, effectX, effectY, effectZ, 0.0D, 0.0D, 0.0D, block, world.getBlockMetadata(x, y, z));
+		effect.multiplyVelocity(0.2F).multipleParticleScaleBy(0.6F);
+		effect.setParticleIcon(block.getIcon(world, x, y, z, side));
+
+		effectRenderer.addEffect(effect);
+
+		return true;
+	}
+
+	@SideOnly(Side.CLIENT)
+	@Override
+	public boolean addDestroyEffects(World world, int x, int y, int z, int meta, EffectRenderer effectRenderer)
+	{
+		Block block = world.getBlock(x, y, z);
+		byte scale = 4;
+
+		for (int effectX = 0; effectX < scale; ++effectX)
+		{
+			for (int effectY = 0; effectY < scale; ++effectY)
+			{
+				for (int effectZ = 0; effectZ < scale; ++effectZ)
+				{
+					double renderX = (double)x + ((double)effectX + 0.5D) / (double)scale;
+					double renderY = (double)y + ((double)effectY + 0.5D) / (double)scale;
+					double renderZ = (double)z + ((double)effectZ + 0.5D) / (double)scale;
+					int side = world.rand.nextInt(6);
+					EntityDiggingFX effect = new EntityDiggingFX(world, renderX, renderY, renderZ, renderX - (double)x - 0.5D, renderY - (double)y - 0.5D, renderZ - (double)z - 0.5D, block, meta, side);
+					effect.setParticleIcon(block.getIcon(world, x, y, z, side));
+
+					effectRenderer.addEffect(effect);
+				}
+			}
+		}
+
+		return true;
 	}
 
 	@SideOnly(Side.CLIENT)
