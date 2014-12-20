@@ -6,39 +6,19 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.client.model.ModelItemStorageBox;
 import moreinventory.item.ItemBlockStorageBox;
-import moreinventory.tileentity.storagebox.StorageBoxType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
 import org.lwjgl.opengl.GL11;
 
-import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 
 @SideOnly(Side.CLIENT)
 public class ItemStorageBoxRenderer implements IItemRenderer
 {
-	private final ModelItemStorageBox model = new ModelItemStorageBox();
-	private final Map<String, ResourceLocation> textureMap = Maps.newHashMap();
+	public static final Map<String, ResourceLocation> textureMap = Maps.newHashMap();
 
-	public ItemStorageBoxRenderer()
-	{
-		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
-		{
-			String name = type.getKey().toLowerCase(Locale.ENGLISH);
-			String folder = StorageBoxType.getTextureFolder(type.getKey());
-
-			if (!type.getKey().equals("Glass"))
-			{
-				textureMap.put(type.getKey() , new ResourceLocation(folder + ":textures/blocks/storagebox_" + name + "_side.png"));
-			}
-			else
-			{
-				textureMap.put(type.getKey() , new ResourceLocation(folder + ":textures/blocks/storagebox_" + name + "_0.png"));
-			}
-		}
-	}
+	private final ModelItemStorageBox model = new ModelItemStorageBox();;
 
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type)

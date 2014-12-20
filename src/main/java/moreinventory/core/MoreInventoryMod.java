@@ -86,6 +86,8 @@ import net.minecraftforge.oredict.RecipeSorter.Category;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
+import java.util.Map.Entry;
+
 @Mod
 (
 	modid = MoreInventoryMod.MODID,
@@ -422,13 +424,14 @@ public class MoreInventoryMod
 		ItemStack lava = new ItemStack(Items.lava_bucket);
 		ItemStack brush = new ItemStack(noFunctionItems, 1, 1);
 
-		for (int i = 0; i < ItemPlating.typeNameIndex.length; i++)
+		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
 		{
-			String type = ItemPlating.typeNameIndex[i];
-
-			for (Object material : StorageBoxType.types.get(type).materials)
+			if (type.getValue().materials != null && type.getValue().materials.length > 0)
 			{
-				GameRegistry.addRecipe(new ShapelessOreRecipe(new ItemStack(plating, 1, i), material, material, lava, brush));
+				for (Object material : type.getValue().materials)
+				{
+					GameRegistry.addRecipe(new ShapelessOreRecipe(ItemBlockStorageBox.writeToNBT(new ItemStack(plating), type.getKey()), material, material, lava, brush));
+				}
 			}
 		}
 	}

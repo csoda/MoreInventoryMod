@@ -28,18 +28,22 @@ public class ItemBlockTransportManager extends ItemBlockWithMetadata
 	public boolean onItemUse(ItemStack itemstack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
 	{
 		TileEntity tile;
-		boolean flg = !world.getBlock(x, y, z).isReplaceable(world, x, y, z) ? true : false;
+		boolean flag = world.getBlock(x, y, z).isReplaceable(world, x, y, z);
 
-		super.onItemUse(itemstack, player, world, x, y, z, side, hitX, hitY, hitZ);
-
-		if (flg)
+		if (!super.onItemUse(itemstack, player, world, x, y, z, side, hitX, hitY, hitZ))
 		{
-			int[] pos = MIMUtils.getSidePos(x, y, z, side);
-			tile = world.getTileEntity(pos[0], pos[1], pos[2]);
+			return false;
+		}
+
+		if (flag)
+		{
+			tile = world.getTileEntity(x, y, z);
 		}
 		else
 		{
-			tile = world.getTileEntity(x, y, z);
+			int[] pos = MIMUtils.getSidePos(x, y, z, side);
+
+			tile = world.getTileEntity(pos[0], pos[1], pos[2]);
 		}
 
 		if (tile != null && tile instanceof TileEntityTransportManager)
@@ -70,6 +74,6 @@ public class ItemBlockTransportManager extends ItemBlockWithMetadata
 	@Override
 	public IIcon getIconFromDamage(int damage)
 	{
-		return icons[damage & (icons.length - 1)];
+		return icons[damage];
 	}
 }

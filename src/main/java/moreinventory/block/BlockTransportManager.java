@@ -96,7 +96,7 @@ public class BlockTransportManager extends BlockContainer
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List list)
 	{
-		for (int meta = 0; meta < 2; meta++)
+		for (int meta = 0; meta < 2; ++meta)
 		{
 			list.add(new ItemStack(this, 1, meta));
 		}

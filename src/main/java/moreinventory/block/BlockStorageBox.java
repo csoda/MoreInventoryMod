@@ -3,6 +3,7 @@ package moreinventory.block;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import moreinventory.client.renderer.ItemStorageBoxRenderer;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.item.ItemBlockStorageBox;
@@ -26,6 +27,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -38,13 +40,13 @@ import java.util.Random;
 public class BlockStorageBox extends BlockContainer
 {
 	@SideOnly(Side.CLIENT)
-	private Map<String, IIcon[]> iconMap;
+	public Map<String, IIcon[]> iconMap;
 	@SideOnly(Side.CLIENT)
-	private IIcon[] icons_glass;
+	public IIcon[] icons_glass;
 	@SideOnly(Side.CLIENT)
-	private IIcon icon_air;
+	public IIcon icon_air;
 	@SideOnly(Side.CLIENT)
-	private byte[][] glassIndex;
+	public byte[][] glassIndex;
 
 	public BlockStorageBox(Material material)
 	{
@@ -55,7 +57,7 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int idk, float hitX, float hitY, float hitZ)
+	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ)
 	{
 		TileEntityStorageBox tile = (TileEntityStorageBox)world.getTileEntity(x, y, z);
 
@@ -151,6 +153,12 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
+	public int quantityDropped(Random random)
+	{
+		return 0;
+	}
+
+	@Override
 	public Item getItemDropped(int damage, Random random, int fortune)
 	{
 		return null;
@@ -171,12 +179,6 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
-	public int getRenderType()
-	{
-		return 0;
-	}
-
-	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
@@ -186,12 +188,6 @@ public class BlockStorageBox extends BlockContainer
 	public boolean renderAsNormalBlock()
 	{
 		return false;
-	}
-
-	@Override
-	public int damageDropped(int metadata)
-	{
-		return metadata;
 	}
 
 	@Override
@@ -325,22 +321,25 @@ public class BlockStorageBox extends BlockContainer
 		{
 			String name = type.getKey().toLowerCase(Locale.ENGLISH);
 			String folder = StorageBoxType.getTextureFolder(type.getKey());
+			IIcon[] icons = new IIcon[3];
 
 			if (!type.getKey().equals("Glass"))
 			{
-				IIcon[] icons = new IIcon[3];
 				icons[0] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_side");
 				icons[1] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_top");
 				icons[2] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_face");
 				iconMap.put(type.getKey(), icons);
+
+				ItemStorageBoxRenderer.textureMap.put(type.getKey(), new ResourceLocation(folder, "textures/blocks/storagebox_" + name + "_side.png"));
 			}
 			else
 			{
-				IIcon[] icons = new IIcon[3];
 				icons[0] = iconRegister.registerIcon(folder + ":storagebox_" + name + "_0");
 				icons[1] = icons[0];
 				icons[2] = icons[0];
 				iconMap.put(type.getKey(), icons);
+
+				ItemStorageBoxRenderer.textureMap.put(type.getKey(), new ResourceLocation(folder, "textures/blocks/storagebox_" + name + "_0.png"));
 			}
 		}
 

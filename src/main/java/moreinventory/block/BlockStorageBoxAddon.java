@@ -84,7 +84,7 @@ public class BlockStorageBoxAddon extends BlockContainer
 	@Override
 	public void getSubBlocks(Item item, CreativeTabs tab, List list)
 	{
-		for (int meta = 0; meta < EnumSBAddon.values().length; meta++)
+		for (int meta = 0; meta < EnumSBAddon.values().length; ++meta)
 		{
 			list.add(new ItemStack(this, 1, meta));
 		}
