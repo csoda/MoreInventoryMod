@@ -12,12 +12,10 @@ import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.item.ItemArrowHolder;
-import moreinventory.item.ItemBlockStorageBox;
 import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.network.PlayerNameCacheMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
-import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
 import moreinventory.util.MIMItemBoxList;
 import moreinventory.util.MIMItemInvList;
@@ -36,7 +34,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
@@ -46,7 +43,6 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.WorldEvent;
 
 import java.util.Random;
@@ -124,29 +120,6 @@ public class MIMEventHooks
 						}
 					}
 				}
-			}
-		}
-	}
-
-	@SubscribeEvent
-	public void onStorageBoxBroken(BlockEvent.BreakEvent event)
-	{
-		EntityPlayer player = event.getPlayer();
-
-		if (player == null || !(player instanceof EntityPlayerMP))
-		{
-			return;
-		}
-
-		if (!player.capabilities.isCreativeMode)
-		{
-			TileEntity tile =  player.worldObj.getTileEntity(event.x, event.y, event.z);
-
-			if (tile != null && tile instanceof TileEntityStorageBox)
-			{
-				ItemStack itemstack = new ItemStack(Item.getItemFromBlock(event.block));
-				ItemBlockStorageBox.writeToNBT(itemstack, ((TileEntityStorageBox)tile).getTypeName());
-				MIMUtils.dropItem(player.worldObj, itemstack, event.x, event.y, event.z);
 			}
 		}
 	}

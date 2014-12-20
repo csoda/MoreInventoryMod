@@ -15,6 +15,7 @@ import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
@@ -143,6 +144,7 @@ public class BlockStorageBox extends BlockContainer
 				tile.face = 2;
 				break;
 		}
+
 		tile.onPlaced(entity);
 	}
 
@@ -202,6 +204,25 @@ public class BlockStorageBox extends BlockContainer
 		TileEntity tile = world.getTileEntity(x, y, z);
 
 		return tile != null && tile instanceof TileEntityStorageBox ? TileEntityStorageBox.getPowerOutput((TileEntityStorageBox)tile) : 0;
+	}
+
+	@Override
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
+	{
+		if (!world.isRemote && !player.capabilities.isCreativeMode && willHarvest)
+		{
+			TileEntity tile = world.getTileEntity(x, y, z);
+
+			if (tile != null && tile instanceof TileEntityStorageBox)
+			{
+				EntityItem item = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, ItemBlockStorageBox.writeToNBT(new ItemStack(this), ((TileEntityStorageBox)tile).getTypeName()));
+				item.delayBeforeCanPickup = 20;
+
+				world.spawnEntityInWorld(item);
+			}
+		}
+
+		return super.removedByPlayer(world, player, x, y, z, willHarvest);
 	}
 
 	@Override
