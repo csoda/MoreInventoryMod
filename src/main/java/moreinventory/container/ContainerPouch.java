@@ -60,7 +60,7 @@ public class ContainerPouch extends Container
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return pouchInventory != null && pouchInventory.isUseableByPlayer(player);
+		return pouchInventory.isUseableByPlayer(player);
 	}
 
 	protected void bindPlayerInventory(InventoryPlayer inventory)
@@ -95,7 +95,7 @@ public class ContainerPouch extends Container
 		if (slot != null && slot.getHasStack())
 		{
 			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
+			itemstack = ItemStack.copyItemStack(itemstack1);
 
 			if (itemstack1 != null && itemstack1.getItem() == MoreInventoryMod.pouch)
 			{
@@ -159,7 +159,7 @@ public class ContainerPouch extends Container
 	@ChestContainer.RowSizeCallback
 	private int getRowSize()
 	{
-		return 54;
+		return pouchInventory.getSizeInventory() - 18;
 	}
 
 	@ContainerSectionCallback
@@ -168,7 +168,7 @@ public class ContainerPouch extends Container
 		Map<ContainerSection, List<Slot>> slotMap = Maps.newHashMap();
 		List<Slot> slotList = Lists.newArrayList();
 
-		for (int i = 0; i < 54; i++)
+		for (int i = 0; i < getRowSize(); ++i)
 		{
 			slotList.add((Slot)inventorySlots.get(i + 18));
 		}

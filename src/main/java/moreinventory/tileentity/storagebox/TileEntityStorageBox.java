@@ -205,7 +205,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			{
 				itemstack = itemstack.splitStack(amount);
 
-				if (itemstack.stackSize == 0)
+				if (itemstack.stackSize <= 0)
 				{
 					setInventorySlotContents(slot, null);
 				}
@@ -319,12 +319,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public boolean tryPutIn(ItemStack itemstack)
 	{
-		if (isSameAsContents(itemstack))
-		{
-			return MIMUtils.mergeItemStack(itemstack, this);
-		}
-
-		return false;
+		return isSameAsContents(itemstack) && MIMUtils.mergeItemStack(itemstack, this);
 	}
 
 	public void collectAllItemStack(IInventory inventory)
@@ -358,31 +353,24 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public boolean canMergeItemStack(ItemStack itemstack)
 	{
 		int size = getUsableInventorySize();
-		ItemStack item;
 
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < size; ++i)
 		{
-			item = getStackInSlot(i);
-
-			if (item == null)
+			if (getStackInSlot(i) == null)
 			{
 				return true;
 			}
 		}
 
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < size; ++i)
 		{
-			item = getStackInSlot(i);
-			int count = 0;
-			if (item.stackSize != item.getMaxStackSize())
+			ItemStack item = getStackInSlot(i);
+
+			if (item.stackSize < item.getMaxStackSize())
 			{
-				if(item.getMaxStackSize() - item.stackSize >= itemstack.stackSize - count)
+				if(item.getMaxStackSize() - item.stackSize >= itemstack.stackSize)
 				{
 					return true;
-				}
-				else
-				{
-					count += item.getMaxStackSize() - item.stackSize;
 				}
 			}
 		}
@@ -448,6 +436,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				case 1:
 					clickTime = 16;
 					ItemStack itemstack = player.getCurrentEquippedItem();
+
 					if (itemstack != null)
 					{
 						registerItems(itemstack);
@@ -466,14 +455,15 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 					canInsert = false;
 					collectAllItemStack(player.inventory);
 					canInsert = prevInsert;
-					updatePlayerInventory(player);
+					MIMUtils.checkNull(player.inventory);
+					player.onUpdate();
 					break;
 				case 3:
 					clickCount = 0;
 
 					getStorageBoxNetworkManager().linkedCollect(player.inventory);
-					updatePlayerInventory(player);
-
+					MIMUtils.checkNull(player.inventory);
+					player.onUpdate();
 					break;
 				default:
 					clickCount = 0;
@@ -497,23 +487,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 				player.inventory.addItemStackToInventory(loadItemStack(0));
 			}
 		}
-	}
-
-	public void updatePlayerInventory(EntityPlayer player)
-	{
-		ItemStack[] items = player.inventory.mainInventory;
-
-		for (int i = 0; i < items.length; i++)
-		{
-			ItemStack itemstack = items[i];
-
-			if (itemstack != null && itemstack.stackSize <= 0)
-			{
-				player.inventory.setInventorySlotContents(i, null);
-			}
-		}
-
-		player.onUpdate();
 	}
 
 	@Override
@@ -577,7 +550,6 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		markDirty();
 	}
 
-
 	public void onNeighborRemoved()
 	{
 		if (getStorageBoxNetworkManager().getBoxList().isOnBoxList(xCoord, yCoord, zCoord, worldObj.getWorldInfo().getVanillaDimension()))
@@ -588,10 +560,9 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void updateTileFromType()
 	{
-		if(this.getClass() != StorageBoxType.types.get(getTypeName()).clazz)
+		if(getClass() != StorageBoxType.types.get(getTypeName()).clazz)
 		{
-			TileEntity tile = upgrade(getTypeName());
-			worldObj.setTileEntity(xCoord, yCoord, zCoord, tile);
+			worldObj.setTileEntity(xCoord, yCoord, zCoord, upgrade(getTypeName()));
 		}
 	}
 

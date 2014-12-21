@@ -1,15 +1,14 @@
 package moreinventory.recipe;
 
-import moreinventory.item.ItemTorchHolder;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ShapelessRecipes;
 
 import java.util.List;
 
-public class RecipeTorchHolder extends ShapelessRecipes
+public class RecipeHolderEject extends ShapelessRecipes
 {
-	public RecipeTorchHolder(ItemStack itemstack, List list)
+	public RecipeHolderEject(ItemStack itemstack, List list)
 	{
 		super(itemstack, list);
 	}
@@ -23,7 +22,7 @@ public class RecipeTorchHolder extends ShapelessRecipes
 		{
 			ItemStack item = crafting.getStackInSlot(i);
 
-			if (item != null && item.getItem() instanceof ItemTorchHolder && item.getItemDamage() < item.getMaxDamage() - 2)
+			if (item != null && item.getItem() == ((ItemStack)recipeItems.get(0)).getItem() && item.getItemDamage() < item.getMaxDamage() - 2)
 			{
 				itemstack = getRecipeOutput().copy();
 			}

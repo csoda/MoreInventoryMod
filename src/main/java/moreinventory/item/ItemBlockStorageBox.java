@@ -50,9 +50,9 @@ public class ItemBlockStorageBox extends ItemBlock
 
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
-			String type = readTypeNameFromNBT(itemstack.getTagCompound());
+			world.setTileEntity(tile.xCoord, tile.yCoord, tile.zCoord, ((TileEntityStorageBox)tile).upgrade(readTypeNameFromNBT(itemstack.getTagCompound())));
 
-			world.setTileEntity(tile.xCoord, tile.yCoord, tile.zCoord, ((TileEntityStorageBox)tile).upgrade(type));
+			tile.markDirty();
 		}
 
 		return true;

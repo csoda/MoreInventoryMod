@@ -98,8 +98,7 @@ public class MIMItemBoxList extends MIMBoxList
 	{
 		if (isOnBoxList(x, y, z, d))
 		{
-			ItemStack newItem = itemstack != null ? itemstack.copy() : null;
-			putItem(new int[]{x, y, z, d}, newItem);
+			putItem(new int[] {x, y, z, d}, ItemStack.copyItemStack(itemstack));
 		}
 		else
 		{

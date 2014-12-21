@@ -68,7 +68,10 @@ public class BlockCatchall extends BlockContainer
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block par5, int par6)
 	{
-		dropItems(world, x, y, z);
+		if (!world.isRemote)
+		{
+			dropItems(world, x, y, z);
+		}
 
 		super.breakBlock(world, x, y, z, par5, par6);
 	}

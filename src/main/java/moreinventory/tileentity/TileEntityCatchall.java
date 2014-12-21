@@ -3,7 +3,6 @@ package moreinventory.tileentity;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.CatchallMessage;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,23 +13,17 @@ import net.minecraft.tileentity.TileEntity;
 public class TileEntityCatchall extends TileEntity implements IInventory
 {
 	private ItemStack[] containerItems = new ItemStack[36];
-	private ItemStack[] displayedItem = new ItemStack[1];
 
 	@Override
 	public int getSizeInventory()
 	{
-		return containerItems.length;
+		return containerItems == null ? 0 : containerItems.length;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int slot)
 	{
 		return containerItems[slot];
-	}
-
-	public ItemStack[] getDisplayedItem()
-	{
-		return displayedItem;
 	}
 
 	@Override
@@ -88,13 +81,9 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	public void transferToBlock(EntityPlayer player)
 	{
-		InventoryPlayer inventory = player.inventory;
-
-		for (int i = 0; i < getSizeInventory(); i++)
+		for (int i = 0; i < getSizeInventory(); ++i)
 		{
-			setInventorySlotContents(i, inventory.getStackInSlot(i));
-
-			inventory.mainInventory[i] = null;
+			setInventorySlotContents(i, player.inventory.getStackInSlotOnClosing(i));
 		}
 
 		player.onUpdate();
@@ -102,18 +91,9 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	public void transferToPlayer(EntityPlayer player)
 	{
-		InventoryPlayer inventory = player.inventory;
-
-		for (int i = 0; i < getSizeInventory(); i++)
+		for (int i = 0; i < getSizeInventory(); ++i)
 		{
-			ItemStack itemstack = getStackInSlot(i);
-
-			if (itemstack != null)
-			{
-				inventory.mainInventory[i] = itemstack;
-			}
-
-			setInventorySlotContents(i, null);
+			player.inventory.setInventorySlotContents(i, getStackInSlotOnClosing(i));
 		}
 
 		player.onUpdate();
@@ -153,7 +133,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	public boolean canTransferToPlayer(EntityPlayer player)
 	{
-		for (int i = 0; i < getSizeInventory(); i++)
+		for (int i = 0; i < getSizeInventory(); ++i)
 		{
 			if (getStackInSlot(i) != null && player.inventory.mainInventory[i] != null)
 			{
@@ -245,7 +225,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	public void handlePacketData(ItemStack[] items)
 	{
-		displayedItem = items;
+		containerItems = items;
 	}
 
 	@Override

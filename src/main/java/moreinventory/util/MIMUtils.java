@@ -91,22 +91,17 @@ public final class MIMUtils
 
 	public static void checkNull(IInventory inventory)
 	{
-		for (int i = 0; i < inventory.getSizeInventory(); i++)
+		for (int i = 0; i < inventory.getSizeInventory(); ++i)
 		{
-			ItemStack item = inventory.getStackInSlot(i);
-
-			if (item != null && item.stackSize == 0)
-			{
-				inventory.setInventorySlotContents(i, null);
-			}
+			checkNullStack(inventory, i);
 		}
 	}
 
 	public static void checkNullStack(IInventory inventory, int slot)
 	{
-		ItemStack item = inventory.getStackInSlot(slot);
+		ItemStack itemstack = inventory.getStackInSlot(slot);
 
-		if (item != null && item.stackSize <= 0)
+		if (itemstack != null && itemstack.stackSize <= 0)
 		{
 			inventory.setInventorySlotContents(slot, null);
 		}
@@ -144,17 +139,17 @@ public final class MIMUtils
 
 	public static boolean mergeItemStack(ItemStack itemstack, IInventory inventory, int side)
 	{
-		boolean success = false;
-		int size = inventory.getSizeInventory();
-
 		if (itemstack == null)
 		{
 			return false;
 		}
 
+		boolean success = false;
+		int size = inventory.getSizeInventory();
+
 		if (itemstack.isStackable())
 		{
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size; ++i)
 			{
 				ItemStack item = inventory.getStackInSlot(i);
 
@@ -190,7 +185,7 @@ public final class MIMUtils
 
 		if (itemstack.stackSize > 0)
 		{
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < size; ++i)
 			{
 				ItemStack item = inventory.getStackInSlot(i);
 

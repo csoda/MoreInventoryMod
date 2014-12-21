@@ -7,39 +7,41 @@ import net.minecraft.item.ItemStack;
 
 public class SlotDisplay extends Slot
 {
-
-	public SlotDisplay(IInventory par1iInventory, int par2, int par3,int par4) {
-		super(par1iInventory, par2, par3, par4);
+	public SlotDisplay(IInventory inventory, int index, int x,int y)
+	{
+		super(inventory, index, x, y);
 	}
 
+	@Override
 	public ItemStack getStack()
 	{
-		ItemStack itemstack = this.inventory.getStackInSlot(this.getSlotIndex());
-		ItemStack retItem = null;
+		ItemStack itemstack = inventory.getStackInSlot(getSlotIndex());
+		ItemStack result = null;
+
 		if (itemstack != null)
 		{
-			retItem = itemstack.copy();
-			retItem.stackSize = 1;
+			result = itemstack.copy();
+			result.stackSize = 1;
 		}
 
-		return retItem;
+		return result;
 	}
 
 	@Override
 	public int getSlotStackLimit()
 	{
-		return 0;
+		return 1;
 	}
 
 	@Override
-	public boolean canTakeStack(EntityPlayer par1EntityPlayer)
+	public boolean canTakeStack(EntityPlayer player)
 	{
 		return false;
 	}
 
-	public boolean isItemValid(ItemStack par1ItemStack)
+	@Override
+	public boolean isItemValid(ItemStack itemstack)
 	{
 		return false;
 	}
-
 }

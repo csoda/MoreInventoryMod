@@ -224,6 +224,19 @@ public class BlockStorageBox extends BlockContainer
 	}
 
 	@Override
+	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
+	{
+		TileEntity tile = world.getTileEntity(x, y, z);
+
+		if (tile != null && tile instanceof TileEntityStorageBox)
+		{
+			return ((TileEntityStorageBox)tile).face != side.ordinal();
+		}
+
+		return super.isSideSolid(world, x, y, z, side);
+	}
+
+	@Override
 	public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z)
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
