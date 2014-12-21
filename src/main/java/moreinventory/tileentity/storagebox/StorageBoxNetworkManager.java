@@ -68,7 +68,7 @@ public class StorageBoxNetworkManager
 				}
 			}
 
-			for (int i = 0; i < 6; i++)
+			for (int i = 0; i < 6; ++i)
 			{
 				int[] pos = MIMUtils.getSidePos(x, y, z, i);
 
@@ -135,7 +135,7 @@ public class StorageBoxNetworkManager
 
 	public void linkedCollect(IInventory inventory)
 	{
-		for (int i = 0; i < inventory.getSizeInventory(); i++)
+		for (int i = 0; i < inventory.getSizeInventory(); ++i)
 		{
 			ItemStack item = inventory.getStackInSlot(i);
 
@@ -164,7 +164,6 @@ public class StorageBoxNetworkManager
 
 		for (int i = 0; i < list.getListSize(); i++)
 		{
-			int[] pos = list.getBoxPos(i);
 			TileEntityStorageBox tile = (TileEntityStorageBox)list.getTileBeyondDim(i);
 
 			if (tile != storageBox && !tile.isFull())
@@ -180,9 +179,7 @@ public class StorageBoxNetworkManager
 
 		if (register)
 		{
-			int size = storageBoxList.getListSize();
-
-			for (int i = 0; i < size; i++)
+			for (int i = 0; i < storageBoxList.getListSize(); ++i)
 			{
 				if (storageBoxList.getItem(i) == null)
 				{
@@ -221,6 +218,4 @@ public class StorageBoxNetworkManager
 
 		return false;
 	}
-
-	public void updateOnInvChanged(World world, int x, int y, int z, ItemStack item) {}
 }

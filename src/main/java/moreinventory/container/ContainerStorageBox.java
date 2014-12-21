@@ -20,11 +20,11 @@ public class ContainerStorageBox extends Container
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return storageBox != null && storageBox.isUseableByPlayer(player);
+		return storageBox.isUseableByPlayer(player);
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
+	public ItemStack transferStackInSlot(EntityPlayer player, int slot)
 	{
 		return null;
 	}

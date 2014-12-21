@@ -50,9 +50,8 @@ import moreinventory.network.StorageBoxConfigMessage;
 import moreinventory.network.StorageBoxContentsMessage;
 import moreinventory.network.StorageBoxMessage;
 import moreinventory.network.TransportManagerMessage;
-import moreinventory.recipe.RecipeArrowHolder;
+import moreinventory.recipe.RecipeHolderEject;
 import moreinventory.recipe.RecipePouch;
-import moreinventory.recipe.RecipeTorchHolder;
 import moreinventory.tileentity.TileEntityCatchall;
 import moreinventory.tileentity.TileEntityExporter;
 import moreinventory.tileentity.TileEntityImporter;
@@ -143,8 +142,7 @@ public class MoreInventoryMod
 	{
 		Version.versionCheck();
 
-		RecipeSorter.register(MODID + ":torchholder", RecipeTorchHolder.class, Category.SHAPELESS, "after:minecraft:shapeless");
-		RecipeSorter.register(MODID + ":arrowholder", RecipeArrowHolder.class, Category.SHAPELESS, "after:minecraft:shapeless");
+		RecipeSorter.register(MODID + ":holder.eject", RecipeHolderEject.class, Category.SHAPELESS, "after:minecraft:shapeless");
 		RecipeSorter.register(MODID + ":pouch", RecipePouch.class, Category.SHAPELESS, "after:minecraft:shapeless");
 	}
 
@@ -280,7 +278,7 @@ public class MoreInventoryMod
 			'S', Items.nether_star
 		);
 
-		GameRegistry.addRecipe(new RecipeTorchHolder(new ItemStack(Blocks.torch), Lists.newArrayList(new ItemStack(torchHolder, 1, OreDictionary.WILDCARD_VALUE))));
+		GameRegistry.addRecipe(new RecipeHolderEject(new ItemStack(Blocks.torch), Lists.newArrayList(new ItemStack(torchHolder, 1, OreDictionary.WILDCARD_VALUE))));
 
 		itemstack = ArrowHolderType.createItemStack("Iron");
 		itemstack.setItemDamage(itemstack.getMaxDamage() - 3);
@@ -314,7 +312,7 @@ public class MoreInventoryMod
 			'A', Items.arrow
 		);
 
-		GameRegistry.addRecipe(new RecipeArrowHolder(new ItemStack(Items.arrow), Lists.newArrayList(new ItemStack(arrowHolder, 1, OreDictionary.WILDCARD_VALUE))));
+		GameRegistry.addRecipe(new RecipeHolderEject(new ItemStack(Items.arrow), Lists.newArrayList(new ItemStack(arrowHolder, 1, OreDictionary.WILDCARD_VALUE))));
 
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(catchall),
 			"P P", "PCP", "HHH",
