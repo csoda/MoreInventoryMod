@@ -3,6 +3,12 @@
 moreinv.version.message=A new %s version is available
 
 tile.catchall.name=Catchall
+tile.catchall:Oak.name=Oak Wooden Catchall
+tile.catchall:Spruce.name=Spruce Wooden Catchall
+tile.catchall:Birch.name=Birch Wooden Catchall
+tile.catchall:Jungle.name=Jungle Wooden Catchall
+tile.catchall:Acacia.name=Acacia Wooden Catchall
+tile.catchall:DarkOak.name=Dark Oak Wooden Catchall
 containerbox.name=Container Box
 containerbox:Wood.name=Wood Container Box
 containerbox:Iron.name=Iron Container Box 

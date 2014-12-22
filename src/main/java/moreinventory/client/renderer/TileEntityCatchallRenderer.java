@@ -2,6 +2,7 @@ package moreinventory.client.renderer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import moreinventory.block.CatchallType;
 import moreinventory.client.model.ModelCatchall;
 import moreinventory.tileentity.TileEntityCatchall;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -26,7 +27,7 @@ public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 			rotation = (byte)tile.getBlockMetadata();
 		}
 
-		bindTexture(ItemCatchallRenderer.woodTexture);
+		bindTexture(CatchallType.getTexturePath(tile.getTypeName()));
 		GL11.glPushMatrix();
 		GL11.glTranslatef((float)posX + 0.5F, (float)posY + 1.5F, (float)posZ + 0.5F);
 		GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
@@ -36,7 +37,7 @@ public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 		if (tile.getWorldObj() != null)
 		{
 			GL11.glPushMatrix();
-			GL11.glTranslatef((float)posX + 0.5F, (float)posY + 0.5F, (float)posZ + 0.525F);
+			GL11.glTranslatef((float)posX + 0.5F, (float)posY + 0.55F, (float)posZ + 0.525F);
 			GL11.glScalef(0.8F, -0.8F, -0.8F);
 			GL11.glRotatef(90, -1.0F, 0.0F, 0.0F);
 

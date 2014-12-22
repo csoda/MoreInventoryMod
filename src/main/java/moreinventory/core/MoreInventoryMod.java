@@ -21,11 +21,13 @@ import moreinventory.block.BlockCatchall;
 import moreinventory.block.BlockStorageBox;
 import moreinventory.block.BlockStorageBoxAddon;
 import moreinventory.block.BlockTransportManager;
+import moreinventory.block.CatchallType;
 import moreinventory.handler.MIMEventHooks;
 import moreinventory.handler.MIMGuiHandler;
 import moreinventory.handler.MIMWorldSaveHelper;
 import moreinventory.item.ArrowHolderType;
 import moreinventory.item.ItemArrowHolder;
+import moreinventory.item.ItemBlockCatchall;
 import moreinventory.item.ItemBlockSBAddon;
 import moreinventory.item.ItemBlockStorageBox;
 import moreinventory.item.ItemBlockTransportManager;
@@ -71,7 +73,6 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
@@ -163,7 +164,7 @@ public class MoreInventoryMod
 		plating = (ItemPlating)new ItemPlating().setUnlocalizedName("painting");
 		pouch = (ItemPouch)new ItemPouch().setUnlocalizedName("pouch");
 
-		GameRegistry.registerBlock(catchall, ItemBlock.class, "catchall");
+		GameRegistry.registerBlock(catchall, ItemBlockCatchall.class, "catchall");
 		GameRegistry.registerBlock(storageBox, ItemBlockStorageBox.class, "containerbox");
 		GameRegistry.registerBlock(transportManager, ItemBlockTransportManager.class, "transportmanager");
 		GameRegistry.registerBlock(storageBoxAddon, ItemBlockSBAddon.class, "StorageBoxAddon");
@@ -245,6 +246,7 @@ public class MoreInventoryMod
 
 		MinecraftForge.EVENT_BUS.register(MIMEventHooks.instance);
 
+		CatchallType.initialize();
 		StorageBoxType.initialize();
 		TorchHolderType.initialize();
 		ArrowHolderType.initialize();
@@ -314,7 +316,7 @@ public class MoreInventoryMod
 
 		GameRegistry.addRecipe(new RecipeHolderEject(new ItemStack(Items.arrow), Lists.newArrayList(new ItemStack(arrowHolder, 1, OreDictionary.WILDCARD_VALUE))));
 
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(catchall),
+		GameRegistry.addRecipe(new ShapedOreRecipe(CatchallType.createItemStack("Oak"),
 			"P P", "PCP", "HHH",
 			'P', "plankWood",
 			'H', "slabWood",

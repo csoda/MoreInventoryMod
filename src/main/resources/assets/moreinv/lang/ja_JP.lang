@@ -3,6 +3,12 @@
 moreinv.version.message=%s の新しいバージョンが利用可能です
 
 tile.catchall.name=ガラクタ入れ
+tile.catchall:Oak.name=オークの木のガラクタ入れ
+tile.catchall:Spruce.name=松の木のガラクタ入れ
+tile.catchall:Birch.name=白樺の木のガラクタ入れ
+tile.catchall:Jungle.name=ジャングルの木のガラクタ入れ
+tile.catchall:Acacia.name=アカシアの木のガラクタ入れ
+tile.catchall:DarkOak.name=ダークオークの木のガラクタ入れ
 containerbox.name=コンテナ
 containerbox:Wood.name=木のコンテナ
 containerbox:Iron.name=鉄のコンテナ 

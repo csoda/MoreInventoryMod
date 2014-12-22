@@ -16,7 +16,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Map.Entry;
 
 public class ItemBlockStorageBox extends ItemBlock
 {
@@ -70,9 +69,9 @@ public class ItemBlockStorageBox extends ItemBlock
 	@Override
 	public void getSubItems(Item item, CreativeTabs tab, List list)
 	{
-		for (Entry<String, StorageBoxType> type : StorageBoxType.types.entrySet())
+		for (String type : StorageBoxType.types.keySet())
 		{
-			list.add(writeToNBT(new ItemStack(this), type.getKey()));
+			list.add(writeToNBT(new ItemStack(this), type));
 		}
 	}
 
