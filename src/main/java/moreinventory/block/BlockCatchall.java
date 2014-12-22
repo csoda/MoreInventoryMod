@@ -18,7 +18,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockCatchall extends BlockContainer
 {
@@ -87,7 +89,7 @@ public class BlockCatchall extends BlockContainer
 
 		IInventory inventory = (IInventory)tile;
 
-		for (int i = 0; i < inventory.getSizeInventory(); i++)
+		for (int i = 0; i < inventory.getSizeInventory(); ++i)
 		{
 			MIMUtils.dropItem(world, inventory.getStackInSlot(i), x, y, z);
 		}
@@ -117,6 +119,12 @@ public class BlockCatchall extends BlockContainer
 		return -2;
 	}
 
+	@Override
+	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
+	{
+		return side != ForgeDirection.UP;
+	}
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconRegister) {}
@@ -125,6 +133,6 @@ public class BlockCatchall extends BlockContainer
 	@Override
 	public IIcon getIcon(int side, int metadata)
 	{
-		return Blocks.planks.getIcon(1, 0);
+		return Blocks.planks.getIcon(side, metadata);
 	}
 }

@@ -107,7 +107,7 @@ public class TileEntityStorageBoxRenderer extends TileEntitySpecialRenderer
 				}
 			}
 
-			String text = builder.substring(0);
+			String text = builder.toString();
 			float scale = 0.016666668F * 0.6666667F * 2.0F;
 			GL11.glPushMatrix();
 			GL11.glTranslatef(0, 0, 0);
