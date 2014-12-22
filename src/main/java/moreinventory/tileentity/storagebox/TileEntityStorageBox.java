@@ -63,6 +63,11 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return StorageBoxType.isExistType(typeName) ? typeName : "Wood";
 	}
 
+	public void setTypeName(String name)
+	{
+		typeName = name;
+	}
+
 	@Override
 	public StorageBoxNetworkManager getStorageBoxNetworkManager()
 	{
@@ -560,7 +565,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 	public void updateTileFromType()
 	{
-		if(getClass() != StorageBoxType.types.get(getTypeName()).clazz)
+		if (getClass() != StorageBoxType.types.get(getTypeName()).clazz)
 		{
 			worldObj.setTileEntity(xCoord, yCoord, zCoord, upgrade(getTypeName()));
 		}

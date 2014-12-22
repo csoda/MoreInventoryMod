@@ -314,7 +314,8 @@ public class ItemTransporter extends Item
 					transferToBlock(tile);
 					block.onBlockPlacedBy(world, tile.xCoord, tile.yCoord, tile.zCoord, player, tileBlock);
 					block.onPostBlockPlaced(world, tile.xCoord, tile.yCoord, tile.zCoord, tile.getBlockMetadata());
-					world.markBlockForUpdate(tile.xCoord, tile.yCoord, tile.zCoord);
+
+					tile.markDirty();
 
 					return true;
 				}
