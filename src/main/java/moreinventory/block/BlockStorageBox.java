@@ -119,7 +119,7 @@ public class BlockStorageBox extends BlockContainer
 
 		IInventory inventory = (IInventory)tile;
 
-		for (int i = 0; i < inventory.getSizeInventory(); i++)
+		for (int i = 0; i < inventory.getSizeInventory(); ++i)
 		{
 			MIMUtils.dropItem(world, inventory.getStackInSlot(i), x, y, z);
 		}

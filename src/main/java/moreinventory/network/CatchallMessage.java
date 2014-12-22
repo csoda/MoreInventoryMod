@@ -16,15 +16,17 @@ import net.minecraft.tileentity.TileEntity;
 public class CatchallMessage implements IMessage, IMessageHandler<CatchallMessage, IMessage>
 {
 	private int x, y, z;
+	private String type;
 	private ItemStack[] items;
 
 	public CatchallMessage() {}
 
-	public CatchallMessage(int x, int y, int z, ItemStack[] items)
+	public CatchallMessage(int x, int y, int z, String type, ItemStack[] items)
 	{
 		this.x = x;
 		this.y = y;
 		this.z = z;
+		this.type = type;
 		this.items = items;
 	}
 
@@ -34,6 +36,7 @@ public class CatchallMessage implements IMessage, IMessageHandler<CatchallMessag
 		x = buf.readInt();
 		y = buf.readInt();
 		z = buf.readInt();
+		type = ByteBufUtils.readUTF8String(buf);
 		items = new ItemStack[buf.readInt()];
 
 		for (int i = 0; i < items.length; ++i)
@@ -48,6 +51,7 @@ public class CatchallMessage implements IMessage, IMessageHandler<CatchallMessag
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
+		ByteBufUtils.writeUTF8String(buf, type);
 		buf.writeInt(items.length);
 
 		for (ItemStack itemstack : items)
@@ -65,7 +69,7 @@ public class CatchallMessage implements IMessage, IMessageHandler<CatchallMessag
 
 		if (tile != null && tile instanceof TileEntityCatchall)
 		{
-			((TileEntityCatchall)tile).handlePacketData(message.items);
+			((TileEntityCatchall)tile).handlePacketData(message.type, message.items);
 		}
 
 		return null;

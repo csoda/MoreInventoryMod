@@ -37,9 +37,9 @@ public class GuiPouch extends GuiContainer
 	{
 		super.initGui();
 
-		buttonList.add(new GuiButtonConfig(0, (width - xSize) / 2 + xSize + 6, (height - ySize) / 2 + 25 + grade * 18, 16, 16, 184, 120, pouch.isCollectedByBox, ""));
-		buttonList.add(new GuiButtonConfig(1, (width - xSize) / 2 + xSize + 24, (height - ySize) / 2 + 25 + grade * 18, 16, 16, 200, 120, pouch.isCollectMainInv, ""));
-		buttonList.add(new GuiButtonConfig(2, (width - xSize) / 2 + xSize + 42, (height - ySize) / 2 + 25 + grade * 18, 16, 16, 216, 120, pouch.isAutoCollect, ""));
+		buttonList.add(new GuiButtonConfig(0, guiLeft + xSize + 6, guiTop + 25 + grade * 18, 16, 16, 184, 120, pouch.isCollectedByBox, ""));
+		buttonList.add(new GuiButtonConfig(1, guiLeft + xSize + 24, guiTop + 25 + grade * 18, 16, 16, 200, 120, pouch.isCollectMainInv, ""));
+		buttonList.add(new GuiButtonConfig(2, guiLeft + xSize + 42, guiTop + 25 + grade * 18, 16, 16, 216, 120, pouch.isAutoCollect, ""));
 	}
 
 	@Override

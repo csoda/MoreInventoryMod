@@ -12,7 +12,20 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityCatchall extends TileEntity implements IInventory
 {
+	private String typeName;
 	private ItemStack[] containerItems = new ItemStack[36];
+
+	public String getTypeName()
+	{
+		return typeName == null ? "Oak" : typeName;
+	}
+
+	public TileEntityCatchall setTypeName(String name)
+	{
+		typeName = name;
+
+		return this;
+	}
 
 	@Override
 	public int getSizeInventory()
@@ -179,6 +192,9 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
+
+		typeName = nbt.getString("TypeName");
+
 		NBTTagList list = (NBTTagList)nbt.getTag("Items");
 		containerItems = new ItemStack[getSizeInventory()];
 
@@ -201,6 +217,9 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	public void writeToNBT(NBTTagCompound nbt)
 	{
 		super.writeToNBT(nbt);
+
+		nbt.setString("TypeName", typeName);
+
 		NBTTagList list = new NBTTagList();
 
 		for (int i = 0; i < containerItems.length; ++i)
@@ -223,8 +242,9 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 		return true;
 	}
 
-	public void handlePacketData(ItemStack[] items)
+	public void handlePacketData(String type, ItemStack[] items)
 	{
+		typeName = type;
 		containerItems = items;
 	}
 
@@ -238,6 +258,6 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	private void sendPacket()
 	{
-		MoreInventoryMod.network.sendToDimension(new CatchallMessage(xCoord, yCoord, zCoord, containerItems), worldObj.provider.dimensionId);
+		MoreInventoryMod.network.sendToDimension(new CatchallMessage(xCoord, yCoord, zCoord, typeName, containerItems), worldObj.provider.dimensionId);
 	}
 }
