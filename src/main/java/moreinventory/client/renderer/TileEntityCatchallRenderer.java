@@ -58,16 +58,24 @@ public class TileEntityCatchallRenderer extends TileEntitySpecialRenderer
 
 	private void renderContentsItem(TileEntityCatchall tile)
 	{
+		ItemStack[] items = tile.displayedItems;
+
+		if (items == null || items.length <= 0)
+		{
+			return;
+		}
+
 		float renderX, renderY, renderZ;
 
-		for (int i = 0; i < tile.getSizeInventory(); ++i)
+		for (int i = 0; i < items.length; ++i)
 		{
-			ItemStack itemstack = tile.getStackInSlot(i);
+			ItemStack itemstack = items[i];
 
 			if (itemstack != null)
 			{
+				itemstack.stackSize = 1;
+
 				entityItem.setEntityItemStack(itemstack);
-				entityItem.getEntityItem().stackSize = 1;
 				entityItem.hoverStart = 0.0F;
 
 				byte x = (byte)(i % 3);

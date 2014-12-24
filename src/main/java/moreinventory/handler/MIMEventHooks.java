@@ -2,6 +2,7 @@ package moreinventory.handler;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
+import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
@@ -11,8 +12,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.inventory.InventoryPouch;
-import moreinventory.item.ItemArrowHolder;
-import moreinventory.item.ItemTorchHolder;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.network.PlayerNameCacheMessage;
 import moreinventory.tileentity.storagebox.TileEntityEnderStorageBox;
@@ -31,14 +30,15 @@ import net.minecraft.event.ClickEvent;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeVersion.Status;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
@@ -125,6 +125,70 @@ public class MIMEventHooks
 	}
 
 	@SubscribeEvent
+	public void onLivingUpdate(LivingUpdateEvent event)
+	{
+		if (event.entityLiving instanceof EntityPlayerMP)
+		{
+			EntityPlayerMP player = (EntityPlayerMP)event.entityLiving;
+
+			if (Config.isCollectArrow.contains(player.getUniqueID().toString()))
+			{
+				WorldServer world = player.getServerForPlayer();
+
+				for (Object obj : world.getEntitiesWithinAABB(EntityArrow.class, player.boundingBox.expand(1.0D, 0.1D, 1.0D)))
+				{
+					EntityArrow arrow = (EntityArrow)obj;
+
+					if ((boolean)ObfuscationReflectionHelper.getPrivateValue(EntityArrow.class, arrow, "inGround", "field_70254_i") && arrow.arrowShake <= 0)
+					{
+						boolean flag = arrow.canBePickedUp == 1 || arrow.canBePickedUp == 2 && player.capabilities.isCreativeMode;
+
+						if (arrow.canBePickedUp == 1 && !player.inventory.hasItem(MoreInventoryMod.arrowHolder))
+						{
+							flag = false;
+						}
+
+						if (flag)
+						{
+							ItemStack itemstack = player.getCurrentEquippedItem();
+
+							if (itemstack != null && itemstack.getItem() == MoreInventoryMod.arrowHolder)
+							{
+								player.swingItem();
+							}
+
+							flag = false;
+
+							for (int i = 0; i < player.inventory.getSizeInventory(); ++i)
+							{
+								itemstack = player.inventory.getStackInSlot(i);
+
+								if (itemstack != null && itemstack.getItem() == MoreInventoryMod.arrowHolder)
+								{
+									int damage = itemstack.getItemDamage();
+
+									if (damage >= 1)
+									{
+										itemstack.setItemDamage(damage - 1);
+										flag = true;
+										break;
+									}
+								}
+							}
+
+							if (flag)
+							{
+								arrow.playSound("random.pop", 0.2F, ((eventRand.nextFloat() - eventRand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+								arrow.setDead();
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@SubscribeEvent
 	public void onItemPickup(EntityItemPickupEvent event)
 	{
 		if (event.entityPlayer instanceof EntityPlayerMP)
@@ -133,7 +197,7 @@ public class MIMEventHooks
 			ItemStack item = event.item.getEntityItem();
 			InventoryPlayer inventory = player.inventory;
 
-			for (int i = 0; i < inventory.getSizeInventory(); i++)
+			for (int i = 0; i < inventory.getSizeInventory(); ++i)
 			{
 				ItemStack itemstack = inventory.getStackInSlot(i);
 
@@ -156,8 +220,8 @@ public class MIMEventHooks
 						}
 					}
 
-					if (Config.isCollectTorch.contains(uuid) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() instanceof ItemTorchHolder ||
-						Config.isCollectArrow.contains(uuid) && item.getItem() == Items.arrow && itemstack.getItem() instanceof ItemArrowHolder)
+					if (Config.isCollectTorch.contains(uuid) && item.getItem() == Item.getItemFromBlock(Blocks.torch) && itemstack.getItem() == MoreInventoryMod.torchHolder ||
+						Config.isCollectArrow.contains(uuid) && item.getItem() == Items.arrow && itemstack.getItem() == MoreInventoryMod.arrowHolder)
 					{
 						int damage = itemstack.getItemDamage();
 						int count = item.stackSize;
@@ -181,82 +245,77 @@ public class MIMEventHooks
 	@SubscribeEvent
 	public void onArrowLoose(ArrowLooseEvent event)
 	{
-		if (event.bow != null && event.bow.getItem() instanceof ItemBow)
+		EntityPlayer player = event.entityPlayer;
+		ItemStack bow = event.bow;
+
+		if (bow != null && bow.getItem() == Items.bow && player.inventory.hasItem(MoreInventoryMod.arrowHolder))
 		{
-			EntityPlayer player = event.entityPlayer;
 			World world = player.worldObj;
-			ItemStack bow = event.bow;
+			float f = (float)event.charge / 20.0F;
+			f = (f * f + f * 2.0F) / 3.0F;
 
-			if (player.inventory.hasItem(MoreInventoryMod.arrowHolder))
+			if ((double)f < 0.1D)
 			{
-				float f = (float)event.charge / 20.0F;
-				f = (f * f + f * 2.0F) / 3.0F;
-
-				if ((double)f < 0.1D)
-				{
-					return;
-				}
-
-				if (f > 1.0F)
-				{
-					f = 1.0F;
-				}
-
-				EntityArrow entity = new EntityArrow(world, player, f * 2.0F);
-
-				if (f == 1.0F)
-				{
-					entity.setIsCritical(true);
-				}
-
-				int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, bow);
-
-				if (k > 0)
-				{
-					entity.setDamage(entity.getDamage() + (double)k * 0.5D + 0.5D);
-				}
-
-				int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, bow);
-
-				if (l > 0)
-				{
-					entity.setKnockbackStrength(l);
-				}
-
-				if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, bow) > 0)
-				{
-					entity.setFire(100);
-				}
-
-				bow.damageItem(1, player);
-				world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (eventRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
-
-				if (!player.capabilities.isCreativeMode)
-				{
-					player.inventory.mainInventory[MIMUtils.getFirstSlot(player.inventory.mainInventory, MoreInventoryMod.arrowHolder)].damageItem(1, player);
-				}
-
-				if (!world.isRemote)
-				{
-					world.spawnEntityInWorld(entity);
-				}
-
-				event.setCanceled(true);
+				return;
 			}
+
+			if (f > 1.0F)
+			{
+				f = 1.0F;
+			}
+
+			EntityArrow entity = new EntityArrow(world, player, f * 2.0F);
+
+			if (f == 1.0F)
+			{
+				entity.setIsCritical(true);
+			}
+
+			int i = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, bow);
+
+			if (i > 0)
+			{
+				entity.setDamage(entity.getDamage() + (double) i * 0.5D + 0.5D);
+			}
+
+			i = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, bow);
+
+			if (i > 0)
+			{
+				entity.setKnockbackStrength(i);
+			}
+
+			if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, bow) > 0)
+			{
+				entity.setFire(100);
+			}
+
+			bow.damageItem(1, player);
+			world.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (eventRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+
+			if (!player.capabilities.isCreativeMode)
+			{
+				player.inventory.mainInventory[MIMUtils.getFirstSlot(player.inventory.mainInventory, MoreInventoryMod.arrowHolder)].damageItem(1, player);
+			}
+
+			if (!world.isRemote)
+			{
+				world.spawnEntityInWorld(entity);
+			}
+
+			event.setCanceled(true);
 		}
 	}
 
 	@SubscribeEvent
 	public void onArrowNock(ArrowNockEvent event)
 	{
-		if (event.result != null && event.result.getItem() == Items.bow)
-		{
-			EntityPlayer player = event.entityPlayer;
+		EntityPlayer player = event.entityPlayer;
+		ItemStack result = event.result;
 
-			if (player.inventory.hasItem(MoreInventoryMod.arrowHolder))
-			{
-				player.setItemInUse(event.result, event.result.getMaxItemUseDuration());
-			}
+		if (result != null && result.getItem() == Items.bow && player.inventory.hasItem(MoreInventoryMod.arrowHolder))
+		{
+			player.setItemInUse(result, result.getMaxItemUseDuration());
 		}
 	}
 

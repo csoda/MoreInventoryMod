@@ -15,9 +15,11 @@ import net.minecraft.client.particle.EntityDiggingFX;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
@@ -27,6 +29,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import java.util.Random;
+
 public class BlockCatchall extends BlockContainer
 {
 	public BlockCatchall(Material material)
@@ -35,6 +39,7 @@ public class BlockCatchall extends BlockContainer
 		this.setStepSound(soundTypeWood);
 		this.setHardness(1.0F);
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 0.75F, 1.0F);
+		this.setHarvestLevel("axe", 0);
 		this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
@@ -100,6 +105,18 @@ public class BlockCatchall extends BlockContainer
 	}
 
 	@Override
+	public int quantityDropped(Random random)
+	{
+		return 0;
+	}
+
+	@Override
+	public Item getItemDropped(int damage, Random random, int fortune)
+	{
+		return null;
+	}
+
+	@Override
 	public float getBlockHardness(World world, int x, int y, int z)
 	{
 		TileEntity tile = world.getTileEntity(x, y, z);
@@ -147,6 +164,25 @@ public class BlockCatchall extends BlockContainer
 	public int getRenderType()
 	{
 		return -2;
+	}
+
+	@Override
+	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
+	{
+		if (!world.isRemote && !player.capabilities.isCreativeMode && willHarvest)
+		{
+			TileEntity tile = world.getTileEntity(x, y, z);
+
+			if (tile != null && tile instanceof TileEntityCatchall)
+			{
+				EntityItem item = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, CatchallType.createItemStack(((TileEntityCatchall)tile).getTypeName()));
+				item.delayBeforeCanPickup = 20;
+
+				world.spawnEntityInWorld(item);
+			}
+		}
+
+		return super.removedByPlayer(world, player, x, y, z, willHarvest);
 	}
 
 	@Override

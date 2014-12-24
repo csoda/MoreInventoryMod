@@ -1,5 +1,7 @@
 package moreinventory.tileentity;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
 import moreinventory.network.CatchallMessage;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +16,9 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 {
 	private String typeName;
 	private ItemStack[] containerItems = new ItemStack[36];
+
+	@SideOnly(Side.CLIENT)
+	public ItemStack[] displayedItems;
 
 	public String getTypeName()
 	{
@@ -133,7 +138,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	public boolean isFilled()
 	{
-		for (int i = 0; i < containerItems.length; i++)
+		for (int i = 0; i < containerItems.length; ++i)
 		{
 			if (getStackInSlot(i) != null)
 			{
@@ -227,7 +232,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 			if (containerItems[i] != null)
 			{
 				NBTTagCompound data = new NBTTagCompound();
-				data.setByte("Slot", (byte) i);
+				data.setByte("Slot", (byte)i);
 				containerItems[i].writeToNBT(data);
 				list.appendTag(data);
 			}
@@ -245,7 +250,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	public void handlePacketData(String type, ItemStack[] items)
 	{
 		typeName = type;
-		containerItems = items;
+		displayedItems = items;
 	}
 
 	@Override
