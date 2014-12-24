@@ -15,14 +15,14 @@ public class ContainerCatchall extends Container
 	{
 		this.catchall = tile;
 
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < 9; ++i)
 		{
 			this.addSlotToContainer(new Slot(tile, i, 8 + i * 18, 72 + 4));
 		}
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; ++i)
 		{
-			for (int j = 0; j < 9; j++)
+			for (int j = 0; j < 9; ++j)
 			{
 				this.addSlotToContainer(new Slot(tile, j + i * 9 + 9, 8 + j * 18, 18 + i * 18));
 			}
@@ -39,15 +39,15 @@ public class ContainerCatchall extends Container
 
 	protected void bindPlayerInventory(InventoryPlayer inventory)
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; ++i)
 		{
-			for (int j = 0; j < 9; j++)
+			for (int j = 0; j < 9; ++j)
 			{
 				addSlotToContainer(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 108 + i * 18));
 			}
 		}
 
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < 9; ++i)
 		{
 			addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 162 + 4));
 		}
