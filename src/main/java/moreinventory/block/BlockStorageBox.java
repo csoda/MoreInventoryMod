@@ -53,6 +53,7 @@ public class BlockStorageBox extends BlockContainer
 		super(material);
 		this.setBlockTextureName("moreinv:storagebox");
 		this.setHardness(2.0F);
+		this.setHarvestLevel("pickaxe", 0);
         this.setCreativeTab(MoreInventoryMod.tabMoreInventoryMod);
 	}
 
