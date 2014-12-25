@@ -2,7 +2,6 @@ package moreinventory.handler;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
@@ -11,6 +10,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
 import moreinventory.core.MoreInventoryMod;
+import moreinventory.entity.EntityMIMArrow;
 import moreinventory.inventory.InventoryPouch;
 import moreinventory.network.ConfigSyncMessage;
 import moreinventory.network.PlayerNameCacheMessage;
@@ -36,9 +36,7 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeVersion.Status;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
@@ -125,70 +123,6 @@ public class MIMEventHooks
 	}
 
 	@SubscribeEvent
-	public void onLivingUpdate(LivingUpdateEvent event)
-	{
-		if (event.entityLiving instanceof EntityPlayerMP)
-		{
-			EntityPlayerMP player = (EntityPlayerMP)event.entityLiving;
-
-			if (Config.isCollectArrow.contains(player.getUniqueID().toString()))
-			{
-				WorldServer world = player.getServerForPlayer();
-
-				for (Object obj : world.getEntitiesWithinAABB(EntityArrow.class, player.boundingBox.expand(1.0D, 0.1D, 1.0D)))
-				{
-					EntityArrow arrow = (EntityArrow)obj;
-
-					if ((boolean)ObfuscationReflectionHelper.getPrivateValue(EntityArrow.class, arrow, "inGround", "field_70254_i") && arrow.arrowShake <= 0)
-					{
-						boolean flag = arrow.canBePickedUp == 1 || arrow.canBePickedUp == 2 && player.capabilities.isCreativeMode;
-
-						if (arrow.canBePickedUp == 1 && !player.inventory.hasItem(MoreInventoryMod.arrowHolder))
-						{
-							flag = false;
-						}
-
-						if (flag)
-						{
-							ItemStack itemstack = player.getCurrentEquippedItem();
-
-							if (itemstack != null && itemstack.getItem() == MoreInventoryMod.arrowHolder)
-							{
-								player.swingItem();
-							}
-
-							flag = false;
-
-							for (int i = 0; i < player.inventory.getSizeInventory(); ++i)
-							{
-								itemstack = player.inventory.getStackInSlot(i);
-
-								if (itemstack != null && itemstack.getItem() == MoreInventoryMod.arrowHolder)
-								{
-									int damage = itemstack.getItemDamage();
-
-									if (damage >= 1)
-									{
-										itemstack.setItemDamage(damage - 1);
-										flag = true;
-										break;
-									}
-								}
-							}
-
-							if (flag)
-							{
-								arrow.playSound("random.pop", 0.2F, ((eventRand.nextFloat() - eventRand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-								arrow.setDead();
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	@SubscribeEvent
 	public void onItemPickup(EntityItemPickupEvent event)
 	{
 		if (event.entityPlayer instanceof EntityPlayerMP)
@@ -264,7 +198,7 @@ public class MIMEventHooks
 				f = 1.0F;
 			}
 
-			EntityArrow entity = new EntityArrow(world, player, f * 2.0F);
+			EntityArrow entity = new EntityMIMArrow(world, player, f * 2.0F);
 
 			if (f == 1.0F)
 			{

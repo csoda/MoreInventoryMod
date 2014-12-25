@@ -81,6 +81,9 @@ pouch13.name=茶色のポーチ
 pouch14.name=緑色のポーチ
 pouch15.name=赤色のポーチ
 pouch16.name=黒色のポーチ
+pouch.gui.config1.tooltip=有効にすると、コンテナはこのポーチからも収集します。
+pouch.gui.config2.tooltip=有効にすると、このポーチはスニークしながら使用した時にプレイヤーのインベントリから登録されたアイテムを収集します。
+pouch.gui.config3.tooltip=有効にすると、このポーチは登録されたアイテムを拾った時に自動収集します。
 
 painting.name=メッキ
 painting:Iron.name=鉄メッキ

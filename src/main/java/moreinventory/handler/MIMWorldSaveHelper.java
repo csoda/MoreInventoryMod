@@ -39,15 +39,15 @@ public class MIMWorldSaveHelper
 
 	public void saveData()
 	{
-		try
+		NBTTagCompound nbt = new NBTTagCompound();
+
+		for (INBTSaveData save : saveList)
 		{
-			NBTTagCompound nbt = new NBTTagCompound();
+			save.writeToNBT(nbt);
+		}
 
-			for (INBTSaveData save : saveList)
-			{
-				save.writeToNBT(nbt);
-			}
-
+		try (FileOutputStream output = new FileOutputStream(saveFile))
+		{
 			if (!saveFile.getParentFile().exists())
 			{
 				saveFile.getParentFile().mkdirs();
@@ -58,7 +58,7 @@ public class MIMWorldSaveHelper
 				saveFile.createNewFile();
 			}
 
-			CompressedStreamTools.writeCompressed(nbt, new FileOutputStream(saveFile));
+			CompressedStreamTools.writeCompressed(nbt, output);
 		}
 		catch (IOException e)
 		{
@@ -68,26 +68,21 @@ public class MIMWorldSaveHelper
 
 	public void loadData()
 	{
-		try
+		if (saveFile.exists())
 		{
-			if (!saveFile.getParentFile().exists())
+			try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(saveFile)))
 			{
-				saveFile.getParentFile().mkdirs();
-			}
-
-			if (saveFile.exists())
-			{
-				NBTTagCompound nbt = CompressedStreamTools.readCompressed(new BufferedInputStream(new FileInputStream(saveFile)));
+				NBTTagCompound nbt = CompressedStreamTools.readCompressed(input);
 
 				for (INBTSaveData save : saveList)
 				{
 					save.readFromNBT(nbt);
 				}
 			}
-		}
-		catch (IOException e)
-		{
-			MIMLog.log(Level.ERROR, e, "An error occurred trying to load the " + FilenameUtils.getBaseName(saveFile.getName()));
+			catch (IOException e)
+			{
+				MIMLog.log(Level.ERROR, e, "An error occurred trying to load the " + FilenameUtils.getBaseName(saveFile.getName()));
+			}
 		}
 	}
 }

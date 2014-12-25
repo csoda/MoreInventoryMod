@@ -60,7 +60,7 @@ public class GuiStorageBox extends GuiContainer
 		}
 
 		nbtButton.xPosition = guiLeft + 75;
-		nbtButton.yPosition = guiTop + 35;
+		nbtButton.yPosition = privateButton.yPosition;
 
 		if (insertButton == null)
 		{
@@ -68,7 +68,7 @@ public class GuiStorageBox extends GuiContainer
 		}
 
 		insertButton.xPosition = guiLeft + 107;
-		insertButton.yPosition = guiTop + 35;
+		insertButton.yPosition = privateButton.yPosition;
 
 		buttonList.add(privateButton);
 		buttonList.add(nbtButton);
@@ -90,9 +90,20 @@ public class GuiStorageBox extends GuiContainer
 			nbtButton.enabled = false;
 		}
 
-		privateHover = new HoverChecker(privateButton, 800);
-		nbtHover = new HoverChecker(nbtButton, 800);
-		insertHover = new HoverChecker(insertButton, 800);
+		if (privateHover == null)
+		{
+			privateHover = new HoverChecker(privateButton, 800);
+		}
+
+		if (nbtHover == null)
+		{
+			nbtHover = new HoverChecker(nbtButton, 800);
+		}
+
+		if (insertHover == null)
+		{
+			insertHover = new HoverChecker(insertButton, 800);
+		}
 	}
 
 	@Override
