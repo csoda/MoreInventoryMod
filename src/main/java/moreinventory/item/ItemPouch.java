@@ -76,6 +76,13 @@ public class ItemPouch extends Item
 	@Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer player)
 	{
+		if (player.isSneaking())
+		{
+			new InventoryPouch(player.getCurrentEquippedItem()).collectAllItemStack(player.inventory, true);
+
+			player.swingItem();
+		}
+
 		if (!world.isRemote)
 		{
 			player.openGui(MoreInventoryMod.instance, 1, world, 0, 0, 0);

@@ -81,6 +81,9 @@ pouch13.name=Brown Pouch
 pouch14.name=Green Pouch
 pouch15.name=Red Pouch
 pouch16.name=Black Pouch
+pouch.gui.config1.tooltip=If enabled, container box can collect from this pouch.
+pouch.gui.config2.tooltip=If enabled, this pouch can collect from your player inventory when sneak and use.
+pouch.gui.config3.tooltip=If enabled, this pouch will collect registered items when you picked up item.
 
 painting.name=Paint
 painting:Iron.name=Iron Paint

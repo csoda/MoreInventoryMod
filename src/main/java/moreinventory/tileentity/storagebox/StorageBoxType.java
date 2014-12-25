@@ -139,8 +139,7 @@ public  class StorageBoxType
 
 		/* recipe */
 		ItemStack stoneslab = new ItemStack(Blocks.stone_slab);
-		ItemStack woodStorageBox = new ItemStack(MoreInventoryMod.storageBox);
-		ItemBlockStorageBox.writeToNBT(woodStorageBox, "Wood");
+		ItemStack woodStorageBox = ItemBlockStorageBox.writeToNBT(new ItemStack(MoreInventoryMod.storageBox), "Wood");
 
 		for (Entry<String, StorageBoxType> type : types)
 		{
