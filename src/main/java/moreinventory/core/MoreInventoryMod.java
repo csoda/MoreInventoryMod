@@ -52,6 +52,7 @@ import moreinventory.network.StorageBoxConfigMessage;
 import moreinventory.network.StorageBoxContentsMessage;
 import moreinventory.network.StorageBoxMessage;
 import moreinventory.network.TransportManagerMessage;
+import moreinventory.plugin.appeng.AppEngPlugin;
 import moreinventory.recipe.RecipeHolderEject;
 import moreinventory.recipe.RecipePouch;
 import moreinventory.tileentity.TileEntityCatchall;
@@ -60,6 +61,7 @@ import moreinventory.tileentity.TileEntityImporter;
 import moreinventory.tileentity.TileEntityTransportManager;
 import moreinventory.tileentity.storagebox.StorageBoxType;
 import moreinventory.tileentity.storagebox.addon.EnumSBAddon;
+import moreinventory.util.MIMLog;
 import moreinventory.util.PlayerNameCache;
 import moreinventory.util.Version;
 import net.minecraft.block.BlockDispenser;
@@ -85,6 +87,7 @@ import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import org.apache.logging.log4j.Level;
 
 import java.util.Map.Entry;
 
@@ -92,7 +95,7 @@ import java.util.Map.Entry;
 (
 	modid = MoreInventoryMod.MODID,
 	acceptedMinecraftVersions = "[1.7.10,)",
-	dependencies = "after:InvTweaks",
+	dependencies = "after:InvTweaks;after:" + AppEngPlugin.MODID,
 	guiFactory = "moreinventory.client.config.MIMGuiFactory",
 	useMetadata = true
 )
@@ -434,12 +437,24 @@ public class MoreInventoryMod
 				}
 			}
 		}
+
+		proxy.registerRenderers();
 	}
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event)
 	{
-		proxy.registerRenderers();
+		try
+		{
+			if (AppEngPlugin.enabled())
+			{
+				AppEngPlugin.invoke();
+			}
+		}
+		catch (Throwable e)
+		{
+			MIMLog.log(Level.WARN, e, "Failed to trying invoke plugin: AppEngPlugin");
+		}
 	}
 
 	@EventHandler
