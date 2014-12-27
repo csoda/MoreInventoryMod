@@ -8,14 +8,16 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
+import moreinventory.entity.EntityMinecartStorageBox;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 public class StorageBoxContentsMessage implements IMessage, IMessageHandler<StorageBoxContentsMessage, IMessage>
 {
-	private int x, y, z;
+	private int x, y, z, entityId;
 	private ItemStack itemstack;
 
 	public StorageBoxContentsMessage() {}
@@ -28,12 +30,19 @@ public class StorageBoxContentsMessage implements IMessage, IMessageHandler<Stor
 		this.itemstack = itemstack;
 	}
 
+	public StorageBoxContentsMessage(int id, ItemStack itemstack)
+	{
+		this.entityId = id;
+		this.itemstack = itemstack;
+	}
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
 		x = buf.readInt();
 		y = buf.readInt();
 		z = buf.readInt();
+		entityId = buf.readInt();
 		itemstack = ByteBufUtils.readItemStack(buf);
 	}
 
@@ -43,6 +52,7 @@ public class StorageBoxContentsMessage implements IMessage, IMessageHandler<Stor
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
+		buf.writeInt(entityId);
 		ByteBufUtils.writeItemStack(buf, itemstack);
 	}
 
@@ -51,11 +61,24 @@ public class StorageBoxContentsMessage implements IMessage, IMessageHandler<Stor
 	public IMessage onMessage(StorageBoxContentsMessage message, MessageContext ctx)
 	{
 		WorldClient world = FMLClientHandler.instance().getWorldClient();
-		TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
 
-		if (tile != null && tile instanceof TileEntityStorageBox)
+		if (message.entityId > 0)
 		{
-			((TileEntityStorageBox)tile).handlePacketContents(message.itemstack);
+			Entity entity = world.getEntityByID(message.entityId);
+
+			if (entity != null && entity instanceof EntityMinecartStorageBox)
+			{
+				((EntityMinecartStorageBox)entity).handlePacketContents(message.itemstack);
+			}
+		}
+		else
+		{
+			TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
+
+			if (tile != null && tile instanceof TileEntityStorageBox)
+			{
+				((TileEntityStorageBox)tile).handlePacketContents(message.itemstack);
+			}
 		}
 
 		return null;

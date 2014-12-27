@@ -101,7 +101,10 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	{
 		for (int i = 0; i < getSizeInventory(); ++i)
 		{
-			setInventorySlotContents(i, player.inventory.getStackInSlotOnClosing(i));
+			if (getStackInSlot(i) == null && player.inventory.getStackInSlot(i) != null)
+			{
+				setInventorySlotContents(i, player.inventory.getStackInSlotOnClosing(i));
+			}
 		}
 
 		player.onUpdate();
@@ -111,7 +114,10 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	{
 		for (int i = 0; i < getSizeInventory(); ++i)
 		{
-			player.inventory.setInventorySlotContents(i, getStackInSlotOnClosing(i));
+			if (player.inventory.getStackInSlot(i) == null && getStackInSlot(i) != null)
+			{
+				player.inventory.setInventorySlotContents(i, getStackInSlotOnClosing(i));
+			}
 		}
 
 		player.onUpdate();
@@ -138,7 +144,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 
 	public boolean isFilled()
 	{
-		for (int i = 0; i < containerItems.length; ++i)
+		for (int i = 0; i < getSizeInventory(); ++i)
 		{
 			if (getStackInSlot(i) != null)
 			{
@@ -153,7 +159,7 @@ public class TileEntityCatchall extends TileEntity implements IInventory
 	{
 		for (int i = 0; i < getSizeInventory(); ++i)
 		{
-			if (getStackInSlot(i) != null && player.inventory.mainInventory[i] != null)
+			if (getStackInSlot(i) != null && player.inventory.getStackInSlot(i) != null)
 			{
 				return false;
 			}

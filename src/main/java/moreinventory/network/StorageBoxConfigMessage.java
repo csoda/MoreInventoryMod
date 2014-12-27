@@ -8,13 +8,15 @@ import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
+import moreinventory.entity.EntityMinecartStorageBox;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 
 public class StorageBoxConfigMessage implements IMessage, IMessageHandler<StorageBoxConfigMessage, IMessage>
 {
-	private int x, y, z, connect;
+	private int x, y, z, entityId, connect;
 	private boolean isPrivate, checkNBT, canInsert;
 	private String owner;
 
@@ -32,12 +34,21 @@ public class StorageBoxConfigMessage implements IMessage, IMessageHandler<Storag
 		this.owner = owner;
 	}
 
+	public StorageBoxConfigMessage(int id, boolean checkNBT, boolean canInsert, String owner)
+	{
+		this.entityId = id;
+		this.checkNBT = checkNBT;
+		this.canInsert = canInsert;
+		this.owner = owner;
+	}
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
 		x = buf.readInt();
 		y = buf.readInt();
 		z = buf.readInt();
+		entityId = buf.readInt();
 		isPrivate = buf.readBoolean();
 		checkNBT = buf.readBoolean();
 		canInsert = buf.readBoolean();
@@ -51,6 +62,7 @@ public class StorageBoxConfigMessage implements IMessage, IMessageHandler<Storag
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
+		buf.writeInt(entityId);
 		buf.writeBoolean(isPrivate);
 		buf.writeBoolean(checkNBT);
 		buf.writeBoolean(canInsert);
@@ -63,11 +75,24 @@ public class StorageBoxConfigMessage implements IMessage, IMessageHandler<Storag
 	public IMessage onMessage(StorageBoxConfigMessage message, MessageContext ctx)
 	{
 		WorldClient world = FMLClientHandler.instance().getWorldClient();
-		TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
 
-		if (tile != null && tile instanceof TileEntityStorageBox)
+		if (message.entityId > 0)
 		{
-			((TileEntityStorageBox)tile).handlePacketConfig(message.isPrivate, message.checkNBT, message.canInsert, message.connect, message.owner);
+			Entity entity = world.getEntityByID(message.entityId);
+
+			if (entity != null && entity instanceof EntityMinecartStorageBox)
+			{
+				((EntityMinecartStorageBox)entity).handlePacketConfig(message.checkNBT, message.canInsert, message.owner);
+			}
+		}
+		else
+		{
+			TileEntity tile = world.getTileEntity(message.x, message.y, message.z);
+
+			if (tile != null && tile instanceof TileEntityStorageBox)
+			{
+				((TileEntityStorageBox)tile).handlePacketConfig(message.isPrivate, message.checkNBT, message.canInsert, message.connect, message.owner);
+			}
 		}
 
 		return null;
