@@ -1,5 +1,6 @@
 package moreinventory.tileentity.storagebox;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import cpw.mods.fml.common.registry.GameRegistry;
 import moreinventory.core.MoreInventoryMod;
@@ -50,7 +51,7 @@ public  class StorageBoxType
 
 	public static boolean isExistType(String type)
 	{
-		return types.containsKey(type);
+		return !Strings.isNullOrEmpty(type) && types.containsKey(type);
 	}
 
 	public static int getInventorySize(String type)

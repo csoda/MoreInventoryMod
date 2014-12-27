@@ -29,7 +29,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 
-@Interface(iface = "appeng.api.storage.IMEInventory", modid = AppEngPlugin.MODID, striprefs = true)
+@Interface(iface = "appeng.api.storage.IMEInventory", modid = AppEngPlugin.MODID)
 public class TileEntityStorageBox extends TileEntity implements IInventory, IStorageBoxNet, IMEInventory<IAEItemStack>
 {
 	protected ItemStack[] storageItems;

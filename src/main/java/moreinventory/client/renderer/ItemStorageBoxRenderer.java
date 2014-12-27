@@ -18,7 +18,7 @@ public class ItemStorageBoxRenderer implements IItemRenderer
 {
 	public static final Map<String, ResourceLocation> textureMap = Maps.newHashMap();
 
-	private final ModelItemStorageBox model = new ModelItemStorageBox();;
+	private final ModelItemStorageBox model = new ModelItemStorageBox();
 
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type)

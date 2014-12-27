@@ -191,6 +191,8 @@ public class MoreInventoryMod
 			GameRegistry.registerTileEntity(EnumSBAddon.values()[i].clazz, "moreinventory." + EnumSBAddon.values()[i].name());
 		}
 
+//		EntityRegistry.registerModEntity(EntityMinecartStorageBox.class, "EntityMinecartStorageBox", 0, this, 128, 1, true);
+
 		BlockDispenser.dispenseBehaviorRegistry.putObject(arrowHolder, new BehaviorProjectileDispense()
 		{
 			@Override
