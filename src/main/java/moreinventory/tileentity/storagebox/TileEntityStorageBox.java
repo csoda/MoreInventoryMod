@@ -1,13 +1,5 @@
 package moreinventory.tileentity.storagebox;
 
-import appeng.api.AEApi;
-import appeng.api.config.Actionable;
-import appeng.api.networking.security.BaseActionSource;
-import appeng.api.storage.IMEInventory;
-import appeng.api.storage.StorageChannel;
-import appeng.api.storage.data.IAEItemStack;
-import appeng.api.storage.data.IItemList;
-import cpw.mods.fml.common.Optional.Interface;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.MoreInventoryMod;
@@ -16,7 +8,6 @@ import moreinventory.network.StorageBoxButtonMessage;
 import moreinventory.network.StorageBoxConfigMessage;
 import moreinventory.network.StorageBoxContentsMessage;
 import moreinventory.network.StorageBoxMessage;
-import moreinventory.plugin.appeng.AppEngPlugin;
 import moreinventory.util.MIMUtils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,8 +20,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Facing;
 import net.minecraft.world.World;
 
-@Interface(iface = "appeng.api.storage.IMEInventory", modid = AppEngPlugin.MODID)
-public class TileEntityStorageBox extends TileEntity implements IInventory, IStorageBoxNet, IMEInventory<IAEItemStack>
+public class TileEntityStorageBox extends TileEntity implements IInventory, IStorageBoxNet
 {
 	protected ItemStack[] storageItems;
 
@@ -754,147 +744,5 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	public void sendGUIPacketToServer(byte channel)
 	{
 		MoreInventoryMod.network.sendToServer(new StorageBoxButtonMessage(xCoord, yCoord, zCoord, channel));
-	}
-
-	@Override
-	public IAEItemStack injectItems(IAEItemStack input, Actionable type, BaseActionSource src)
-	{
-		boolean flag = type == Actionable.MODULATE;
-		ItemStack out = flag ? input.getItemStack() : input.getItemStack().copy();
-		int max = getSizeInventory();
-
-		for (int i = 0; i < max; ++i)
-		{
-			if (isItemValidForSlot(i, out))
-			{
-				ItemStack itemstack = getStackInSlot(i);
-
-				if (itemstack == null)
-				{
-					int size = out.stackSize;
-
-					if (size > getInventoryStackLimit())
-					{
-						size = getInventoryStackLimit();
-					}
-
-					out.stackSize -= size;
-
-					if (out.stackSize <= 0)
-					{
-						return null;
-					}
-				}
-				else if (input.isSameType(itemstack))
-				{
-					int original = itemstack.stackSize;
-					int size = original + out.stackSize;
-
-					if (size > getInventoryStackLimit())
-					{
-						size = getInventoryStackLimit();
-					}
-
-					if (size > itemstack.getMaxStackSize())
-					{
-						size = itemstack.getMaxStackSize();
-					}
-
-					out.stackSize -= size - original;
-
-					if (out.stackSize <= 0)
-					{
-						return null;
-					}
-				}
-			}
-		}
-
-		return AEApi.instance().storage().createItemStack(out);
-	}
-
-	@Override
-	public IAEItemStack extractItems(IAEItemStack request, Actionable type, BaseActionSource src)
-	{
-		boolean flag = type == Actionable.MODULATE;
-		ItemStack gathered, req = flag ? request.getItemStack() : request.getItemStack().copy();
-
-		int size = req.stackSize;
-
-		if (size > req.getMaxDamage())
-		{
-			size = req.getMaxStackSize();
-		}
-
-		req.stackSize = size;
-
-		gathered = flag ? request.getItemStack() : request.getItemStack().copy();
-		gathered.stackSize = 0;
-
-		int max = getSizeInventory();
-
-		for (int i = 0; i < max; ++i)
-		{
-			ItemStack itemstack = flag ? getStackInSlot(i) : ItemStack.copyItemStack(getStackInSlot(i));
-
-			if (itemstack != null && request.isSameType(itemstack))
-			{
-				ItemStack retrieved;
-
-				if (itemstack.stackSize < req.stackSize)
-				{
-					retrieved = itemstack.copy();
-					itemstack.stackSize = 0;
-				}
-				else
-				{
-					retrieved = itemstack.splitStack(req.stackSize);
-				}
-
-				if (flag)
-				{
-					if (itemstack.stackSize <= 0)
-					{
-						setInventorySlotContents(i, null);
-					}
-					else
-					{
-						setInventorySlotContents(i, itemstack);
-					}
-				}
-
-				gathered.stackSize += retrieved.stackSize;
-				req.stackSize -= retrieved.stackSize;
-
-				if (size == gathered.stackSize)
-				{
-					return AEApi.instance().storage().createItemStack(gathered);
-				}
-			}
-		}
-
-		if (gathered.stackSize <= 0)
-		{
-			return null;
-		}
-
-		return AEApi.instance().storage().createItemStack(gathered);
-	}
-
-	@Override
-	public IItemList<IAEItemStack> getAvailableItems(IItemList<IAEItemStack> out)
-	{
-		for (int i = 0; i < getSizeInventory(); ++i)
-		{
-			out.addStorage(AEApi.instance().storage().createItemStack(getStackInSlot(i)));
-		}
-
-		return out;
-	}
-
-	@Override
-	public StorageChannel getChannel()
-	{
-		return StorageChannel.ITEMS;
 	}
 }
