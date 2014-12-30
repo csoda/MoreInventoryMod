@@ -5,7 +5,6 @@ import cpw.mods.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientConnectedToServerEvent;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import moreinventory.core.Config;
@@ -82,17 +81,19 @@ public class MIMEventHooks
 	}
 
 	@SubscribeEvent
-	public void onServerConnect(ServerConnectionFromClientEvent event)
-	{
-		NBTTagCompound data = new NBTTagCompound();
-		MoreInventoryMod.playerNameCache.writeToNBT(data);
-		event.manager.scheduleOutboundPacket(MoreInventoryMod.network.getPacketFrom(new PlayerNameCacheMessage(data)));
-	}
-
-	@SubscribeEvent
 	public void onPlayerLoggedIn(PlayerLoggedInEvent event)
 	{
-		MoreInventoryMod.playerNameCache.refreshOwner(event.player);
+		EntityPlayer player = event.player;
+
+		MoreInventoryMod.playerNameCache.refreshOwner(player);
+
+		if (player instanceof EntityPlayerMP)
+		{
+			NBTTagCompound data = new NBTTagCompound();
+			MoreInventoryMod.playerNameCache.writeToNBT(data);
+
+			MoreInventoryMod.network.sendTo(new PlayerNameCacheMessage(data), (EntityPlayerMP)player);
+		}
 	}
 
 	@SubscribeEvent

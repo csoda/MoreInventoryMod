@@ -16,18 +16,16 @@ public class RecipeHolderEject extends ShapelessRecipes
 	@Override
 	public ItemStack getCraftingResult(InventoryCrafting crafting)
 	{
-		ItemStack itemstack = null;
-
 		for (int i = 0; i < crafting.getSizeInventory(); ++i)
 		{
 			ItemStack item = crafting.getStackInSlot(i);
 
 			if (item != null && item.getItem() == ((ItemStack)recipeItems.get(0)).getItem() && item.getItemDamage() < item.getMaxDamage() - 2)
 			{
-				itemstack = getRecipeOutput().copy();
+				return getRecipeOutput().copy();
 			}
 		}
 
-		return itemstack;
+		return null;
 	}
 }
