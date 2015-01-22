@@ -23,6 +23,12 @@ public class TileEntityTeleporter extends TileEntitySBAddonBase
 	}
 
 	@Override
+	public String getSBNetID()
+	{
+		return "Teleporter";
+	}
+
+	@Override
 	public void setStorageBoxNetworkManager(StorageBoxNetworkManager manager)
 	{
 		super.setStorageBoxNetworkManager(manager);

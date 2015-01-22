@@ -11,11 +11,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 public class StorageBoxNetworkManager
 {
 	private final String ownerID;
-	private final MIMItemBoxList storageBoxList = new MIMItemBoxList();
-	private final MIMBoxList addonList = new MIMBoxList();
+	private final Map<String, MIMBoxList> networkMap = new HashMap();
+
 
 	public StorageBoxNetworkManager(World world, int x, int y, int z, String uuid)
 	{
@@ -25,19 +29,31 @@ public class StorageBoxNetworkManager
 
 	public MIMItemBoxList getBoxList()
 	{
-		return storageBoxList;
+		return (MIMItemBoxList) getListFromID("StorageBox");
 	}
 
-	public MIMBoxList getAddonList()
+	public MIMBoxList getListFromID(String id)
 	{
-		return addonList;
+		if(networkMap.containsKey(id))
+		{
+			return networkMap.get(id);
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	public MIMBoxList getKnownList()
 	{
 		MIMBoxList list = new MIMBoxList();
-		list.addAllBox(storageBoxList);
-		list.addAllBox(addonList);
+
+		Set<Map.Entry <String, MIMBoxList>> networkSet = networkMap.entrySet();
+
+		for (Map.Entry<String, MIMBoxList> set : networkSet)
+		{
+			list.addAllBox(set.getValue());
+		}
 
 		return list;
 	}
@@ -54,16 +70,7 @@ public class StorageBoxNetworkManager
 			{
 				if (!storage.isPrivate() || storage.getOwner().equals(MoreInventoryMod.defaultOwnerID) || storage.getOwner().equals(ownerID))
 				{
-					if (tile instanceof TileEntityStorageBox)
-					{
-						storageBoxList.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId, ((TileEntityStorageBox)tile).getContents());
-					}
-
-					if (storage instanceof IStorageBoxAddon)
-					{
-						addonList.addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
-					}
-
+					addToNetWork(tile);
 					storage.setStorageBoxNetworkManager(this);
 				}
 			}
@@ -79,6 +86,36 @@ public class StorageBoxNetworkManager
 			}
 		}
 	}
+
+	private void addToNetWork(TileEntity tile)
+	{
+
+		String id = ((IStorageBoxNet)tile).getSBNetID();
+
+		if (!networkMap.containsKey(id))
+		{
+			if ("StorageBox".equals(id))
+			{
+				networkMap.put(id, new MIMItemBoxList());
+			}
+			else
+			{
+				networkMap.put(id, new MIMBoxList());
+			}
+		}
+
+		if ("StorageBox".equals(id))
+		{
+			((MIMItemBoxList)networkMap.get(id)).addBox(tile.xCoord, tile.yCoord, tile.zCoord,
+					tile.getWorldObj().provider.dimensionId, ((TileEntityStorageBox) tile).getContents());
+		}
+		else
+		{
+			networkMap.get(id).addBox(tile.xCoord, tile.yCoord, tile.zCoord, tile.getWorldObj().provider.dimensionId);
+		}
+
+	}
+
 
 	public void addNetwork(World world, int x, int y, int z)
 	{
@@ -116,11 +153,11 @@ public class StorageBoxNetworkManager
 
 		if (itemstack != null)
 		{
-			for (int i = 0; i < storageBoxList.getListSize(); i++)
+			for (int i = 0; i < getBoxList().getListSize(); i++)
 			{
-				if (MIMUtils.compareStacksWithDamage(itemstack, storageBoxList.getItem(i)))
+				if (MIMUtils.compareStacksWithDamage(itemstack, getBoxList().getItem(i)))
 				{
-					TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
+					TileEntityStorageBox tile = (TileEntityStorageBox)getBoxList().getTileBeyondDim(i);
 
 					if (tile != null)
 					{
@@ -179,11 +216,11 @@ public class StorageBoxNetworkManager
 
 		if (register)
 		{
-			for (int i = 0; i < storageBoxList.getListSize(); ++i)
+			for (int i = 0; i < getBoxList().getListSize(); ++i)
 			{
-				if (storageBoxList.getItem(i) == null)
+				if (getBoxList().getItem(i) == null)
 				{
-					TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
+					TileEntityStorageBox tile = (TileEntityStorageBox)getBoxList().getTileBeyondDim(i);
 
 					if (!StorageBoxType.compareTypes(tile, "Glass") && !StorageBoxType.compareTypes(tile, "Ender") && tile.getContents() == null)
 					{
@@ -203,11 +240,11 @@ public class StorageBoxNetworkManager
 
 	protected boolean canLinkedImport(ItemStack itemstack, TileEntityStorageBox storageBox)
 	{
-		for (int i = 0; i < storageBoxList.getListSize(); i++)
+		for (int i = 0; i < getBoxList().getListSize(); i++)
 		{
-			if (MIMUtils.compareStacksWithDamage(itemstack, storageBoxList.getItem(i)))
+			if (MIMUtils.compareStacksWithDamage(itemstack, getBoxList().getItem(i)))
 			{
-				TileEntityStorageBox tile = (TileEntityStorageBox)storageBoxList.getTileBeyondDim(i);
+				TileEntityStorageBox tile = (TileEntityStorageBox)getBoxList().getTileBeyondDim(i);
 
 				if (tile != null && tile != storageBox && tile.canMergeItemStack(itemstack))
 				{

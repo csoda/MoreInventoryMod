@@ -6,7 +6,9 @@ public interface IStorageBoxNet
 
 	public void setStorageBoxNetworkManager(StorageBoxNetworkManager SBNetManager);
 
-	public String getOwner(); //UUID
+	public String getOwner();
 
 	public boolean isPrivate();
+
+	public String getSBNetID();
 }

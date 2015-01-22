@@ -102,6 +102,12 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		return isPrivate;
 	}
 
+	@Override
+	public String getSBNetID()
+	{
+		return "StorageBox";
+	}
+
 	public void rotateBlock()
 	{
 		face = (byte)(face == 2 ? 5 : face == 5 ? 3 : face == 3 ? 4 : 2);
