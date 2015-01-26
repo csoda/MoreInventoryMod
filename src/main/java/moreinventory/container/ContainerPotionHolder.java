@@ -1,6 +1,7 @@
 package moreinventory.container;
 
 import moreinventory.inventory.InventoryPotionHolder;
+import moreinventory.slot.SlotDisplay;
 import moreinventory.slot.SlotPotion;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -39,7 +40,14 @@ public class ContainerPotionHolder extends Container
 
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 138 + 4));
+			if (i != inventory.currentItem)
+			{
+				addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 138 + 4));
+			}
+			else
+			{
+				addSlotToContainer(new SlotDisplay(inventory, i, 8 + i * 18, 138 + 4));
+			}
 		}
 	}
 

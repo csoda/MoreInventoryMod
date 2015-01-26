@@ -8,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 
+import java.util.Arrays;
+
 public class TileEntityExporter extends TileEntityTransportManager
 {
 	private final int[] boxPos = new int[3];
@@ -30,7 +32,7 @@ public class TileEntityExporter extends TileEntityTransportManager
 					currentSlot = 0;
 				}
 
-				if (itemstack != null && getBoxPos(itemstack))
+				if (itemstack != null && getBoxPos(itemstack) && !(pos[0] == boxPos[0] && pos[1] == boxPos[1] && pos[2] == boxPos[2]))
 				{
 					TileEntityStorageBox tile = (TileEntityStorageBox)worldObj.getTileEntity(boxPos[0], boxPos[1], boxPos[2]);
 
@@ -43,7 +45,6 @@ public class TileEntityExporter extends TileEntityTransportManager
 							if (MIMUtils.mergeItemStack(itemstack1, inventory, getSneak(topFace)))
 							{
 								MIMUtils.checkNullStack(tile, j);
-
 								break extract;
 							}
 						}
@@ -55,8 +56,9 @@ public class TileEntityExporter extends TileEntityTransportManager
 
 	private boolean getBoxPos(ItemStack itemstack)
 	{
-		int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, face);
-		TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
+		int[] pullPos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, face);
+		int[] putPos =  MIMUtils.getSidePos(xCoord, yCoord, zCoord, topFace);
+		TileEntity tile = worldObj.getTileEntity(pullPos[0],pullPos[1], pullPos[2]);
 
 		if (tile != null && tile instanceof TileEntityStorageBox)
 		{
@@ -66,14 +68,14 @@ public class TileEntityExporter extends TileEntityTransportManager
 			{
 				if (MIMUtils.compareStacksWithDamage(itemstack, list.getItem(i)))
 				{
-					pos = list.getBoxPos(i);
-					TileEntityStorageBox storageBox = (TileEntityStorageBox)worldObj.getTileEntity(pos[0], pos[1], pos[2]);
+					pullPos = list.getBoxPos(i);
+					TileEntityStorageBox storageBox = (TileEntityStorageBox)worldObj.getTileEntity(pullPos[0], pullPos[1], pullPos[2]);
 
-					if (storageBox.getContentItemCount() > 0)
+					if (!Arrays.equals(pullPos , putPos) && storageBox != null && storageBox.getContentItemCount() > 0)
 					{
-						boxPos[0] = pos[0];
-						boxPos[1] = pos[1];
-						boxPos[2] = pos[2];
+						boxPos[0] = pullPos[0];
+						boxPos[1] = pullPos[1];
+						boxPos[2] = pullPos[2];
 
 						return true;
 					}
