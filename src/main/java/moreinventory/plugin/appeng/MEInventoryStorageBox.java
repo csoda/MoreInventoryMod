@@ -42,7 +42,14 @@ public class MEInventoryStorageBox implements IMEInventory<IAEItemStack>
         int maxStacksCount = storage.getUsableInventorySize();
         int maxOneStackSize = template.getMaxStackSize();
 
-        int remainingFreeCount = (maxStacksCount * maxOneStackSize) - storedCount;
+        int maxStorableCount;
+        if(storage.getTypeName().equals("Ender")){
+            maxStorableCount = Integer.MAX_VALUE;
+        }else{
+            maxStorableCount = maxStacksCount * maxOneStackSize;
+        }
+
+        int remainingFreeCount = maxStorableCount - storedCount;
 
         if(remainingFreeCount <= 0)
             return input;
