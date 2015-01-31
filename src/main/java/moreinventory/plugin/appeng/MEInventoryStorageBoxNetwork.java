@@ -151,6 +151,8 @@ public class MEInventoryStorageBoxNetwork implements IMEInventory<IAEItemStack> 
 
         MIMItemBoxList list = storage.getStorageBoxNetworkManager().getBoxList();
 
+        if(list == null) return null;
+
         for (int i = 0; i < list.getListSize(); i++)
         {
             if(MIMUtils.compareStacksWithDamage(itemstack, list.getItem(i)) && ItemStack.areItemStackTagsEqual(itemstack, list.getItem(i))){
@@ -170,6 +172,8 @@ public class MEInventoryStorageBoxNetwork implements IMEInventory<IAEItemStack> 
     {
 
         MIMItemBoxList list = storage.getStorageBoxNetworkManager().getBoxList();
+
+        if(list == null) return out;
 
         for (int i = list.getListSize(); 0 < i--;)
         {
