@@ -262,12 +262,14 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 			sendPacket();
 
             MIMBoxList list = this.getStorageBoxNetworkManager().getListFromID("Teleporter");
-            for(int idx = list.getListSize();0<idx--;){
-                TileEntity tile = list.getTileBeyondDim(idx);
-                if(tile == null) continue;
-                if(!(tile instanceof IStorageBoxNet)) continue;
+            if(list != null){
+                for(int idx = list.getListSize();0<idx--;){
+                    TileEntity tile = list.getTileBeyondDim(idx);
+                    if(tile == null) continue;
+                    if(!(tile instanceof IStorageBoxNet)) continue;
 
-                ((TileEntityTeleporter) tile).setNetworkChanged();
+                    ((TileEntityTeleporter) tile).setNetworkChanged();
+                }
             }
 		}
 
