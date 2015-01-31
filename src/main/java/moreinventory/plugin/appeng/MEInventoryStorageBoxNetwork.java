@@ -37,16 +37,8 @@ public class MEInventoryStorageBoxNetwork implements IMEInventory<IAEItemStack> 
         if (input.getStackSize() == 0L)
             return null;
 
-        ChunkPosition pos = getBoxPos(input.getItemStack());
-
-        if(pos == null) return input;
-
-        TileEntity tile = this.storage.getWorldObj().getTileEntity(pos.chunkPosX,pos.chunkPosY,pos.chunkPosZ);
-
-        if(tile == null) return null;
-        if(!(tile instanceof TileEntityStorageBox)) return null;
-
-        TileEntityStorageBox storage = (TileEntityStorageBox)tile;
+        TileEntityStorageBox storage = getStorageBox(input.getItemStack());
+        if(storage == null) return null;
 
         ItemStack template = storage.getContents();
         if(template == null)
@@ -106,16 +98,9 @@ public class MEInventoryStorageBoxNetwork implements IMEInventory<IAEItemStack> 
         if(request == null) return null;
 
         ItemStack requestStack = request.getItemStack();
-        ChunkPosition pos = getBoxPos(requestStack);
 
-        if(pos == null) return null;
-
-        TileEntity tile = this.storage.getWorldObj().getTileEntity(pos.chunkPosX,pos.chunkPosY,pos.chunkPosZ);
-
-        if(tile == null) return null;
-        if(!(tile instanceof TileEntityStorageBox)) return null;
-
-        TileEntityStorageBox storage = (TileEntityStorageBox)tile;
+        TileEntityStorageBox storage = getStorageBox(requestStack);
+        if(storage == null) return null;
 
         int firstSlotIdx = storage.getFirstItemIndex();
         if(firstSlotIdx < 0)
@@ -153,25 +138,19 @@ public class MEInventoryStorageBoxNetwork implements IMEInventory<IAEItemStack> 
         return result;
     }
 
-    private ChunkPosition getBoxPos(ItemStack itemstack)
+    private TileEntityStorageBox getStorageBox(ItemStack itemstack)
     {
-        int[] pullPos;
 
         MIMItemBoxList list = storage.getStorageBoxNetworkManager().getBoxList();
 
         for (int i = 0; i < list.getListSize(); i++)
         {
             if(MIMUtils.compareStacksWithDamage(itemstack, list.getItem(i)) && ItemStack.areItemStackTagsEqual(itemstack, list.getItem(i))){
-                pullPos = list.getBoxPos(i);
-                TileEntity tile =storage.getWorldObj().getTileEntity(pullPos[0], pullPos[1], pullPos[2]);
+                TileEntity tile = list.getTileBeyondDim(i);
                 if(tile == null) continue;
                 if(!(tile instanceof TileEntityStorageBox)) continue;
-                TileEntityStorageBox storageBox = (TileEntityStorageBox)tile;
 
-                if (storageBox != null)
-                {
-                    return new ChunkPosition(pullPos[0], pullPos[1], pullPos[2]);
-                }
+                return (TileEntityStorageBox)tile;
             }
         }
 
