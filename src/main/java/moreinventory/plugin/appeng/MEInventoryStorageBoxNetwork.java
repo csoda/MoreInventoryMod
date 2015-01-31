@@ -8,6 +8,7 @@ import appeng.api.storage.StorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.storage.data.IItemList;
 import moreinventory.tileentity.storagebox.TileEntityStorageBox;
+import moreinventory.tileentity.storagebox.addon.TileEntitySBAddonBase;
 import moreinventory.util.MIMItemBoxList;
 import moreinventory.util.MIMUtils;
 import net.minecraft.item.ItemStack;
@@ -20,9 +21,9 @@ import java.util.Arrays;
  * Created by Furia on 15/01/30.
  */
 public class MEInventoryStorageBoxNetwork implements IMEInventory<IAEItemStack> {
-    protected final TileEntityStorageBox storage;
+    protected final TileEntitySBAddonBase storage;
 
-    public MEInventoryStorageBoxNetwork(TileEntityStorageBox tile)
+    public MEInventoryStorageBoxNetwork(TileEntitySBAddonBase tile)
     {
         this.storage = tile;
     }

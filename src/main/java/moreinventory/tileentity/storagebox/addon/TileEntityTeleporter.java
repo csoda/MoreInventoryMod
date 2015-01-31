@@ -68,4 +68,19 @@ public class TileEntityTeleporter extends TileEntitySBAddonBase
 			}
 		}
 	}
+
+    private boolean hasNetworkChanged = false;
+    public void setNetworkChanged() {
+        hasNetworkChanged = true;
+    }
+
+    @Override
+    public void updateEntity() {
+        if(hasNetworkChanged){
+            hasNetworkChanged = false;
+
+            markDirty();
+        }
+        super.updateEntity();
+    }
 }
