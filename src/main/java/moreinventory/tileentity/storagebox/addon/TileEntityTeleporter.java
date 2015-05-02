@@ -28,12 +28,18 @@ public class TileEntityTeleporter extends TileEntitySBAddonBase
 		return "Teleporter";
 	}
 
+    private long lastUpdateConnnecting = -1;
 	@Override
 	public void setStorageBoxNetworkManager(StorageBoxNetworkManager manager)
 	{
 		super.setStorageBoxNetworkManager(manager);
 
-		teleportConnect();
+        long totalWoldTime = worldObj.getTotalWorldTime();
+        if(lastUpdateConnnecting != totalWoldTime){
+            lastUpdateConnnecting = totalWoldTime;
+
+            teleportConnect();
+        }
 	}
 
 	public void updateConnect()
@@ -68,4 +74,19 @@ public class TileEntityTeleporter extends TileEntitySBAddonBase
 			}
 		}
 	}
+
+    private boolean hasNetworkChanged = false;
+    public void setNetworkChanged() {
+        hasNetworkChanged = true;
+    }
+
+    @Override
+    public void updateEntity() {
+        if(hasNetworkChanged){
+            hasNetworkChanged = false;
+
+            markDirty();
+        }
+        super.updateEntity();
+    }
 }

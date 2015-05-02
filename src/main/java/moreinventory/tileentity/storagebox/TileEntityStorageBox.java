@@ -8,6 +8,8 @@ import moreinventory.network.StorageBoxButtonMessage;
 import moreinventory.network.StorageBoxConfigMessage;
 import moreinventory.network.StorageBoxContentsMessage;
 import moreinventory.network.StorageBoxMessage;
+import moreinventory.tileentity.storagebox.addon.TileEntityTeleporter;
+import moreinventory.util.MIMBoxList;
 import moreinventory.util.MIMUtils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -258,6 +260,17 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 		if (!worldObj.isRemote)
 		{
 			sendPacket();
+
+            MIMBoxList list = this.getStorageBoxNetworkManager().getListFromID("Teleporter");
+            if(list != null){
+                for(int idx = list.getListSize();0<idx--;){
+                    TileEntity tile = list.getTileBeyondDim(idx);
+                    if(tile == null) continue;
+                    if(!(tile instanceof IStorageBoxNet)) continue;
+
+                    ((TileEntityTeleporter) tile).setNetworkChanged();
+                }
+            }
 		}
 
 		super.markDirty();
