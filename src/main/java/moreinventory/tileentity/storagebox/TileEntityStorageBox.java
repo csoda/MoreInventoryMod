@@ -279,8 +279,8 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return itemstack != null && !isFull() &&((slot != getSizeInventory() && (getContents() == null || isSameAsContents(itemstack))) ||
-			(slot == getSizeInventory() && canInsert && getStorageBoxNetworkManager().canLinkedImport(itemstack, this)));
+		return itemstack != null && !isFull() &&((slot != getUsableInventorySize() && (getContents() == null || isSameAsContents(itemstack))) ||
+			(slot == getUsableInventorySize() && canInsert && getStorageBoxNetworkManager().canLinkedImport(itemstack, this)));
 	}
 
 	public boolean registerItems(ItemStack itemstack)
