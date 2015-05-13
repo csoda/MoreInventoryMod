@@ -18,6 +18,7 @@ public class ContainerTeleporter extends ContainerSBAddonBase
 	@Override
 	public ItemStack slotClick(int index, int button, int modifiers, EntityPlayer player)
 	{
+
 		if (index == 0)
 		{
 			SlotConfig slot = (SlotConfig)inventorySlots.get(index);
@@ -31,7 +32,10 @@ public class ContainerTeleporter extends ContainerSBAddonBase
 				slot.removeItem();
 			}
 
-			((TileEntityTeleporter)addonBase).updateConnect();
+			if (!player.worldObj.isRemote)
+			{
+				((TileEntityTeleporter)addonBase).updateConnect();
+			}
 		}
 		else return super.slotClick(index, button, modifiers, player);
 

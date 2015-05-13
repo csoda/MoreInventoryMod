@@ -136,7 +136,8 @@ public class StorageBoxNetworkManager
 			else
 			{
 				int[] pos = list.getBoxPos(0);
-				StorageBoxNetworkManager manager = new StorageBoxNetworkManager(DimensionManager.getWorld(list.getDimensionID(0)), pos[0], pos[1], pos[2], ownerID);
+				StorageBoxNetworkManager manager = new StorageBoxNetworkManager(
+						DimensionManager.getWorld(list.getDimensionID(0)), pos[0], pos[1], pos[2], ownerID);
 				list = list.getDifference(manager.getKnownList());
 			}
 

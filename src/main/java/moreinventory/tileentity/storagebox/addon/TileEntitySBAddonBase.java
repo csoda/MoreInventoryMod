@@ -264,7 +264,7 @@ public abstract class TileEntitySBAddonBase extends TileEntity implements IInven
 
 	public void handleConfigPacketServer(byte channel, String owner)
 	{
-		if (!isPrivate() || ownerID.equals(owner) || ownerID.equals(MoreInventoryMod.defaultOwnerID))
+		if (ownerID.equals(owner) || ownerID.equals(MoreInventoryMod.defaultOwnerID))
 		{
 			if (channel == 0)
 			{

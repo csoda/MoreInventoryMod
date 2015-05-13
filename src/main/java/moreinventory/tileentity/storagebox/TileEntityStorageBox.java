@@ -279,7 +279,7 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack itemstack)
 	{
-		return itemstack != null && !isFull() &&((slot != getUsableInventorySize() && (getContents() == null || isSameAsContents(itemstack))) ||
+		return itemstack != null  &&((slot != getUsableInventorySize() && !isFull() && (getContents() == null || isSameAsContents(itemstack))) ||
 			(slot == getUsableInventorySize() && canInsert && getStorageBoxNetworkManager().canLinkedImport(itemstack, this)));
 	}
 
@@ -551,24 +551,28 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 
 		updateTileFromType();
 
-		for (int i = 0; i < 6; ++i)
+		if (entity != null && !entity.worldObj.isRemote)
 		{
-			int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, Facing.oppositeSide[i]);
-			TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
-
-			if (tile != null && tile instanceof IStorageBoxNet)
+			for (int i = 0; i < 6; ++i)
 			{
-				StorageBoxNetworkManager manager = ((IStorageBoxNet)tile).getStorageBoxNetworkManager();
-				manager.addNetwork(worldObj, xCoord, yCoord, zCoord);
-				manager.getBoxList().registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
+				int[] pos = MIMUtils.getSidePos(xCoord, yCoord, zCoord, Facing.oppositeSide[i]);
+				TileEntity tile = worldObj.getTileEntity(pos[0], pos[1], pos[2]);
 
-				return;
+				if (tile != null && tile instanceof IStorageBoxNet)
+				{
+					StorageBoxNetworkManager manager = ((IStorageBoxNet)tile).getStorageBoxNetworkManager();
+					manager.addNetwork(worldObj, xCoord, yCoord, zCoord);
+					manager.getBoxList().registerItem(xCoord, yCoord, zCoord, worldObj.provider.dimensionId, getContents());
+
+					return;
+				}
 			}
-		}
 
-		if (storageBoxManager == null)
-		{
-			makeNewBoxList();
+			if (storageBoxManager == null)
+			{
+				makeNewBoxList();
+			}
+
 		}
 
 		markDirty();
