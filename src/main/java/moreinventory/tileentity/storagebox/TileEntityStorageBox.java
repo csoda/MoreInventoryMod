@@ -502,13 +502,39 @@ public class TileEntityStorageBox extends TileEntity implements IInventory, ISto
 	{
 		if (getContents() != null)
 		{
-			if (player.isSneaking())
+			boolean hasSpaceForContent = false;
+			int i=0;
+			int spaceLeft=0;
+			
+			if (player.inventory.getFirstEmptyStack() != -1)
 			{
-				player.inventory.addItemStackToInventory(loadItemStack(1));
+				hasSpaceForContent = true;
 			}
-			else if (player.inventory.getFirstEmptyStack() != -1)
+			else
 			{
-				player.inventory.addItemStackToInventory(loadItemStack(0));
+				for (;i<player.inventory.mainInventory.length;i++)
+				{
+					if (player.inventory.getStackInSlot(i).getItem() == getContents().getItem()&&
+							player.inventory.getStackInSlot(i).getItemDamage() == getContents().getItemDamage())
+					{
+						if (player.inventory.getStackInSlot(i).stackSize < player.inventory.getStackInSlot(i).getMaxStackSize())
+						{
+							hasSpaceForContent = true;
+							spaceLeft = player.inventory.getStackInSlot(i).getMaxStackSize() - player.inventory.getStackInSlot(i).stackSize;
+						}
+					}
+				}
+			}
+			if (hasSpaceForContent)
+			{
+				if (player.isSneaking())
+				{
+					player.inventory.addItemStackToInventory(loadItemStack(1));
+				}
+				else
+				{
+					player.inventory.addItemStackToInventory(loadItemStack(spaceLeft));
+				}
 			}
 		}
 	}
